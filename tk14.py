@@ -9,8 +9,7 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
     if modulus is None:
         modulus = e
     beta = d_len / modulus.nbits()
-    delta = (d_len - d_high) / modulus.nbits()
-    gamma = max(delta, beta - 1 / 2)
+    gamma = Integer(X).nbits() / modulus.nbits()
     k0 = e * d_high // N
     x, y = ZZ['x, y'].gens()
     f = 1 + (k0 + x) * (A + y)
@@ -31,7 +30,9 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
     for i in range(h):
         for j in range(w):
             L[i, j] = shifts[i].monomial_coefficient(monomials[j])
+    print((L * L.T).det().nbits() / (2 * h) -  m * e.nbits())
     start = time()
+    print(h, w)
     L = L.LLL(delta=0.75)
     pols = []
     for i in range(h):

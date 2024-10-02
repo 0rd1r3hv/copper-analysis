@@ -1,5 +1,6 @@
 from sage.all import *
 from time import time
+MAX_FAILS = 10
 
 def groebner(pols, var, bound):
     start = time()
@@ -9,7 +10,7 @@ def groebner(pols, var, bound):
     fails = 0
     crt_rem = []
     crt_mod = []
-    while m < bound and fails < 10:
+    while m < bound and fails < MAX_FAILS:
         p = p.next_prime()
         for i in range(len(pols), 0, -1):
             R = R.change_ring(GF(p))
@@ -25,7 +26,7 @@ def groebner(pols, var, bound):
                     break
         else:
             fails += 1
-    if fails < 10:
+    if fails < MAX_FAILS:
         print(time() - start)
         return crt(crt_rem, crt_mod)
 

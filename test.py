@@ -42,11 +42,11 @@ q = get_prime(lp)
 p_q = -(p + q)
 N = p * q
 phi = (p - 1) * (q - 1)
-delta = 0.35
-leak_prop = 0.39
-ld = floor(N.nbits() * delta)
+beta = 0.35
+leak_prop = 0.5
+ld = floor(N.nbits() * beta)
 d, e = get_pair(ld, phi)
 d_high = get_leak(d, 'high', proportion=leak_prop)
-sol = high_leak(N, e, d_high, ld, N + 1, 1 << ceil(ld * (1 - leak_prop)), 1 << (N.nbits() // 2 + 1), 9)
+sol = high_leak(N, e, d_high, ld, N + 1, 1 << ceil(ld * (1 - leak_prop)), 1 << (N.nbits() // 2), 3)
 if sol:
     print(sol == d)
