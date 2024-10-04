@@ -25,15 +25,15 @@ def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
         bits = ceil(num.nbits() * proportion)
     else:
         bits = length
-    if pos == 'high':
+    if pos == "high":
         bits = num.nbits() - bits
     if rand_mod == False:
-        mod = 2 ** bits
+        mod = 2**bits
     else:
         mod = get_rand(bits)
-    if pos == 'high':
+    if pos == "high":
         return (num // mod) * mod
-    elif pos == 'low':
+    elif pos == "low":
         return num % mod
 
 
@@ -48,8 +48,17 @@ def tk14_test():
     leak_prop = 0.45
     ld = floor(N.nbits() * beta)
     d, e = get_pair(ld, phi)
-    d_high = get_leak(d, 'high', proportion=leak_prop)
-    sol = high_leak(N, e, d_high, ld, N + 1, 1 << ceil(ld * (1 - leak_prop)), 1 << (N.nbits() // 2), 8)
+    d_high = get_leak(d, "high", proportion=leak_prop)
+    sol = high_leak(
+        N,
+        e,
+        d_high,
+        ld,
+        N + 1,
+        1 << ceil(ld * (1 - leak_prop)),
+        1 << (N.nbits() // 2),
+        8,
+    )
     if sol:
         print(sol == d)
 
@@ -68,7 +77,7 @@ def tk17_test():
             e = inverse_mod(dq, q - 1) + get_rand(lp) * (q - 1)
             if gcd(e, phi) == 1 and e.nbits() == phi.nbits():
                 break
-    print(small_dq(N, e, 7, lp / ln, ldq / ln) == p)
+    assert small_dq(N, e, 7, lp / ln, ldq / ln) == p
 
 
 tk17_test()
