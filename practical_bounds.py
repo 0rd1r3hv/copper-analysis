@@ -35,13 +35,13 @@ def tk14_high(beta, gamma):
             return m
 
 
-def tk17_small_dq(alpha, beta, delta):
+def tk17_large_e(alpha, beta, delta):
     tp = (1 - 2 * beta - delta) / (2 * beta)
     tq = (1 - beta - delta) / (1 - beta)
     for m in range(1, MAX_M + 1):
         n = s_X = s_Yp = s_Yq = s_e = 0
         for i in range(m + 1):
-            for j in range(0, m - i + 1):
+            for j in range(m - i + 1):
                 n += 1
                 s_X += i + j
                 s_Yp += i
@@ -76,8 +76,45 @@ def tk17_small_dq(alpha, beta, delta):
             )
             print(s_X, s_Yp, s_Yq, s_e, n, m)
             print(alpha + beta + delta - 1, beta, 1 - beta, alpha)
-            return m, i, j
+            return m
 
 
-tk17_small_dq(1, 0.405, 0.05)
+def tk17_small_e(alpha, beta, delta):
+    l = (1 - beta - delta) / beta
+    t = (1 - beta - delta) / (1 - beta)
+    for m in range(1, MAX_M + 1):
+        n = s_X = s_Yp = s_Yq = s_e = 0
+        for i in range(m + 1):
+            for j in range(m - i + 1):
+                n += 1
+                s_X += i + j
+                s_Yp += ceil(l * i)
+                s_Yq += floor((1 - l) * i)
+                s_e += m - i
+        for i in range(1, m + 1):
+            for j in range(1, ceil(t * i) - floor((1 - l) * i) + 1):
+                n += 1
+                s_X += i
+                s_Yq += floor((1 - l) * i) + j
+                s_e += m - i
+        if (
+            s_X * (alpha + beta + delta - 1)
+            + s_Yp * beta
+            + s_Yq * (1 - beta)
+            + s_e * alpha
+            < n * m * alpha
+        ):
+            print(
+                (
+                    s_X * (alpha + beta + delta - 1)
+                    + s_Yp * beta
+                    + s_Yq * (1 - beta)
+                    + s_e * alpha
+                    - n * m * alpha
+                )
+                / n
+            )
+            print(s_X, s_Yp, s_Yq, s_e, n, m)
+            print(alpha + beta + delta - 1, beta, 1 - beta, alpha)
+            return m
 

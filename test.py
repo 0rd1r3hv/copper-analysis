@@ -1,6 +1,7 @@
 from sage.all import *
 from tk14 import *
 from tk17 import *
+from practical_bounds import *
 
 
 def get_prime(length, proof=True):
@@ -63,10 +64,14 @@ def tk14_test():
         print(sol == d)
 
 
-def tk17_test():
-    lp = 405
-    ln = 1000
-    ldq = 50
+def tk17_large_e_test():
+    ln = 2000
+    alpha = 1
+    beta = 0.405
+    delta = 0.07
+    le = ceil(alpha * ln)
+    lp = ceil(beta * ln)
+    ldq = ceil(delta * ln)
     p = get_prime(lp)
     q = get_prime(ln - lp)
     N = p * q
@@ -77,7 +82,29 @@ def tk17_test():
             e = inverse_mod(dq, q - 1) + get_rand(lp) * (q - 1)
             if gcd(e, phi) == 1 and e.nbits() == phi.nbits():
                 break
-    assert small_dq(N, e, 7, lp / ln, ldq / ln) == p
+    assert large_e(N, e, tk17_large_e(alpha, beta, delta), lp / ln, ldq / ln) == p
 
 
-tk17_test()
+def tk17_small_e_test():
+    ln = 2000
+    alpha = 0.6
+    beta = 0.5
+    delta = 0.065
+    le = ceil(alpha * ln)
+    lp = ceil(beta * ln)
+    ldq = ceil(delta * ln)
+    p = get_prime(lp)
+    q = get_prime(ln - lp)
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    while True:
+        dq = get_rand(ldq)
+        if gcd(dq, q - 1) == 1:
+            e = inverse_mod(dq, q - 1) + get_rand(le - (ln - lp)) * (q - 1)
+            if gcd(e, phi) == 1:
+                break
+    assert small_e(N, e, tk17_small_e(alpha, beta, delta), lp / ln, ldq / ln, (e * dq - 1) // (q - 1) - 1, (e * dq - 1) // (q - 1), p, q) == p
+
+
+tk17_large_e_test()
+tk17_small_e_test()
