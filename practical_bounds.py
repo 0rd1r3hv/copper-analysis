@@ -1,8 +1,11 @@
 from sage.all import *
-MAX_M= 1000
+
+MAX_M = 1000
+
 
 def l_MSBs(x, km, t):
     return max(0, ceil((x - km) / (t + 1)))
+
 
 def tk14_high(beta, gamma):
     k = 2 * (beta - gamma)
@@ -26,8 +29,8 @@ def tk14_high(beta, gamma):
                 s_e += m - u
                 n += 1
         print(s_X, s_Y, s_Z, s_e)
-        if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) +  s_e < n * m:
-            print(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) +  s_e - n * m)
+        if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
+            print(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m)
             print(n)
             return m
 
@@ -54,11 +57,27 @@ def tk17_small_dq(alpha, beta, delta):
                 s_X += i
                 s_Yq += j
                 s_e += m - i
-        if s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) +  s_e * alpha < n * m * alpha:
-            print((s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) +  s_e * alpha - n * m * alpha) / n)
+        if (
+            s_X * (alpha + beta + delta - 1)
+            + s_Yp * beta
+            + s_Yq * (1 - beta)
+            + s_e * alpha
+            < n * m * alpha
+        ):
+            print(
+                (
+                    s_X * (alpha + beta + delta - 1)
+                    + s_Yp * beta
+                    + s_Yq * (1 - beta)
+                    + s_e * alpha
+                    - n * m * alpha
+                )
+                / n
+            )
             print(s_X, s_Yp, s_Yq, s_e, n, m)
             print(alpha + beta + delta - 1, beta, 1 - beta, alpha)
             return m, i, j
 
 
 tk17_small_dq(1, 0.405, 0.05)
+
