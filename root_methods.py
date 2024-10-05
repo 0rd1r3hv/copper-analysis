@@ -47,4 +47,4 @@ def newton(sys, boundslst, it=20):
             v0 -= jacob.subs(v0).solve_right(fv0)
             for j in range(l):
                 v0[j] = round(v0[j])
-        print('Failed')
+        print("Failed")

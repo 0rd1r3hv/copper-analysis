@@ -1,5 +1,5 @@
 from sage.all import *
-from root_methods import groebner
+from mp import groebner
 from time import time
 
 
@@ -17,7 +17,7 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
     beta = d_len / modulus.nbits()
     gamma = Integer(X).nbits() / modulus.nbits()
     k0 = e * d_high // N
-    x, y, z = ZZ['x, y, z'].gens()
+    x, y, z = ZZ["x, y, z"].gens()
     A = Integer(1)
     k0 = Integer(1)
     f = z + A * (k0 + x)
@@ -28,26 +28,26 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
     km = k * m
     Z = Y * (1 << k0.nbits())
     shifts = []
-    '''
+    """
     for u in range(m + 1):
         for i in range(u + 1):
             shifts.append((x ** (u - i) * f ** i)(X * x, Y * y) * modulus ** (m - i))
         for j in range(1, floor(2 * (beta - gamma) * m + (1 + 2 * gamma - 4 * beta) * u)):
             shifts.append((y ** j * f ** u)(X * x, Y * y) * modulus ** (m - u))
-    '''
+    """
     for u in range(m + 1):
         for i in range(u + 1):
-            orig = x ** (u - i) * f ** i
+            orig = x ** (u - i) * f**i
             deg = i - l_MSBs(i, km, t)
-            rem = orig % (z ** deg)
-            modified = (orig - rem) // (z ** deg) * (1 + (k0 + x) * y) ** deg + rem
+            rem = orig % (z**deg)
+            modified = (orig - rem) // (z**deg) * (1 + (k0 + x) * y) ** deg + rem
             print(u, i, modified)
             shifts.append(modified(X * x, Y * y, Z * z) * modulus ** (m - i))
         for j in range(1, ceil(k * m + t * u) + 1):
-            orig = y ** j * f ** u
+            orig = y**j * f**u
             deg = u - l_MSBs(u + j, km, t)
-            rem = orig % (z ** deg)
-            modified = (orig - rem) // (z ** deg) * (1 + (k0 + x) * y) ** deg + rem
+            rem = orig % (z**deg)
+            modified = (orig - rem) // (z**deg) * (1 + (k0 + x) * y) ** deg + rem
             print(u, j, modified)
             shifts.append(modified(X * x, Y * y, Z * z) * modulus ** (m - u))
     monomials = set()
@@ -74,3 +74,4 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
     x0 = groebner(pols, x, X)
     if x0:
         return floor(((k0 + x0) * N) // e)
+

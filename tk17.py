@@ -1,7 +1,8 @@
-from sage.all import *
-from root_methods import groebner
+from sage.all import Matrix, ZZ, inverse_mod, Integer
+from math import ceil, floor
+from mp import groebner
 from time import time
-from fplll_fmt import *
+from fplll_fmt import encode_fplll_format, read_fplll_format
 import subprocess
 # Small CRT-Exponent RSA Revisited
 
@@ -96,11 +97,15 @@ def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
     for i in range(m + 1):
         for j in range(m - i + 1):
             if i == 0 or ceil(l * i) - ceil(l * (i - 1)) == 1:
-                monomials.append(xp**(i + j) * yp**ceil(l * i))
+                monomials.append(xp ** (i + j) * yp ** ceil(l * i))
             else:
-                monomials.append(xq**(i + j) * yq**floor((1 - l) * i))
+                monomials.append(xq ** (i + j) * yq ** floor((1 - l) * i))
             if i != 0:
-                orig = Q(xp ** j * (N * xq - xp * yp) ** ceil(l * i) * (xq * yq - xp) ** floor((1 - l) * i)).lift()
+                orig = Q(
+                    xp**j
+                    * (N * xq - xp * yp) ** ceil(l * i)
+                    * (xq * yq - xp) ** floor((1 - l) * i)
+                ).lift()
                 pt1 = orig.subs(yq=0)
                 pt2 = orig - pt1
                 trans = pt1.subs(xq=xp + 1) + pt2.subs(xp=xq - 1)
@@ -111,22 +116,26 @@ def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
                     * e ** (m - i)
                 )
             else:
-                shifts.append((X * xp) ** j * e ** m)
-            assert Integer(shifts[-1](x1 / X, x2 / X, y1 / Yp, y2 / Yq)) % (e ** m) == 0
+                shifts.append((X * xp) ** j * e**m)
+            assert Integer(shifts[-1](x1 / X, x2 / X, y1 / Yp, y2 / Yq)) % (e**m) == 0
     for i in range(1, m + 1):
         for j in range(1, ceil(t * i) - floor((1 - l) * i) + 1):
-            orig = Q(yq ** j * (N * xq - xp * yp) ** ceil(l * i) * (xq * yq - xp) ** floor((1 - l) * i)).lift()
+            orig = Q(
+                yq**j
+                * (N * xq - xp * yp) ** ceil(l * i)
+                * (xq * yq - xp) ** floor((1 - l) * i)
+            ).lift()
             pt1 = orig.subs(yq=0)
             pt2 = orig - pt1
             trans = pt1.subs(xq=xp + 1) + pt2.subs(xp=xq - 1)
-            monomials.append(xq**i * yq**(floor((1 - l) * i + j)))
+            monomials.append(xq**i * yq ** (floor((1 - l) * i + j)))
             times = trans.monomial_coefficient(monomials[-1]).valuation(N)
             inv = inverse_mod(N**times, e**i)
             shifts.append(
                 ((trans * inv) % (e**i))(X * xp, X * xq, Yp * yp, Yq * yq)
                 * e ** (m - i)
             )
-            assert Integer(shifts[-1](x1 / X, x2 / X, y1 / Yp, y2 / Yq)) % (e ** m) == 0
+            assert Integer(shifts[-1](x1 / X, x2 / X, y1 / Yp, y2 / Yq)) % (e**m) == 0
     n = len(shifts)
     print(n)
     scales = [mono(X, X, Yp, Yq) for mono in monomials]
@@ -135,8 +144,8 @@ def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
         for j in range(i + 1):
             L[i, j] = shifts[i].monomial_coefficient(monomials[j])
     start = time()
-    L = L.LLL(delta=0.75)
-    '''
+    # L = L.LLL(delta=0.75)
+
     s = encode_fplll_format(L)
     file_name = "output.txt"
 
@@ -155,7 +164,7 @@ def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
     except subprocess.CalledProcessError as e:
         print(e)
         return
-    '''
+
     k, p, q = ZZ["k, p, q"].gens()
     pols = [N - p * q]
     # pols = [N - yp * yq, xq - xp - 1]
