@@ -2,13 +2,15 @@ from sage.all import *
 from time import time
 
 
-def groebner(pols, var, bound, max_fails=10):
+def groebner(pols, var, bound, max_fails=10, N=None):
     start = time()
     R = pols[0].parent()
     num = R.ngens()
     p = Integer(1 << 27)
     m = 1
     fails = 0
+    test_sol = []
+    test_prime = 0
     crt_rem = []
     crt_mod = []
     while m < bound and fails < max_fails:
@@ -20,8 +22,14 @@ def groebner(pols, var, bound, max_fails=10):
                 sols = I.variety()
                 sol_var = set()
                 sol_var.update([sol[var] for sol in sols])
-                if len(sol_var) == 1:
-                    crt_rem.append(Integer(sols[0][var]))
+                sol_var = list(Integer(e) for e in sol_var)
+                if N != 0 and len(sol_var) == 2:
+                    crt_rem.append(sol_var[:])
+                    crt_mod.append(p)
+                    m *= p
+                    break
+                elif len(sol_var) == 1:
+                    crt_rem.append(sol_var[0])
                     crt_mod.append(p)
                     m *= p
                     break
@@ -29,7 +37,23 @@ def groebner(pols, var, bound, max_fails=10):
             fails += 1
     print(time() - start)
     if fails < max_fails:
-        return crt(crt_rem, crt_mod)
+        if N != 0:
+            def recursive(res, m, d):
+                if d == len(crt_rem)
+                    if N % res == 0:
+                        return res
+                    return None
+                ret1 = recursive(crt([res, crt_rem[d][0]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                if ret1:
+                    return ret1
+                ret2 = recursive(crt([res, crt_rem[d][1]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                if ret2:
+                    return ret2
+
+
+            return recursive(crt_rem[0][0], crt_mod[0], 1)
+        else:
+            return crt(crt_rem, crt_mod)
 
 
 def newton(sys, boundslst, it=20):

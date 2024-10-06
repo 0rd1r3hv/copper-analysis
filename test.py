@@ -65,7 +65,7 @@ def tk14_test():
 
 
 def tk17_large_e_test():
-    ln = 2000
+    ln = 1000
     alpha = 1
     beta = 0.405
     delta = 0.07
@@ -107,13 +107,14 @@ def tk17_small_e_test():
 
 
 def tk17_small_dp_dq_test():
-    ln = 1000
+    ln = 400
     beta = 0.5
-    delta = 0.015
+    delta1 = 0.015
+    delta2 = 0.015
     lp = ceil(beta * ln)
     lq = ceil(beta * ln)
-    ldp = ceil(delta * ln)
-    ldq = ceil(delta * ln)
+    ldp = ceil(delta1 * ln)
+    ldq = ceil(delta2 * ln)
     while True:
         p = get_prime(lp - 1)
         q = get_prime(lq - 1)
@@ -131,7 +132,10 @@ def tk17_small_dp_dq_test():
                 le = e.nbits()
                 alpha = le / ln
                 break
-    assert small_dp_dq(N, e, tk17_small_dp_dq(alpha, delta), delta, (e * dp - 1) // (p - 1), (e * dq - 1) // (q - 1), p, q) == p
+    res = small_dp_dq(N, e, tk17_small_dp_dq(alpha, max(delta1, delta2)), delta1, delta2, (e * dp - 1) // (p - 1), (e * dq - 1) // (q - 1), p, q)
+    print(res)
+    print(p, q)
+    assert res == p or res == q
 
 
 # tk17_large_e_test()

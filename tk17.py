@@ -1,6 +1,6 @@
-from sage.all import Matrix, ZZ, inverse_mod, Integer
-from math import ceil, floor
-from mp import groebner
+from sage.all import Matrix, ZZ, inverse_mod, Integer, gcd, ceil, floor
+# from mp import groebner
+from root_methods import groebner
 from time import time
 from fplll_fmt import encode_fplll_format, read_fplll_format
 import subprocess
@@ -178,16 +178,16 @@ def small_e(N, e, m, beta, delta):
 
 
 # Small dp and dq
-def small_dp_dq(N, e, m, delta, k1, k2, n1, n2):
+def small_dp_dq(N, e, m, delta1, delta2):
+    delta = max(delta1, delta2)
     PR = ZZ["xp1, xq1, xp2, xq2, yp, yq"]
     print(m)
-    xp1, xq1, xp2, xq2, yp, yq = PR.gens()
+    xp1, xq1, xp2, xq2, yp, yq= PR.gens()
     Q = PR.quotient(N - yp * yq)
     t = 1 - 2 * delta
-    X = 1 << (e.nbits() + floor(N.nbits() * (delta - 1 / 2)))
-    X += 1
+    Xp = 1 << (e.nbits() + floor(N.nbits() * (delta1 - 1 / 2)))
+    Xq = 1 << (e.nbits() + floor(N.nbits() * (delta2 - 1 / 2)))
     Y = 1 << (N.nbits() // 2)
-    Y += 3
     fp1 = N * xq1 - xp1 * yp
     fp2 = xp2 * yp - xq2
     h = N * xp2 * xq1 - xp1 * xq2
@@ -241,7 +241,8 @@ def small_dp_dq(N, e, m, delta, k1, k2, n1, n2):
                 pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2 + u))) % (e ** (i1 + i2 + u))
         else:
             pol = monomials[-1]
-        shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2 - u))
+        # shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Yp * yp, Yq * yq) * e ** (m - i1 - i2 - u))
+        shifts.append(pol(Xp * xp1, Xq * xq1, Xp * xp2, Xq * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2 - u))
     for i1, i2, j1 in indices_2:
         monomials.append(xp1 ** i1 * xp2 ** i2 * yp ** ((i1 + i2 + 1) // 2 + j1))
         if i1 + i2 != 0:
@@ -257,7 +258,8 @@ def small_dp_dq(N, e, m, delta, k1, k2, n1, n2):
                 pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2))) % (e ** (i1 + i2))
         else:
             pol = monomials[-1]
-        shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2))
+        # shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Yp * yp, Yq * yq) * e ** (m - i1 - i2))
+        shifts.append(pol(Xp * xp1, Xq * xq1, Xp * xp2, Xq * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2))
     for i1, i2, j2 in indices_3:
         monomials.append(xq1 ** i1 * xq2 ** i2 * yq ** ((i1 + i2) // 2 + j2))
         if i1 + i2 != 0:
@@ -273,13 +275,14 @@ def small_dp_dq(N, e, m, delta, k1, k2, n1, n2):
                 pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2))) % (e ** (i1 + i2))
         else:
             pol = monomials[-1]
-        shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2))
+        # shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Yp * yp, Yq * yq) * e ** (m - i1 - i2))
+        shifts.append(pol(Xp * xp1, Xq * xq1, Xp * xp2, Xq * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2))
     n = len(shifts)
     print(n)
-    scales = [mono(X, X, X, X, Y, Y) for mono in monomials]
+    # scales = [mono(X, X, X, X, Yp, Yq) for mono in monomials]
+    scales = [mono(Xp, Xq, Xp, Xq, Y, Y) for mono in monomials]
     L = Matrix(ZZ, n)
     for i in range(n):
-        pol = 0
         for j in range(i + 1):
             L[i, j] = shifts[i].monomial_coefficient(monomials[j])
     start = time()
@@ -313,6 +316,7 @@ def small_dp_dq(N, e, m, delta, k1, k2, n1, n2):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol)
     print(time() - start)
-    p0 = groebner(pols, yp, Y)
+    p0 = groebner(pols, yp, Y, N=N)
     # p0 = groebner(pols, p, Y)
     return p0
+
