@@ -118,3 +118,61 @@ def tk17_small_e(alpha, beta, delta):
             print(alpha + beta + delta - 1, beta, 1 - beta, alpha)
             return m
 
+
+def tk17_small_dp_dq(alpha, delta):
+    t = 1 - 2 * delta
+    for m in range(1, MAX_M + 1):
+        n = s_X = s_Y = s_e = 0
+        indices = []
+        for i1 in range(m // 2 + 1):
+            for i2 in range(m // 2 + 1):
+                for u in range(min(m // 2 - i1, m // 2 - i2) + 1):
+                    indices.append([i1, i2, 0, 0, u])
+        for i1 in range(m // 2):
+            for i2 in range(1, m // 2 + 1):
+                for u in range(min(m // 2 - i1 - 1, m // 2 - i2) + 1):
+                    indices.append([i1, i2, 1, 0, u])
+        for i1 in range(m // 2 + 1):
+            for j1 in range(1, m // 2 - i1 + 1):
+                for u in range(m // 2 - i1 - j1 + 1):
+                    indices.append([i1, 0, j1, 0, u])
+        for i2 in range(m // 2 + 1):
+            for j2 in range(1, m // 2 - i2 + 1):
+                for u in range(m // 2 - i2 - j2 + 1):
+                    indices.append([0, i2, 0, j2, u])
+        for i1, i2, j1, j2, u in indices:
+            n += 1
+            s_X += i1 + i2 + j1 + j2 + 2 * u
+            s_Y += (i1 + i2 + 1) // 2
+            s_e += m - (i1 + i2 + u)
+        for i1 in range(m // 2 + 1):
+            for i2 in range(m // 2 + 1):
+                for j1 in range(1, floor(t * (i1 + i2)) - (i1 + i2 + 1) // 2 + 1):
+                    n += 1
+                    s_X += i1 + i2
+                    s_Y += (i1 + i2 + 1) // 2 + j1
+                    s_e += m - (i1 + i2)
+        for i1 in range(m // 2 + 1):
+            for i2 in range(m // 2 + 1):
+                for j2 in range(1, floor(t * (i1 + i2)) - (i1 + i2) // 2 + 1):
+                    n += 1
+                    s_X += i1 + i2
+                    s_Y += (i1 + i2) // 2 + j2
+                    s_e += m - (i1 + i2)
+        if (
+            s_X * (alpha + delta - 1 / 2)
+            + s_Y / 2
+            + s_e * alpha
+            < n * m * alpha
+        ):
+            print(
+                (
+                    s_X * (alpha + delta - 1 / 2)
+                    + s_Y / 2
+                    + s_e * alpha
+                    - n * m * alpha
+                ) / n
+            )
+            print(s_X, s_Y, s_e, n, m)
+            print(alpha + delta - 1 / 2, 1 / 2, alpha)
+            return m

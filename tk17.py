@@ -83,7 +83,7 @@ def large_e(N, e, m, beta, delta):
     return p0
 
 
-def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
+def small_e(N, e, m, beta, delta):
     PR = ZZ["xp, xq, yp, yq"]
     xp, xq, yp, yq = PR.gens()
     Q = PR.quotient(N - yp * yq)
@@ -116,8 +116,7 @@ def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
                     * e ** (m - i)
                 )
             else:
-                shifts.append((X * xp) ** j * e**m)
-            assert Integer(shifts[-1](x1 / X, x2 / X, y1 / Yp, y2 / Yq)) % (e**m) == 0
+                shifts.append((X * xp) ** j * e ** m)
     for i in range(1, m + 1):
         for j in range(1, ceil(t * i) - floor((1 - l) * i) + 1):
             orig = Q(
@@ -135,7 +134,6 @@ def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
                 ((trans * inv) % (e**i))(X * xp, X * xq, Yp * yp, Yq * yq)
                 * e ** (m - i)
             )
-            assert Integer(shifts[-1](x1 / X, x2 / X, y1 / Yp, y2 / Yq)) % (e**m) == 0
     n = len(shifts)
     print(n)
     scales = [mono(X, X, Yp, Yq) for mono in monomials]
@@ -176,4 +174,145 @@ def small_e(N, e, m, beta, delta, x1, x2, y1, y2):
     print(time() - start)
     # p0 = groebner(pols, yp, Yp)
     p0 = groebner(pols, p, Yp)
+    return p0
+
+
+# Small dp and dq
+def small_dp_dq(N, e, m, delta, k1, k2, n1, n2):
+    PR = ZZ["xp1, xq1, xp2, xq2, yp, yq"]
+    print(m)
+    xp1, xq1, xp2, xq2, yp, yq = PR.gens()
+    Q = PR.quotient(N - yp * yq)
+    t = 1 - 2 * delta
+    X = 1 << (e.nbits() + floor(N.nbits() * (delta - 1 / 2)))
+    X += 1
+    Y = 1 << (N.nbits() // 2)
+    Y += 3
+    fp1 = N * xq1 - xp1 * yp
+    fp2 = xp2 * yp - xq2
+    h = N * xp2 * xq1 - xp1 * xq2
+    shifts = []
+    monomials = []
+    indices_1 = []
+    indices_2 = []
+    indices_3 = []
+    for i1 in range(m // 2 + 1):
+        for i2 in range(m // 2 + 1):
+            for u in range(min(m // 2 - i1, m // 2 - i2) + 1):
+                indices_1.append([i1, i2, 0, 0, u])
+    for i1 in range(m // 2):
+        for i2 in range(1, m // 2 + 1):
+            for u in range(min(m // 2 - i1 - 1, m // 2 - i2) + 1):
+                indices_1.append([i1, i2, 1, 0, u])
+    for i1 in range(m // 2 + 1):
+        for j1 in range(1, m // 2 - i1 + 1):
+            for u in range(m // 2 - i1 - j1 + 1):
+                indices_1.append([i1, 0, j1, 0, u])
+    for i2 in range(m // 2 + 1):
+        for j2 in range(1, m // 2 - i2 + 1):
+            for u in range(m // 2 - i2 - j2 + 1):
+                indices_1.append([0, i2, 0, j2, u])
+    indices_1 = sorted(indices_1, key=lambda e: (e[0] + e[1], e[4], e[2], e[3]))
+    for i1 in range(m // 2 + 1):
+        for i2 in range(m // 2 + 1):
+            for j1 in range(1, floor(t * (i1 + i2)) - (i1 + i2 + 1) // 2 + 1):
+                indices_2.append([i1, i2, j1])
+    indices_2 = sorted(indices_2, key=lambda e: (e[0] + e[1], e[2]))
+    for i1 in range(m // 2 + 1):
+        for i2 in range(m // 2 + 1):
+            for j2 in range(1, floor(t * (i1 + i2)) - (i1 + i2) // 2 + 1):
+                indices_3.append([i1, i2, j2])
+    indices_3 = sorted(indices_3, key=lambda e: (e[0] + e[1], e[2]))
+    for i1, i2, j1, j2, u in indices_1:
+        if (i1 + i2) % 2 == 1:
+            monomials.append(xp1 ** (i1 + j1 + u) * xp2 ** (i2 + j2 + u) * yp ** ((i1 + i2 + 1) // 2))
+        else:
+            monomials.append(xq1 ** (i1 + j1 + u) * xq2 ** (i2 + j2 + u) * yq ** ((i1 + i2 + 1) // 2))
+        if i1 + i2 + u != 0:
+            orig = Q(xp1 ** j1 * xp2 ** j2 * yq ** ((i1 + i2) // 2) * fp1 ** i1 * fp2 ** i2).lift() * h ** u
+            pt2 = orig.subs(yp=0)
+            pt1 = orig - pt2
+            pol = pt1.subs(xq1=xp1 + 1, xq2=xp2 - 1) + pt2.subs(xp1=xq1 - 1, xp2=xq2 + 1)
+            coef = pol.monomial_coefficient(monomials[-1])
+            if abs(coef) != 1:
+                g = gcd(abs(coef), e ** (i1 + i2 + u))
+                if coef < 0:
+                    pol = -pol
+                pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2 + u))) % (e ** (i1 + i2 + u))
+        else:
+            pol = monomials[-1]
+        shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2 - u))
+    for i1, i2, j1 in indices_2:
+        monomials.append(xp1 ** i1 * xp2 ** i2 * yp ** ((i1 + i2 + 1) // 2 + j1))
+        if i1 + i2 != 0:
+            orig = Q(yq ** ((i1 + i2) // 2 - j1) * fp1 ** i1 * fp2 ** i2).lift()
+            pt2 = orig.subs(yp=0)
+            pt1 = orig - pt2
+            pol = pt1.subs(xq1=xp1 + 1, xq2=xp2 - 1) + pt2.subs(xp1=xq1 - 1, xp2=xq2 + 1)
+            coef = pol.monomial_coefficient(monomials[-1])
+            if abs(coef) != 1:
+                g = gcd(abs(coef), e ** (i1 + i2))
+                if coef < 0:
+                    pol = -pol
+                pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2))) % (e ** (i1 + i2))
+        else:
+            pol = monomials[-1]
+        shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2))
+    for i1, i2, j2 in indices_3:
+        monomials.append(xq1 ** i1 * xq2 ** i2 * yq ** ((i1 + i2) // 2 + j2))
+        if i1 + i2 != 0:
+            orig = Q(yq ** ((i1 + i2) // 2 + j2) * fp1 ** i1 * fp2 ** i2).lift()
+            pt2 = orig.subs(yp=0)
+            pt1 = orig - pt2
+            pol = pt1.subs(xq1=xp1 + 1, xq2=xp2 - 1) + pt2.subs(xp1=xq1 - 1, xp2=xq2 + 1)
+            coef = pol.monomial_coefficient(monomials[-1])
+            if abs(coef) != 1:
+                g = gcd(abs(coef), e ** (i1 + i2))
+                if coef < 0:
+                    pol = -pol
+                pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2))) % (e ** (i1 + i2))
+        else:
+            pol = monomials[-1]
+        shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Y * yp, Y * yq) * e ** (m - i1 - i2))
+    n = len(shifts)
+    print(n)
+    scales = [mono(X, X, X, X, Y, Y) for mono in monomials]
+    L = Matrix(ZZ, n)
+    for i in range(n):
+        pol = 0
+        for j in range(i + 1):
+            L[i, j] = shifts[i].monomial_coefficient(monomials[j])
+    start = time()
+    L = L.LLL(delta=0.75)
+    '''
+    s = encode_fplll_format(L)
+    file_name = "output.txt"
+
+    # 写入文件，覆盖之前的内容
+    with open(file_name, "w", encoding="utf-8") as file:
+        file.write(s)
+
+    try:
+        rst = subprocess.Popen(
+            "flatter.nu",
+            text=True,
+            stdout=subprocess.PIPE,
+            shell=True,
+        )
+        L = read_fplll_format(rst.stdout)
+    except subprocess.CalledProcessError as e:
+        print(e)
+        return
+    '''
+    # kp, kq, p, q = ZZ["kp, kq, p, q"].gens()
+    # pols = [N - p * q]
+    pols = [N - yp * yq, xp1 - xq1 + 1, xp2 -xq2 - 1]
+    for i in range(10):
+        pol = 0
+        for j in range(n):
+            pol += L[i, j] * monomials[j] // scales[j]
+        pols.append(pol)
+    print(time() - start)
+    p0 = groebner(pols, yp, Y)
+    # p0 = groebner(pols, p, Y)
     return p0

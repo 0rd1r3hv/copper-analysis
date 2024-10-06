@@ -23,6 +23,7 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
     f = z + A * (k0 + x)
     # k = 2 * (beta - gamma)
     # t = 1 + 2 * gamma - 4 * beta
+    m = 2
     k = 1 / 2
     t = 1
     km = k * m
@@ -71,6 +72,8 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
         for j in range(w):
             pols[i] += L[i, j] * monomials[j] // scales[j]
     print(time() - start)
+    print(Q(y * f ** 2).lift())
+    print(Q(f ** 2).lift())
     x0 = groebner(pols, x, X)
     if x0:
         return floor(((k0 + x0) * N) // e)

@@ -103,8 +103,37 @@ def tk17_small_e_test():
             e = inverse_mod(dq, q - 1) + get_rand(le - (ln - lp)) * (q - 1)
             if gcd(e, phi) == 1:
                 break
-    assert small_e(N, e, tk17_small_e(alpha, beta, delta), lp / ln, ldq / ln, (e * dq - 1) // (q - 1) - 1, (e * dq - 1) // (q - 1), p, q) == p
+    assert small_e(N, e, tk17_small_e(alpha, beta, delta), lp / ln, ldq / ln) == p
 
 
-tk17_large_e_test()
-tk17_small_e_test()
+def tk17_small_dp_dq_test():
+    ln = 1000
+    beta = 0.5
+    delta = 0.015
+    lp = ceil(beta * ln)
+    lq = ceil(beta * ln)
+    ldp = ceil(delta * ln)
+    ldq = ceil(delta * ln)
+    while True:
+        p = get_prime(lp - 1)
+        q = get_prime(lq - 1)
+        if gcd(p - 1, q - 1) == 2:
+            break
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    while True:
+        dp = 2 * get_rand(ldp - 1) + 1
+        dq = 2 * get_rand(ldq - 1) + 1
+        if gcd(dp, p - 1) == 1 and gcd(dq, q - 1) == 1:
+            d = crt([dp, dq], [p - 1, q - 1])
+            e = inverse_mod(d, phi)
+            if gcd(e, N - 1) == 1:
+                le = e.nbits()
+                alpha = le / ln
+                break
+    assert small_dp_dq(N, e, tk17_small_dp_dq(alpha, delta), delta, (e * dp - 1) // (p - 1), (e * dq - 1) // (q - 1), p, q) == p
+
+
+# tk17_large_e_test()
+# tk17_small_e_test()
+tk17_small_dp_dq_test()
