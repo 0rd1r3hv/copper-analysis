@@ -37,7 +37,7 @@ def groebner(pols, var, bound, max_fails=10, N=None):
             fails += 1
     print(time() - start)
     if fails < max_fails:
-        if N != 0:
+        if N:
             def recursive(res, m, d):
                 if d == len(crt_rem):
                     if N % res == 0:

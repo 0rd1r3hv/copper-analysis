@@ -39,18 +39,20 @@ def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
 
 
 def tk14_test():
-    lp = 512
+    lp = 500
     p = get_prime(lp)
     q = get_prime(lp)
     p_q = -(p + q)
     N = p * q
     phi = (p - 1) * (q - 1)
-    beta = 0.35
-    leak_prop = 0.45
+    beta = 0.3
+    gamma = 0.276
+    leak_prop = 1 - gamma / beta
     ld = floor(N.nbits() * beta)
     d, e = get_pair(ld, phi)
+    k = (e * d - 1) // phi
     d_high = get_leak(d, "high", proportion=leak_prop)
-    sol = high_leak(
+    assert high_leak(
         N,
         e,
         d_high,
@@ -58,10 +60,8 @@ def tk14_test():
         N + 1,
         1 << ceil(ld * (1 - leak_prop)),
         1 << (N.nbits() // 2),
-        8,
-    )
-    if sol:
-        print(sol == d)
+        tk14_high(beta, gamma)
+    ) == d
 
 
 def tk17_large_e_test():
@@ -109,8 +109,8 @@ def tk17_small_e_test():
 def tk17_small_dp_dq_test():
     ln = 1000
     beta = 0.5
-    delta1 = 0.033
-    delta2 = 0.033
+    delta1 = 0.062
+    delta2 = 0.062
     lp = ceil(beta * ln)
     lq = ceil(beta * ln)
     ldp = ceil(delta1 * ln)
@@ -140,4 +140,5 @@ def tk17_small_dp_dq_test():
 
 # tk17_large_e_test()
 # tk17_small_e_test()
-tk17_small_dp_dq_test()
+# tk17_small_dp_dq_test()
+tk14_test()

@@ -21,17 +21,16 @@ def tk14_high(beta, gamma):
                 s_Z += l
                 s_e += m - i
                 n += 1
-            for j in range(1, floor(k * m + t * u)):
+            for j in range(1, floor(k * m + t * u) + 1):
                 l = l_MSBs(u + j, km, t)
                 s_X += u - l
                 s_Y += u + j - l
                 s_Z += l
                 s_e += m - u
                 n += 1
-        print(s_X, s_Y, s_Z, s_e)
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
-            print(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m)
-            print(n)
+            print((s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n)
+            print(s_X, s_Y, s_Z, s_e, n, m)
             return m
 
 
