@@ -22,9 +22,14 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
     x, y, z = PR.gens()
     Q = PR.quotient((k0 + x) * y - z)
     f = z + A * (k0 + x) + 1
+    print(f)
+    print((k0 + x) * y)
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
+    k = 0
+    t = 0.6
     km = k * m
+    print(y // z)
     shifts = []
     monomials = []
     for u in range(m + 1):
@@ -48,9 +53,16 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m, modulus=None):
                 pre = l_MSBs(deg_y + deg_z, km, t)
                 pol += orig.monomial_coefficient(mono) * (mono // (z ** pre)).subs(z=(k0 + x) * y) * z ** pre
             pre = l_MSBs(u + j, km, t)
+            print(pol(x, y, (k0 + x) * y).monomials())
+            print(orig(x, y, (k0 + x) * y).monomials())
+            assert pol(x, y, (k0 + x) * y) == orig(x, y, (k0 + x) * y)
             monomials.append(x ** (u - pre) * y ** (u + j - pre) * z ** pre)
             shifts.append(pol(X * x, Y * y, Z * z) * modulus ** (m - u))
     scales = [mono(X, Y, Z) for mono in monomials]
+    mono2 = set()
+    for shift in shifts:
+        mono2.update(shift.monomials())
+    assert sorted(mono2) == sorted(monomials)
     n = len(shifts)
     L = Matrix(ZZ, n)
     for i in range(n):

@@ -1,6 +1,7 @@
 from sage.all import *
 from tk14 import *
 from tk17 import *
+from mns21 import *
 from practical_bounds import *
 
 
@@ -39,29 +40,31 @@ def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
 
 
 def tk14_test():
-    lp = 500
+    lp = 250
     p = get_prime(lp)
     q = get_prime(lp)
     p_q = -(p + q)
     N = p * q
     phi = (p - 1) * (q - 1)
-    beta = 0.3
-    gamma = 0.276
-    leak_prop = 1 - gamma / beta
+    beta = 0.4
+    lamb = 0.4 - 0.2
+    leak_prop = lamb / beta
     ld = floor(N.nbits() * beta)
     d, e = get_pair(ld, phi)
     k = (e * d - 1) // phi
-    d_high = get_leak(d, "high", proportion=leak_prop)
-    assert high_leak(
+    d_low = get_leak(d, "low", proportion=leak_prop)
+    res = mixed_leak(
         N,
         e,
-        d_high,
+        ((0, 0), (d_low, ceil(d.nbits() * leak_prop))),
         ld,
-        N + 1,
-        1 << ceil(ld * (1 - leak_prop)),
-        1 << (N.nbits() // 2),
-        tk14_high(beta, gamma)
-    ) == d
+        7,
+        k - 1,
+        -(p + q)
+    )
+    print(res)
+    print(k)
+    assert res == k
 
 
 def tk17_large_e_test():
@@ -116,9 +119,9 @@ def tk17_small_dp_dq_test():
     ldp = ceil(delta1 * ln)
     ldq = ceil(delta2 * ln)
     while True:
-        p = get_prime(lp - 1)
-        q = get_prime(lq - 1)
-        if gcd(p - 1, q - 1) == 2:
+        p = get_prime(lp)
+        q = get_prime(lq)
+        if gcd(p - 1, q - 1) == 2 and (p - 1).valuation(2) == 1 and (q - 1).valuation(2) == 1:
             break
     N = p * q
     phi = (p - 1) * (q - 1)
@@ -138,7 +141,42 @@ def tk17_small_dp_dq_test():
     assert res == p or res == q
 
 
+def mns21_test():
+    ln = 1000
+    beta = 0.5
+    delta1 = 0.07
+    delta2 = 0.07
+    lp = ceil(beta * ln)
+    lq = ceil(beta * ln)
+    ldp = ceil(delta1 * ln)
+    ldq = ceil(delta2 * ln)
+    leak_prop = 0.03
+    while True:
+        p = get_prime(lp - 1)
+        q = get_prime(lq - 1)
+        if gcd(p - 1, q - 1) == 2 and (p - 1).valuation(2) == 1 and (q - 1).valuation(2) == 1:
+            break
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    while True:
+        dp = 2 * get_rand(ldp - 1) + 1
+        dq = 2 * get_rand(ldq - 1) + 1
+        if gcd(dp, p - 1) == 1 and gcd(dq, q - 1) == 1:
+            d = crt([dp, dq], [p - 1, q - 1])
+            e = inverse_mod(d, phi)
+            if gcd(e, N - 1) == 1:
+                k = (e * dp - 1) // (p - 1)
+                l = (e * dq - 1) // (q - 1)
+                le = e.nbits()
+                alpha = le / ln
+                break
+    leak_1 = get_leak(dp, 'low', ceil(dp.nbits() * leak_prop))
+    leak_2 = get_leak(dq, 'low', ceil(dp.nbits() * leak_prop))
+    dp_dq_with_lsb(N, e, delta1, delta2, leak_1, leak_2, (5, 2), k, k - 1, p, q, l - 1, l, l_leak=ceil(dp.nbits() * leak_prop))
+
+
 # tk17_large_e_test()
 # tk17_small_e_test()
 # tk17_small_dp_dq_test()
-tk14_test()
+# tk14_test()
+mns21_test()

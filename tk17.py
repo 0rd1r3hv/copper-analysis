@@ -238,7 +238,7 @@ def small_dp_dq(N, e, m, delta1, delta2):
                 g = gcd(abs(coef), e ** (i1 + i2 + u))
                 if coef < 0:
                     pol = -pol
-                pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2 + u))) % (e ** (i1 + i2 + u))
+                pol = (pol * inverse_mod(abs(coef) // g, (e ** (i1 + i2 + u)) // g)) % (e ** (i1 + i2 + u))
         else:
             pol = monomials[-1]
         # shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Yp * yp, Yq * yq) * e ** (m - i1 - i2 - u))
@@ -255,7 +255,7 @@ def small_dp_dq(N, e, m, delta1, delta2):
                 g = gcd(abs(coef), e ** (i1 + i2))
                 if coef < 0:
                     pol = -pol
-                pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2))) % (e ** (i1 + i2))
+                pol = (pol * inverse_mod(abs(coef) // g, (e ** (i1 + i2)) // g)) % (e ** (i1 + i2))
         else:
             pol = monomials[-1]
         # shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Yp * yp, Yq * yq) * e ** (m - i1 - i2))
@@ -272,7 +272,7 @@ def small_dp_dq(N, e, m, delta1, delta2):
                 g = gcd(abs(coef), e ** (i1 + i2))
                 if coef < 0:
                     pol = -pol
-                pol = (pol * inverse_mod(abs(coef) // g, e ** (i1 + i2))) % (e ** (i1 + i2))
+                pol = (pol * inverse_mod(abs(coef) // g, (e ** (i1 + i2)) // g)) % (e ** (i1 + i2))
         else:
             pol = monomials[-1]
         # shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Yp * yp, Yq * yq) * e ** (m - i1 - i2))

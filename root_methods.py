@@ -23,7 +23,7 @@ def groebner(pols, var, bound, max_fails=10, N=None):
                 sol_var = set()
                 sol_var.update([sol[var] for sol in sols])
                 sol_var = list(Integer(e) for e in sol_var)
-                if N != 0 and len(sol_var) == 2:
+                if N and len(sol_var) == 2:
                     crt_rem.append(sol_var[:])
                     crt_mod.append(p)
                     m *= p

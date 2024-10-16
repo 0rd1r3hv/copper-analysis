@@ -2,15 +2,15 @@ from sage.all import *
 
 MAX_M = 1000
 
-
 def l_MSBs(x, km, t):
     return max(0, ceil((x - km) / (t + 1)))
 
 
-def tk14_high(beta, gamma):
-    k = 2 * (beta - gamma)
-    t = 1 + 2 * gamma - 4 * beta
-    for m in range(1, MAX_M + 1):
+def tk14_high(alpha, beta, delta, eta, lamb):
+    k = (beta - delta - lamb) / eta
+    t = (alpha - 2 * beta + delta - eta + 2 * lamb) / eta
+    print(k, t)
+    for m in range(6, MAX_M + 1):
         n = s_X = s_Y = s_Z = s_e = 0
         km = k * m
         for u in range(m + 1):
@@ -28,8 +28,8 @@ def tk14_high(beta, gamma):
                 s_Z += l
                 s_e += m - u
                 n += 1
-        if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
-            print((s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n)
+        if s_X * (delta + lamb) + s_Y * eta + s_Z * (beta + eta) + s_e * (alpha + lamb) < n * m * (alpha + lamb):
+            print((s_X * (delta + lamb) + s_Y * eta + s_Z * (beta + eta) + s_e * (alpha + lamb) - n * m * (alpha + lamb)) / n)
             print(s_X, s_Y, s_Z, s_e, n, m)
             return m
 
@@ -175,3 +175,120 @@ def tk17_small_dp_dq(alpha, delta):
             print(s_X, s_Y, s_e, n, m)
             print(alpha + delta - 1 / 2, 1 / 2, alpha)
             return m
+
+
+def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
+    t = max(1 - 2 * max(delta1, delta2), 1 / 2)
+    for m in range(1, MAX_M + 1):
+        for thres in range(m + 1):
+            s_X = s_Y = s_Z = s_M = s_eM = n = 0
+            for c in range(m + 1):
+                for a in range(m + 1):
+                    b = 0
+                    while (b + 1) // 2 <= thres:
+                        if b <= a + c:
+                            if a <= c and b <= c - a:
+                                ef = 0
+                                eg = b
+                                eh = a
+                            elif a > c and b < a - c:
+                                ef = b
+                                eg = 0
+                                eh = c
+                            elif (a + b + c) % 2 == 0:
+                                ef = (a + b - c) // 2
+                                eg = (-a + b + c) // 2
+                                eh = (a - b + c) // 2
+                            else:
+                                ef = (a + b - c + 1) // 2
+                                eg = (-a + b + c - 1) // 2
+                                eh = (a - b + c - 1) // 2
+                        else:
+                            ef = a
+                            eg = c
+                            eh = 0
+                        deg = ef + eg + eh
+                        s_X += a
+                        s_Y += (b + 1) // 2
+                        s_Z += c
+                        s_eM += 2 * m - deg
+                        n += 1
+                        b += 1
+            for c in range(m + 1):
+                for a in range(m + 1):
+                    for b in range(a + c + 1):
+                        if (b + 1) // 2 > thres or b == a + c:
+                            if a <= c and b <= c - a:
+                                ef = 0
+                                eg = b
+                                eh = a
+                            elif a > c and b < a - c:
+                                ef = b
+                                eg = 0
+                                eh = c
+                            elif (a + b + c) % 2 == 0:
+                                ef = (a + b - c) // 2
+                                eg = (-a + b + c) // 2
+                                eh = (a - b + c) // 2
+                            else:
+                                ef = (a + b - c + 1) // 2
+                                eg = (-a + b + c - 1) // 2
+                                eh = (a - b + c - 1) // 2
+                            deg = ef + eg + eh
+                            if (b + 1) // 2 > thres:
+                                s_X += a
+                                s_Y += (b + 1) // 2
+                                s_Z += c
+                                s_M += deg
+                                s_eM += 2 * m - deg
+                                n += 1
+                            if b == a + c:
+                                for i in range(max(1, thres - b // 2 + 1), floor(t * b - b // 2) + 1):
+                                    s_X += a
+                                    s_Y += b // 2 + i
+                                    s_Z += c
+                                    s_M += deg
+                                    s_eM += 2 * m - deg
+                                    n += 1
+                                for i in range(max(1, thres - (b + 1) // 2 + 1), floor(t * b - (b + 1) // 2) + 1):
+                                    s_X += a
+                                    s_Y += (b + 1) // 2 + i
+                                    s_Z += c
+                                    s_M += deg
+                                    s_eM += 2 * m - deg
+                                    n += 1
+            print(
+                (
+                    s_X * (alpha + delta1 - 1 / 2)
+                    + s_Y / 2
+                    + s_Z * (alpha + delta2 - 1 / 2)
+                    + s_M * leak
+                    + s_eM * (alpha + leak)
+                    - n * 2 * m * (alpha + leak)
+                ) / n
+            )
+            print(n, m, thres)
+            if (
+                s_X * (alpha + delta1 - 1 / 2)
+                + s_Y / 2
+                + s_Z * (alpha + delta2 - 1 / 2)
+                + s_M * leak
+                + s_eM * (alpha + leak)
+                < n * 2 * m * (alpha + leak)
+            ):
+                print(
+                    (
+                        s_X * (alpha + delta1 - 1 / 2)
+                        + s_Y / 2
+                        + s_Z * (alpha + delta2 - 1 / 2)
+                        + s_M * leak
+                        + s_eM * (alpha + leak)
+                        - n * 2 * m * (alpha + leak)
+                    ) / n
+                )
+                print(s_X, s_Y, s_Z, s_eM, s_M, n, m, thres)
+                return m, thres
+
+
+# mns21_dp_dq_with_lsb(1, 0.07, 0.07, 0.03)
+# tk17_small_dp_dq(1, 0.05)
