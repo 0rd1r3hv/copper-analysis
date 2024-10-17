@@ -30,7 +30,7 @@ def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
     if pos == "high":
         bits = num.nbits() - bits
     if rand_mod == False:
-        mod = 2**bits
+        mod = 2 ** bits
     else:
         mod = get_rand(bits)
     if pos == "high":
@@ -40,31 +40,20 @@ def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
 
 
 def tk14_test():
-    lp = 250
+    lp = 512
     p = get_prime(lp)
     q = get_prime(lp)
     p_q = -(p + q)
     N = p * q
     phi = (p - 1) * (q - 1)
-    beta = 0.4
-    lamb = 0.4 - 0.2
-    leak_prop = lamb / beta
-    ld = floor(N.nbits() * beta)
+    beta = 0.3
+    delta = 0.27
+    ld = ceil(N.nbits() * beta)
     d, e = get_pair(ld, phi)
     k = (e * d - 1) // phi
-    d_low = get_leak(d, "low", proportion=leak_prop)
-    res = mixed_leak(
-        N,
-        e,
-        ((0, 0), (d_low, ceil(d.nbits() * leak_prop))),
-        ld,
-        7,
-        k - 1,
-        -(p + q)
-    )
-    print(res)
-    print(k)
-    assert res == k
+    d_high = get_leak(d, 'high', ceil(ld - lp * 2 * delta))
+    sol = high_leak(N, e, d_high, ld, N + 1, 1 << floor(lp * 2 * delta), (1 << (N.nbits() // 2)), 19, k, p_q)
+    assert sol == d
 
 
 def tk17_large_e_test():
@@ -178,5 +167,5 @@ def mns21_test():
 # tk17_large_e_test()
 # tk17_small_e_test()
 # tk17_small_dp_dq_test()
-# tk14_test()
-mns21_test()
+tk14_test()
+# mns21_test()
