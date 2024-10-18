@@ -1,9 +1,6 @@
 from sage.all import *
-import sys
-import io
 
-
-def encode_fplll_format(M):
+def fplll_fmt(M):
     m, n = M.dimensions()
     s = "["
     for i in range(m):
@@ -17,7 +14,7 @@ def encode_fplll_format(M):
     return s
 
 
-def read_fplll_format(s):
+def fplll_read(s):
     rows = []
     for line in s:
         line = line.lstrip("[").rstrip("\n").rstrip("]")

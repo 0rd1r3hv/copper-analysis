@@ -2,7 +2,7 @@ from sage.all import Matrix, ZZ, inverse_mod, Integer, gcd, ceil, floor
 # from mp import groebner
 from root_methods import groebner
 from time import time
-from fplll_fmt import encode_fplll_format, read_fplll_format
+from fplll_fmt import fplll_fmt, fplll_read
 import subprocess
 # Small CRT-Exponent RSA Revisited
 
@@ -50,7 +50,7 @@ def large_e(N, e, m, beta, delta):
             L[i, j] = shifts[i].monomial_coefficient(monomials[j])
     start = time()
 
-    s = encode_fplll_format(L)
+    s = fplll_fmt(L)
     file_name = "output.txt"
 
     # 写入文件，覆盖之前的内容
@@ -64,7 +64,7 @@ def large_e(N, e, m, beta, delta):
             stdout=subprocess.PIPE,
             shell=True,
         )
-        L = read_fplll_format(rst.stdout)
+        L = fplll_read(rst.stdout)
     except subprocess.CalledProcessError as e:
         print(e)
         return
@@ -144,7 +144,7 @@ def small_e(N, e, m, beta, delta):
     start = time()
     # L = L.LLL(delta=0.75)
 
-    s = encode_fplll_format(L)
+    s = fplll_fmt(L)
     file_name = "output.txt"
 
     # 写入文件，覆盖之前的内容
@@ -158,7 +158,7 @@ def small_e(N, e, m, beta, delta):
             stdout=subprocess.PIPE,
             shell=True,
         )
-        L = read_fplll_format(rst.stdout)
+        L = fplll_read(rst.stdout)
     except subprocess.CalledProcessError as e:
         print(e)
         return
@@ -287,26 +287,25 @@ def small_dp_dq(N, e, m, delta1, delta2):
             L[i, j] = shifts[i].monomial_coefficient(monomials[j])
     start = time()
     L = L.LLL(delta=0.75)
-    '''
-    s = encode_fplll_format(L)
-    file_name = "output.txt"
+    
+    # s = fplll_fmt(L)
+    # file_name = "tk17_output.txt"
 
-    # 写入文件，覆盖之前的内容
-    with open(file_name, "w", encoding="utf-8") as file:
-        file.write(s)
+    # with open(file_name, "w", encoding="utf-8") as file:
+    #     file.write(s)
 
-    try:
-        rst = subprocess.Popen(
-            "flatter.nu",
-            text=True,
-            stdout=subprocess.PIPE,
-            shell=True,
-        )
-        L = read_fplll_format(rst.stdout)
-    except subprocess.CalledProcessError as e:
-        print(e)
-        return
-    '''
+    # try:
+    #     rst = subprocess.Popen(
+    #         "tk17_flatter.nu",
+    #         text=True,
+    #         stdout=subprocess.PIPE,
+    #         shell=True,
+    #     )
+    #     L = fplll_read(rst.stdout)
+    # except subprocess.CalledProcessError as e:
+    #     print(e)
+    #     return
+    
     # kp, kq, p, q = ZZ["kp, kq, p, q"].gens()
     # pols = [N - p * q]
     pols = [N - yp * yq, xp1 - xq1 + 1, xp2 -xq2 - 1]

@@ -2,7 +2,7 @@ from sage.all import *
 # from mp import groebner
 from root_methods import groebner
 from time import time
-from fplll_fmt import encode_fplll_format, read_fplll_format
+from fplll_fmt import fplll_fmt, fplll_read
 import subprocess
 
 
@@ -156,7 +156,25 @@ def dp_dq_with_lsb(N, e, delta1, delta2, ldp, ldq, m_thres, x1, x2, x3, x4, x5, 
         for j in range(i + 1):
             pol += L[i, j] * monomials[j]
         assert pol == shifts[i]
-    L = L.LLL(delta=0.75)
+    # L = L.LLL(delta=0.75)
+    s = fplll_fmt(L)
+    file_name = "mns21_output.txt"
+
+    with open(file_name, "w", encoding="utf-8") as file:
+        file.write(s)
+
+    try:
+        rst = subprocess.Popen(
+            "mns21_flatter.nu",
+            text=True,
+            stdout=subprocess.PIPE,
+            shell=True,
+        )
+        L = fplll_read(rst.stdout)
+    except subprocess.CalledProcessError as e:
+        print(e)
+        return
+    
     pols = [N - yp * yq, xp - xq - 1, zp - zq + 1]
     for i in range(10):
         pol = 0

@@ -1,1 +1,0 @@
-cat output.txt | flatter

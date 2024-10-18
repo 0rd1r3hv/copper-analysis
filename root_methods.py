@@ -35,18 +35,23 @@ def groebner(pols, var, bound, max_fails=10, N=None, neg=False):
                     break
         else:
             fails += 1
-    print(time() - start)
+    print(f"groebner: {time() - start}")
     if fails < max_fails:
         if N:
+
             def recursive(res, m, d):
                 if d == len(crt_rem):
                     if N % res == 0:
                         return res
                     return None
-                ret1 = recursive(crt([res, crt_rem[d][0]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                ret1 = recursive(
+                    crt([res, crt_rem[d][0]], [m, crt_mod[d]]), m * crt_mod[d], d + 1
+                )
                 if ret1:
                     return ret1
-                ret2 = recursive(crt([res, crt_rem[d][1]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                ret2 = recursive(
+                    crt([res, crt_rem[d][1]], [m, crt_mod[d]]), m * crt_mod[d], d + 1
+                )
                 if ret2:
                     return ret2
 
@@ -61,6 +66,7 @@ def groebner(pols, var, bound, max_fails=10, N=None, neg=False):
         else:
             return res
 
+
 def newton(sys, boundslst, it=20):
     st = time()
     l = len(sys)
@@ -71,9 +77,9 @@ def newton(sys, boundslst, it=20):
         for i in range(it):
             fv0 = vector(ZZ, [eq.subs(v0) for eq in sys])
             if fv0 == 0:
-                print(time() - st)
+                print(f"newton: {time() - st}")
                 return v0
             v0 -= jacob.subs(v0).solve_right(fv0)
             for j in range(l):
                 v0[j] = round(v0[j])
-        print("Failed")
+        print("Newton Failed")

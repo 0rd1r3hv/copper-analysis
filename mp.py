@@ -1,10 +1,27 @@
 from sage.all import Integer, GF, Ideal, crt
 import multiprocessing
-from time import time, sleep
+from time import time
 import queue
 
 
-def groebner(pols, var, bound, max_fails=10):
+def groebner(pols, var, bound, max_fails=10, N=None):
+    def worker(R, num, p, pols, var, rsts, N):
+        for i in range(len(pols), num - 1, -1):
+            I = Ideal((R * pols[:i]).groebner_basis())
+            if I.dimension() == 0:
+                sols = I.variety()
+                sol_var = set()
+                sol_var.update([sol[var] for sol in sols])
+                sol_var = list(Integer(e) for e in sol_var)
+                if N and len(sol_var) == 2:
+                    rsts.put((sol_var[:], p))
+                    break
+                elif len(sol_var) == 1:
+                    rsts.put((sol_var[0], p))
+                    break
+        else:
+            rsts.put(None)
+
     start = time()
 
     R = pols[0].parent()
@@ -15,7 +32,7 @@ def groebner(pols, var, bound, max_fails=10):
     crt_rem = []
     crt_mod = []
 
-    max_proc = 6
+    max_proc = 8
     procs = []
     rsts = multiprocessing.Queue()
 
@@ -24,7 +41,7 @@ def groebner(pols, var, bound, max_fails=10):
         p = p.next_prime()
         R = R.change_ring(GF(p))
 
-        proc = multiprocessing.Process(target=worker, args=(R, num, p, pols, var, rsts))
+        proc = multiprocessing.Process(target=worker, args=(R, num, p, pols, var, rsts, N))
         proc.start()
         procs.append(proc)
 
@@ -44,6 +61,22 @@ def groebner(pols, var, bound, max_fails=10):
             for p in procs:
                 p.join()
             print(f"succ: {time() - start}")
+            if N:
+                def recursive(res, m, d):
+                    if d == len(crt_rem):
+                        if N % res == 0:
+                            return res
+                        return None
+                    ret1 = recursive(crt([res, crt_rem[d][0]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                    if ret1:
+                        return ret1
+                    ret2 = recursive(crt([res, crt_rem[d][1]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                    if ret2:
+                        return ret2
+
+
+            return recursive(crt_rem[0][0], crt_mod[0], 1)
+        else:
             return crt(crt_rem, crt_mod)
 
         procs = [p for p in procs if p.is_alive()]
@@ -70,15 +103,4 @@ def groebner(pols, var, bound, max_fails=10):
             pass
 
 
-def worker(R, num, p, pols, var, rsts):
-    for i in range(len(pols), num - 1, -1):
-        I = Ideal((R * pols[:i]).groebner_basis())
-        if I.dimension() == 0:
-            sols = I.variety()
-            sol_var = set()
-            sol_var.update([sol[var] for sol in sols])
-            if len(sol_var) == 1:
-                rsts.put((Integer(sols[0][var]), p))
-                break
-    else:
-        rsts.put(None)
+
