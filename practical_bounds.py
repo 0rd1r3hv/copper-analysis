@@ -6,10 +6,13 @@ def l_MSBs(x, km, t):
     return max(0, ceil((x - km) / (t + 1)))
 
 
+def l_LSBs(x, km, t):
+    return max(0, ceil((x - km) / t))
+
+
 def tk14_high(beta, gamma):
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
-    print(k, t)
     for m in range(1, MAX_M + 1):
         n = s_X = s_Y = s_Z = s_e = 0
         km = k * m
@@ -30,6 +33,33 @@ def tk14_high(beta, gamma):
                 n += 1
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
             print((s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n)
+            print(s_X, s_Y, s_Z, s_e, n, m)
+            return m
+
+
+def tk14_low(beta, gamma):
+    k = 2 * (beta - gamma)
+    t = 1 + 2 * gamma - 4 * beta
+    for m in range(1, MAX_M + 1):
+        n = s_X = s_Y = s_Z = s_e = s_M = 0
+        km = k * m
+        for u in range(m + 1):
+            for i in range(u + 1):
+                s_X += u
+                s_Y += i
+                s_e += m - i
+                s_M += m - i
+                n += 1
+            for j in range(1, floor(k * m + t * u) + 1):
+                l = l_LSBs(j, km, t)
+                s_X += u - l
+                s_Y += u + j - l
+                s_Z += l
+                s_e += m - u
+                s_M += m - u + l
+                n += 1
+        if s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) < n * m * (1 + beta - gamma):
+            print((s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) - n * m * (1 + beta - gamma)) / n)
             print(s_X, s_Y, s_Z, s_e, n, m)
             return m
 
@@ -292,4 +322,5 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
 
 # mns21_dp_dq_with_lsb(1, 0.07, 0.07, 0.03)
 # tk17_small_dp_dq(1, 0.05)
-tk14_high(0.3, 0.27)
+# tk14_high(0.3, 0.27)
+# tk14_low(0.3, 0.23)

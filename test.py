@@ -39,7 +39,7 @@ def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
         return num % mod
 
 
-def tk14_test():
+def tk14_high_leak_test():
     lp = 512
     p = get_prime(lp)
     q = get_prime(lp)
@@ -52,7 +52,24 @@ def tk14_test():
     d, e = get_pair(ld, phi)
     k = (e * d - 1) // phi
     d_high = get_leak(d, 'high', ceil(ld - lp * 2 * delta))
-    sol = high_leak(N, e, d_high, ld, N + 1, 1 << floor(lp * 2 * delta), (1 << (N.nbits() // 2)), 19, k, p_q)
+    sol = high_leak(N, e, d_high, ld, N + 1, 1 << floor(lp * 2 * delta), (1 << (N.nbits() // 2)), 19)
+    assert sol == d
+
+
+def tk14_low_leak_test():
+    lp = 512
+    p = get_prime(lp)
+    q = get_prime(lp)
+    p_q = -(p + q)
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    beta = 0.3
+    delta = 0.23
+    ld = ceil(N.nbits() * beta)
+    d, e = get_pair(ld, phi)
+    k = (e * d - 1) // phi
+    d_low = get_leak(d, 'low', ceil(ld - lp * 2 * delta))
+    sol = low_leak(N, e, d_low, ld, ceil(ld - lp * 2 * delta), N + 1, 1 << ceil(N.nbits() * beta), (1 << (N.nbits() // 2)), 5, k, p_q)
     assert sol == d
 
 
@@ -164,8 +181,10 @@ def mns21_test():
     dp_dq_with_lsb(N, e, delta1, delta2, leak_1, leak_2, (5, 2), k, k - 1, p, q, l - 1, l, l_leak=ceil(dp.nbits() * leak_prop))
 
 
+# tk14_high_leak_test()
 # tk17_large_e_test()
 # tk17_small_e_test()
 # tk17_small_dp_dq_test()
-tk14_test()
 # mns21_test()
+# tk14_low_leak_test()
+tk14_low_leak_test()

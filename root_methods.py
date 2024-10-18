@@ -2,7 +2,7 @@ from sage.all import *
 from time import time
 
 
-def groebner(pols, var, bound, max_fails=10, N=None):
+def groebner(pols, var, bound, max_fails=10, N=None, neg=False):
     start = time()
     R = pols[0].parent()
     num = R.ngens()
@@ -50,11 +50,16 @@ def groebner(pols, var, bound, max_fails=10, N=None):
                 if ret2:
                     return ret2
 
-
-            return recursive(crt_rem[0][0], crt_mod[0], 1)
+            res = recursive(crt_rem[0][0], crt_mod[0], 1)
         else:
-            return crt(crt_rem, crt_mod)
-
+            res = crt(crt_rem, crt_mod)
+        if neg:
+            m = 1
+            for mod in crt_mod:
+                m *= mod
+            return res - m
+        else:
+            return res
 
 def newton(sys, boundslst, it=20):
     st = time()
