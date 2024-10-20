@@ -36,5 +36,9 @@ self:
   ^$env.EDITOR justfile
 
 [group('dev')]
+test:
+  python test.py
+    
+[group('dev')]
 upd:
   nix flake update
