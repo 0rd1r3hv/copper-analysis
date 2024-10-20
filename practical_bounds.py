@@ -1,6 +1,9 @@
 from sage.all import *
+from misc import *
+
 
 MAX_M = 1000
+
 
 def l_MSBs(x, km, t):
     return max(0, ceil((x - km) / (t + 1)))
@@ -8,6 +11,68 @@ def l_MSBs(x, km, t):
 
 def l_LSBs(x, km, t):
     return max(0, ceil((x - km) / t))
+
+
+def ernst05_eq1(bounds=None, props=None):
+    if bounds:
+        x, y, z, w = calc_bits(bounds)
+    else:
+        x, y, z, w = props
+    for m in range(1, MAX_M + 1):
+        for t in range(m + 1):
+            sx = sy = sz = sw = dim = 0
+            for i in range(m + 1):
+                for j in range(m - i + 1):
+                    for k in range(j + t + 1):
+                        dim += 1
+            sx = sy = sz = dim * m
+            sz += dim * t
+            for i in range(m + 2):
+                j = m + 1 - i
+                for k in range(j + t + 1):
+                    sx += m + i
+                    sy += m + j
+                    sz += m + t + k
+                    sw += 1
+                    dim += 1
+            if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * z + w):
+                print(sx, sy, sz, sw, dim, m, t)
+                return m, t
+
+
+def ernst05_eq2(bounds=None, props=None):
+    if bounds:
+        x, y, z, w = calc_bits(bounds)
+    else:
+        x, y, z, w = props
+    for m in range(1, MAX_M + 1):
+        for t in range(m + 1):
+            sx = sy = sz = sw = dim = 0
+            for i in range(m + 1):
+                for j in range(m - i + t + 1):
+                    for k in range(m - i + 1):
+                        dim += 1
+            sx = sy = sz = dim * m
+            sy += dim * t
+            for i in range(m + 2):
+                k = m + 1 - i
+                for j in range(m + t + 1 - i + 1):
+                    sx += m + i
+                    sy += m + t + j
+                    sz += m + k
+                    sw += 1
+                    dim += 1
+            for i in range(m + 1):
+                j = m + t + 1 - i
+                for k in range(m - i + 1):
+                    sx += m + i
+                    sy += m + t + j
+                    sz += m + k
+                    sw += 1
+                    dim += 1
+            if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * y + w):
+                print(sx, sy, sz, sw, dim, m, t)
+                return m, t
 
 
 def tk14_high(beta, gamma):
@@ -37,7 +102,7 @@ def tk14_high(beta, gamma):
             return m
 
 
-def tk14_low(beta, gamma):
+def tk14_low_1(beta, gamma):
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
     for m in range(1, MAX_M + 1):
@@ -62,6 +127,27 @@ def tk14_low(beta, gamma):
             print((s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) - n * m * (1 + beta - gamma)) / n)
             print(s_X, s_Y, s_Z, s_e, n, m)
             return m
+
+
+def tk14_low_2(beta, gamma):
+    for m in range(1, MAX_M + 1):
+        for t in range(m + 1):
+            s_X = s_Y = s_eM = n = 0
+            for u in range(m + 1):
+                for i in range(u + 1):
+                    s_X += u
+                    s_Y += i
+                    s_eM += m - i
+                    n += 1
+                for j in range(1, t):
+                    s_X += u
+                    s_Y += u + j
+                    s_eM += m - u
+                    n += 1
+            if s_X * beta + s_Y * 1 / 2 + s_eM * (1 + beta - gamma) < n * m * (1 + beta - gamma):
+                print((s_X * beta + s_Y * 1 / 2 + s_eM * (1 + beta - gamma) - n * m * (1 + beta - gamma)) / n)
+                print(s_X, s_Y, s_eM, n, m, t)
+                return m, t
 
 
 def tk17_large_e(alpha, beta, delta):
@@ -323,4 +409,8 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
 # mns21_dp_dq_with_lsb(1, 0.07, 0.07, 0.03)
 # tk17_small_dp_dq(1, 0.05)
 # tk14_high(0.3, 0.27)
-# tk14_low(0.3, 0.23)
+# tk14_low_1(0.3, 0.27)
+# tk14_low_2(0.4, 0.17)
+# ernst05_eq1(props=[0.07, 0.7, 0.5, 1 + 0.7])
+# beta = 0.7
+# ernst05_eq2(props=[0.074, 0.2, 0.5, 1 + 0.2])

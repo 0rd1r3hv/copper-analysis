@@ -2,8 +2,13 @@ from sage.all import *
 from time import time
 
 
-def groebner(pols, var, bound, max_fails=10, N=None, neg=False):
+def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
     start = time()
+    print(len(pols))
+    bound, var = bound_var
+    if bound < 0:
+        bound = -bound
+        neg = True
     R = pols[0].parent()
     num = R.ngens()
     p = Integer(1 << 27)
@@ -58,7 +63,7 @@ def groebner(pols, var, bound, max_fails=10, N=None, neg=False):
             res = recursive(crt_rem[0][0], crt_mod[0], 1)
         else:
             res = crt(crt_rem, crt_mod)
-        if neg:
+        if neg == True:
             m = 1
             for mod in crt_mod:
                 m *= mod

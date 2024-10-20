@@ -2,6 +2,7 @@ from sage.all import *
 from tk14 import *
 from tk17 import *
 from mns21 import *
+from ernst05 import *
 from practical_bounds import *
 
 
@@ -39,6 +40,44 @@ def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
         return num % mod
 
 
+def ernst05_mixed_1_test():
+    lp = 512
+    p = get_prime(lp)
+    q = get_prime(lp)
+    p_q = -(p + q)
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    beta = 0.4
+    delta = 0.15
+    high = 0.15
+    ld = ceil(N.nbits() * beta)
+    d, e = get_pair(ld, phi)
+    k = (e * d - 1) // phi
+    d_low = get_leak(d, 'low', ceil(ld - lp * 2 * (delta + high)))
+    d_high = get_leak(d, 'high', ceil(lp * 2 * high))
+    sol = mixed_1(N, e, [d_high, d_low], [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))])
+    assert sol == d
+
+
+def ernst05_mixed_2_test():
+    lp = 512
+    p = get_prime(lp)
+    q = get_prime(lp)
+    p_q = p + q
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    beta = 0.7
+    delta = 0.07
+    high = 0.6
+    ld = ceil(N.nbits() * beta)
+    d, e = get_pair(ld, phi)
+    k = (e * d - 1) // phi
+    d_low = get_leak(d, 'low', ceil(ld - lp * 2 * (delta + high)))
+    d_high = get_leak(d, 'high', ceil(lp * 2 * high))
+    sol = mixed_2(N, e, [d_high, d_low], [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))], test=[d, p_q])
+    assert sol == d
+
+
 def tk14_high_leak_test():
     lp = 512
     p = get_prime(lp)
@@ -46,17 +85,20 @@ def tk14_high_leak_test():
     p_q = -(p + q)
     N = p * q
     phi = (p - 1) * (q - 1)
-    beta = 0.3
-    delta = 0.27
+    # beta = 0.3
+    # delta = 0.27
+    beta = 0.8
+    delta = 0.12
     ld = ceil(N.nbits() * beta)
     d, e = get_pair(ld, phi)
     k = (e * d - 1) // phi
     d_high = get_leak(d, 'high', ceil(ld - lp * 2 * delta))
-    sol = high_leak(N, e, d_high, ld, N + 1, 1 << floor(lp * 2 * delta), (1 << (N.nbits() // 2)), 19)
+    # sol = high_leak(N, e, d_high, ld, N + 1, 1 << floor(lp * 2 * delta), (1 << (N.nbits() // 2)), 19)
+    sol = high_leak(N, e, d_high, ld, N + 1, 1 << ceil(lp * 2 * delta), 1 << (N.nbits() // 2), 6, k, p_q)
     assert sol == d
 
 
-def tk14_low_leak_test():
+def tk14_low_leak_1_test():
     lp = 512
     p = get_prime(lp)
     q = get_prime(lp)
@@ -64,12 +106,29 @@ def tk14_low_leak_test():
     N = p * q
     phi = (p - 1) * (q - 1)
     beta = 0.3
-    delta = 0.23
+    delta = 0.24
     ld = ceil(N.nbits() * beta)
     d, e = get_pair(ld, phi)
     k = (e * d - 1) // phi
     d_low = get_leak(d, 'low', ceil(ld - lp * 2 * delta))
-    sol = low_leak(N, e, d_low, ld, ceil(ld - lp * 2 * delta), N + 1, 1 << ceil(N.nbits() * beta), (1 << (N.nbits() // 2)), 5, k, p_q)
+    sol = low_leak_1(N, e, d_low, ld, ceil(ld - lp * 2 * delta), N + 1, 1 << ceil(N.nbits() * beta), (1 << (N.nbits() // 2)), 6)
+    assert sol == d
+
+
+def tk14_low_leak_2_test():
+    lp = 512
+    p = get_prime(lp)
+    q = get_prime(lp)
+    p_q = -(p + q)
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    beta = 0.4
+    delta = 0.17
+    ld = ceil(N.nbits() * beta)
+    d, e = get_pair(ld, phi)
+    k = (e * d - 1) // phi
+    d_low = get_leak(d, 'low', ceil(ld - lp * 2 * delta))
+    sol = low_leak_2(N, e, d_low, ld, ceil(ld - lp * 2 * delta), N + 1, 1 << ceil(N.nbits() * beta), (1 << (N.nbits() // 2)), 7, 3)
     assert sol == d
 
 
@@ -181,10 +240,12 @@ def mns21_test():
     dp_dq_with_lsb(N, e, delta1, delta2, leak_1, leak_2, (5, 2), k, k - 1, p, q, l - 1, l, l_leak=ceil(dp.nbits() * leak_prop))
 
 
+# ernst05_mixed_1_test()
+ernst05_mixed_2_test()
 # tk14_high_leak_test()
+# tk14_low_leak_1_test()
+# tk14_low_leak_2_test()
 # tk17_large_e_test()
 # tk17_small_e_test()
 # tk17_small_dp_dq_test()
 # mns21_test()
-# tk14_low_leak_test()
-tk14_low_leak_test()
