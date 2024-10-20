@@ -13,6 +13,7 @@ def l_LSBs(x, km, t):
     return max(0, ceil((x - km) / t))
 
 
+# X, Y, Z, W
 def ernst05_eq1(bounds=None, props=None):
     if bounds:
         x, y, z, w = calc_bits(bounds)
@@ -75,7 +76,7 @@ def ernst05_eq2(bounds=None, props=None):
                 return m, t
 
 
-def tk14_high(beta, gamma):
+def tk14_msb_1(beta, gamma):
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
     for m in range(1, MAX_M + 1):

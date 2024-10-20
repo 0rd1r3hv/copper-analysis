@@ -28,6 +28,15 @@ def calc_bits(lst):
     return list(map(lambda e: Integer(e).nbits(), lst))
 
 
+def reduce_varsize(N):
+    len_p = (N.nbits() + 1) >> 1
+    s_l = floor(2 * sqrt(N))
+    s_r = (1 << len_p) + N // (1 << len_p)
+    s = (s_l + s_r) >> 1
+    s += (N + 1 - s) % 4
+    return N + 1 - s, (s_r - s_l) >> 1
+
+
 def solve_copper(shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None):
     if select_num is None:
         select_num = len(shifts)

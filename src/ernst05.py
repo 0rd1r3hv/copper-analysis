@@ -82,7 +82,7 @@ def mixed_1(N, e, leaks, lens, mt=None, test=None):
         return d_m + (res << len_l) + d_l
 
 
-# leaks = [d msb, d lsb], lens = [len msb, len lsb], mt = [m ,t], test = [d, p + q]
+# leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], mt = [m, t], test = [d, p + q]
 def mixed_2(N, e, leaks, lens, mt=None, test=None):
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))

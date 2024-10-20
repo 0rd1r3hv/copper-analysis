@@ -23,21 +23,23 @@ def get_pair(length, phi):
                 return a, b
 
 
-def get_leak(num, pos, length=None, proportion=None, rand_mod=False):
-    if proportion:
-        bits = ceil(num.nbits() * proportion)
+def get_leak(num, pos, length):
+    if pos == 'high':
+        return num >> (num.nbits() - length)
+    else
+        return num % (1 << length)
+
+
+def get_partial_test(len_fac, len_control, len_m, len_l, control='d'):
+    p = get_prime(len_fac)
+    q = get_prime(len_fac)
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    if control == 'd':
+        d, e = get_pair(len_control, phi)
     else:
-        bits = length
-    if pos == "high":
-        bits = num.nbits() - bits
-    if rand_mod == False:
-        mod = 2**bits
-    else:
-        mod = get_rand(bits)
-    if pos == "high":
-        return (num // mod) * mod
-    elif pos == "low":
-        return num % mod
+        e, d = get_pair(len_control, phi)
+    return p, N, e, d, get_leak(d, 'high', len_m), get_leak(d, 'low', len_l)
 
 
 def ernst05_mixed_1_test():
@@ -309,7 +311,7 @@ def mns21_test():
     )
 
 
-ernst05_mixed_1_test()
+# ernst05_mixed_1_test()
 # ernst05_mixed_2_test()
 # tk14_high_leak_test()
 # tk14_low_leak_1_test()
@@ -318,3 +320,4 @@ ernst05_mixed_1_test()
 # tk17_small_e_test()
 # tk17_small_dp_dq_test()
 # mns21_test()
+# tk14_msb_1(0.3, 0.25)

@@ -1,8 +1,10 @@
 from sage.all import *
+from src.misc import *
 from src.root_methods import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
 import subprocess
+
 
 # Partial Key Exposure Attacks on RSA: Achieving the Boneh-Durfee Bound
 
@@ -13,6 +15,112 @@ def l_MSBs(x, km, t):
 
 def l_LSBs(x, km, t):
     return max(0, ceil((x - km) / t))
+
+
+# leaks = [d msb], lens = [len msb, len lsb], params = [m], test = [p]
+def msb_1(N, e, leaks, lens, params, test=None):
+    d_m, = leaks
+    d_m <<= len_d - len_m
+    len_d, len_m = lens
+    k0 = e * (d_m << (len_m - len_d)) // N
+    X = 1 << (len_d - len_m)
+    A, Y = reduce_varsize(N)
+    Z = (k0 + X) * Y
+    bounds = [X, Y, Z]
+    beta = len_d / N.nbits()
+    gamma = (len_d - len_m) / N.nbits()
+    k = 2 * (beta - gamma)
+    t = 1 + 2 * gamma - 4 * beta
+    if None in params:
+        m = tk14_msb_1(beta, gamma)
+    else:
+        m, = params
+    km = k * m
+    PR = ZZ["x, y, z"]
+    x, y, z = PR.gens()
+    Q = PR.quotient(x * y + 1 - z)
+    f = z + A * x
+    shifts = []
+    monomials = []
+    trans_x = [z**0]
+    trans_y = [[z**0] * max(floor(km + t * m) + 1, floor(km) + 1)] + [
+        [z**0] for _ in range(m)
+    ]
+    for i in range(1, m + 1):
+        deg = l_MSBs(i, km, t)
+        if deg == 0:
+            trans_x.append((1 + x * y) ** i)
+        else:
+            pol = (x * y) ** (i - deg) * z ** deg
+            rem = z ** i - (z - 1) ** (i - deg) * z ** deg
+            for d in range(deg, i):
+                pol += rem.monomial_coefficient(z ** d) * trans_x[d]
+            trans_x.append(pol)
+    for u in range(1, m + 1):
+        for j in range(1, floor(km + t * u) + 1):
+            deg = l_MSBs(u + j, km, t)
+            if deg == 0:
+                trans_y[u].append((1 + x * y) ** u)
+            else:
+                pol = (x * y) ** (u - deg) * z ** deg
+                rem = z ** u - (z - 1) ** (u - deg) * z ** deg
+                for d in range(deg, u):
+                    pol += rem.monomial_coefficient(z ** d) * trans_y[d][j]
+                trans_y[u].append(pol)
+    for u in range(m + 1):
+        for i in range(u + 1):
+            orig = f**i
+            pol = 0
+            for mono in orig.monomials():
+                deg_z = mono.degree(z)
+                pol += (
+                    orig.monomial_coefficient(mono)
+                    * trans_x[deg_z]
+                    * mono
+                    // (z**deg_z)
+                )
+            pol = x ** (u - i) * (pol.subs(x=k0 + x))
+            assert pol.subs(z=(k0 + x) * y + 1) == x ** (u - i) * (
+                (f**i).subs(x=k0 + x, z=(k0 + x) * y + 1)
+            )
+            deg = l_MSBs(i, km, t)
+            monomials.append(x ** (u - deg) * y ** (i - deg) * z**deg)
+            shifts.append(pol * e ** (m - i))
+        for j in range(1, floor(km + t * u) + 1):
+            orig = Q(y**j * f**u).lift()
+            pol = 0
+            for mono in orig.monomials():
+                deg_y = mono.degree(y)
+                deg_z = mono.degree(z)
+                if deg_y != 0:
+                    pol += (
+                        orig.monomial_coefficient(mono)
+                        * trans_y[deg_z][deg_y]
+                        * mono
+                        // (z**deg_z)
+                    )
+                else:
+                    pol += (
+                        orig.monomial_coefficient(mono)
+                        * trans_x[deg_z]
+                        * mono
+                        // (z**deg_z)
+                    )
+            pol = pol.subs(x=k0 + x)
+            assert pol.subs(z=(k0 + x) * y + 1) == (y**j * f**u).subs(
+                x=k0 + x, z=(k0 + x) * y + 1
+            )
+            deg = l_MSBs(u + j, km, t)
+            monomials.append(x ** (u - deg) * y ** (u + j - deg) * z**deg)
+            shifts.append(pol * e ** (m - u))
+    if test:
+        p, = test
+        x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
+        y0 = -(p + N // p - (N + 1 - A))
+        test = [x0, y0, (k0 + x0) * y0 + 1]
+    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - (k0 + x) * y - 1])
+
+    return ((k0 + res) * N) // e
 
 
 # f_MSBs(x, y) = 1 + (k0 + x)(A + y) ≡ 0 (mod e)
