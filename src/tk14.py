@@ -1,5 +1,6 @@
 from sage.all import *
 from src.misc import *
+from src.practical_bounds import *
 from src.root_methods import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
@@ -20,9 +21,9 @@ def l_LSBs(x, km, t):
 # leaks = [d msb], lens = [len msb, len lsb], params = [m], test = [p]
 def msb_1(N, e, leaks, lens, params, test=None):
     d_m, = leaks
-    d_m <<= len_d - len_m
     len_d, len_m = lens
-    k0 = e * (d_m << (len_m - len_d)) // N
+    d_m <<= len_d - len_m
+    k0 = e * d_m // N
     X = 1 << (len_d - len_m)
     A, Y = reduce_varsize(N)
     Z = (k0 + X) * Y
@@ -119,7 +120,6 @@ def msb_1(N, e, leaks, lens, params, test=None):
         y0 = -(p + N // p - (N + 1 - A))
         test = [x0, y0, (k0 + x0) * y0 + 1]
     res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - (k0 + x) * y - 1])
-
     return ((k0 + res) * N) // e
 
 

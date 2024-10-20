@@ -26,7 +26,7 @@ def get_pair(length, phi):
 def get_leak(num, pos, length):
     if pos == 'high':
         return num >> (num.nbits() - length)
-    else
+    else:
         return num % (1 << length)
 
 
@@ -40,6 +40,14 @@ def get_partial_test(len_fac, len_control, len_m, len_l, control='d'):
     else:
         e, d = get_pair(len_control, phi)
     return p, N, e, d, get_leak(d, 'high', len_m), get_leak(d, 'low', len_l)
+
+
+def tk14_msb_1_test(beta, delta, len_fac):
+    len_d = ceil(2 * len_fac * beta)
+    len_m = ceil(2 * len_fac * (beta - delta))
+    len_l = 0
+    p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
+    return msb_1(N, e, [d_m], [len_d, len_m], [None], [p]) == d
 
 
 def ernst05_mixed_1_test():
@@ -321,3 +329,4 @@ def mns21_test():
 # tk17_small_dp_dq_test()
 # mns21_test()
 # tk14_msb_1(0.3, 0.25)
+tk14_msb_1_test(0.3, 0.24, 512)
