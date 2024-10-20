@@ -51,7 +51,7 @@ def large_e(N, e, m, beta, delta):
     start = time()
 
     s = fplll_fmt(L)
-    file_name = "output.txt"
+    file_name = "tk17_output.txt"
 
     # 写入文件，覆盖之前的内容
     with open(file_name, "w", encoding="utf-8") as file:
@@ -59,7 +59,7 @@ def large_e(N, e, m, beta, delta):
 
     try:
         rst = subprocess.Popen(
-            "flatter.nu",
+            "./scripts/tk17_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,
@@ -145,7 +145,7 @@ def small_e(N, e, m, beta, delta):
     # L = L.LLL(delta=0.75)
 
     s = fplll_fmt(L)
-    file_name = "output.txt"
+    file_name = "tk17_output.txt"
 
     # 写入文件，覆盖之前的内容
     with open(file_name, "w", encoding="utf-8") as file:
@@ -153,7 +153,7 @@ def small_e(N, e, m, beta, delta):
 
     try:
         rst = subprocess.Popen(
-            "flatter.nu",
+            "./scripts/tk17_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,
@@ -296,7 +296,7 @@ def small_dp_dq(N, e, m, delta1, delta2):
 
     # try:
     #     rst = subprocess.Popen(
-    #         "tk17_flatter.nu",
+    #         "./scripts/tk17_flatter.nu",
     #         text=True,
     #         stdout=subprocess.PIPE,
     #         shell=True,

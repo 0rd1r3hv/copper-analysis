@@ -165,7 +165,7 @@ def dp_dq_with_lsb(N, e, delta1, delta2, ldp, ldq, m_thres, x1, x2, x3, x4, x5, 
 
     try:
         rst = subprocess.Popen(
-            "mns21_flatter.nu",
+            "./scripts/mns21_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,

@@ -117,7 +117,7 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m):
 
     try:
         rst = subprocess.Popen(
-            "tk14_flatter.nu",
+            "./scripts/tk14_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,
@@ -206,7 +206,7 @@ def low_leak_1(N, e, d_low, d_len, leak_len, A, X, Y, m):
 
     try:
         rst = subprocess.Popen(
-            "tk14_flatter.nu",
+            "./scripts/tk14_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,
