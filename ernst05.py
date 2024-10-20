@@ -4,7 +4,6 @@ from practical_bounds import *
 # from mp import groebner
 from root_methods import groebner
 from time import time
-from fplll_fmt import encode_fplll_format, read_fplll_format
 import subprocess
 
 
@@ -31,7 +30,7 @@ def eq1(coefs, bounds, mt, test):
         for j in range(m - i + 1):
             for k in range(j + t + 1):
                 shifts.append(x ** i * y ** j * z ** k * f * X ** (m - i) * Y ** (m - j) * Z ** (m + t - k))
-    return solve_copper(shifts, min(zip(bounds, [x, y, z])), test, bounds, ex_pols=[f0])
+    return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0])
 
 
 # test = [x, y, z]
@@ -63,7 +62,7 @@ def eq2(coefs, bounds, mt, test):
     return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0])
 
 
-# test = [d, p + q]
+# leaks = [d msb, d lsb], lens = [len msb, len lsb], mt = [m ,t], test = [d, p + q]
 def mixed_1(N, e, leaks, lens, mt=None, test=None):
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))
@@ -72,6 +71,7 @@ def mixed_1(N, e, leaks, lens, mt=None, test=None):
     A = N + 1 - s - ((N + 1 - s) % 4)
     len_d, len_m, len_l = lens
     d_m, d_l = leaks
+    d_m <<= len_d - len_m
     coefs = [e << len_l, -A, 4, e * (d_m + d_l) - 1]
     bounds = [1 << (len_d - len_m - len_l), 1 << len_d, (s_r - s_l) >> 1]
     if test:
@@ -82,7 +82,7 @@ def mixed_1(N, e, leaks, lens, mt=None, test=None):
         return d_m + (res << len_l) + d_l
 
 
-# test = [d, p + q]
+# leaks = [d msb, d lsb], lens = [len msb, len lsb], mt = [m ,t], test = [d, p + q]
 def mixed_2(N, e, leaks, lens, mt=None, test=None):
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))
@@ -91,6 +91,7 @@ def mixed_2(N, e, leaks, lens, mt=None, test=None):
     A = N + 1 - s - ((N + 1 - s) % 4)
     len_d, len_m, len_l = lens
     d_m, d_l = leaks
+    d_m <<= len_d - len_m
     k0 = e * d_m // N
     coefs = [e << len_l, -A, 4, 4 * k0, e * (d_m + d_l) - k0 * A - 1]
     bounds = [1 << (len_d - len_m - len_l), 1 << (max(len_d - len_m, len_d - len_p)), (s_r - s_l) >> 1]

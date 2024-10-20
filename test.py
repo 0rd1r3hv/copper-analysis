@@ -55,7 +55,7 @@ def ernst05_mixed_1_test():
     k = (e * d - 1) // phi
     d_low = get_leak(d, 'low', ceil(ld - lp * 2 * (delta + high)))
     d_high = get_leak(d, 'high', ceil(lp * 2 * high))
-    sol = mixed_1(N, e, [d_high, d_low], [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))])
+    sol = mixed_1(N, e, [d_high // (1 << (ld - ceil(lp * 2 * high))), d_low], [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))])
     assert sol == d
 
 
@@ -74,7 +74,7 @@ def ernst05_mixed_2_test():
     k = (e * d - 1) // phi
     d_low = get_leak(d, 'low', ceil(ld - lp * 2 * (delta + high)))
     d_high = get_leak(d, 'high', ceil(lp * 2 * high))
-    sol = mixed_2(N, e, [d_high, d_low], [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))], test=[d, p_q])
+    sol = mixed_2(N, e, [d_high // (1 << ceil(lp * 2 * high)), d_low], [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))], test=[d, p_q])
     assert sol == d
 
 
@@ -240,8 +240,8 @@ def mns21_test():
     dp_dq_with_lsb(N, e, delta1, delta2, leak_1, leak_2, (5, 2), k, k - 1, p, q, l - 1, l, l_leak=ceil(dp.nbits() * leak_prop))
 
 
-# ernst05_mixed_1_test()
-ernst05_mixed_2_test()
+ernst05_mixed_1_test()
+# ernst05_mixed_2_test()
 # tk14_high_leak_test()
 # tk14_low_leak_1_test()
 # tk14_low_leak_2_test()
