@@ -1,13 +1,14 @@
 import sys
+import io
 from PySide6.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
     QParallelAnimationGroup,
-    QTimer,
+    QTimer
 )
 from sage.all import *
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
+from PySide6.QtGui import QIcon, QTextCursor
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel,
 from ui import MainWinIniter
 from qt_material import apply_stylesheet
 from src.cfg import Cfg
@@ -58,7 +59,8 @@ class MainWin(QMainWindow):
         攻击函数 = [
             self._attack_function_1,
             self._attack_function_2,
-            self.ernst05,
+            self.ernst1,
+            self.ernst2,
         ]
 
         if 0 <= 攻击方法序列 < len(攻击函数):
@@ -72,11 +74,29 @@ class MainWin(QMainWindow):
     def _attack_function_2(self):
         print("执行攻击函数2")
 
-    def ernst05(self):
+    def ernst1(self):
+        redirect_stdout(self)
+        print("Ernst1")
         mixed_1(
             Integer(self.ui.N_le.text()),
             Integer(self.ui.e_le.text()),
             (Integer(self.ui.d_msb_le.text()), Integer(self.ui.d_lsb_le.text())),
+            (
+                Integer(self.ui.d_len_le.text()),
+                Integer(self.ui.msb_len_le.text()),
+                Integer(self.ui.lsb_len_le.text()),
+            ),
+        )
+
+    def ernst2(self):
+        print("Ernst2")
+        mixed_2(
+            Integer(self.ui.N_le.text()),
+            Integer(self.ui.e_le.text()),
+            (
+                Integer(self.ui.d_msb_le.text()),
+                Integer(self.ui.d_lsb_le.text()),
+            ),
             (
                 Integer(self.ui.d_len_le.text()),
                 Integer(self.ui.msb_len_le.text()),
@@ -128,6 +148,24 @@ class MainWin(QMainWindow):
             item = self.ui.sidebar_glo.itemAtPosition(r, 1)
             if isinstance(item.widget(), QLabel):
                 item.widget().setVisible(ext)
+
+
+class StdoutRedirector(io.StringIO):
+    def __init__(self, text_widget):
+        super().__init__()
+        self.text_widget = text_widget
+
+    def write(self, string):
+        self.text_widget.append(string)
+        self.text_widget.moveCursor(QTextCursor.End)
+        QApplication.processEvents()
+
+    def redirect_stdout(self):
+        self.stdout_redirector = StdoutRedirector(self.ui.output_te)
+        sys.stdout = self.stdout_redirector
+
+    def restore_stdout(self):
+        sys.stdout = sys.__stdout__
 
 
 if __name__ == "__main__":

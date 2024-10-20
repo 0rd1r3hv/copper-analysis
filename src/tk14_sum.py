@@ -1,15 +1,15 @@
 from sage.all import *
 
-var('u', 'i', 'j', 'm', 'k', 't', 'a', 'b', 'd', 'e', 'g', 's', 'l', 'x', 'y')
-n = Rational('1/2') + k + t / 2
-sx = Rational('1/6') + k / 2 + t / 6
-sy = k / 2 + k ** 2 / 2 + k * t / 2 + t / 6 + t ** 2 / 6
-sz = Rational('1/6') + t / 6
-se = Rational('1/3') + k / 2 + t / 6
+var("u", "i", "j", "m", "k", "t", "a", "b", "d", "e", "g", "s", "l", "x", "y")
+n = Rational("1/2") + k + t / 2
+sx = Rational("1/6") + k / 2 + t / 6
+sy = k / 2 + k**2 / 2 + k * t / 2 + t / 6 + t**2 / 6
+sz = Rational("1/6") + t / 6
+se = Rational("1/3") + k / 2 + t / 6
 
 
 def solve(X, Y, Z, E, var):
-    eq = (sx * X + sy * Y + sz * Z + se * E - n * E == 0)
+    eq = sx * X + sy * Y + sz * Z + se * E - n * E == 0
     # K = (Z - X - Y) / Y
     # T = (X + Y + E - 2 * Z) / Y
     K = k

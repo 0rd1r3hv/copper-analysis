@@ -258,7 +258,7 @@ class MainWinIniter:
         atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
         atk_cb.setObjectName("atk_cb")
         atk_cb.setMinimumHeight(40)
-        atk_cb.addItems(["May", "BD", "Ernst"])  # 添加攻击方法选项
+        atk_cb.addItems(["May", "BD", "Ernst1", "Ernst2"])  # 添加攻击方法选项
         setattr(self, "atk_cb", atk_cb)
         atk_hlo.addWidget(atk_lbl)
         atk_hlo.addWidget(atk_cb)
