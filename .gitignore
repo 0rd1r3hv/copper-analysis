@@ -1,4 +1,4 @@
-*.txt
-.ruff_cache/
-__pycache__/
-
+__pycache__
+.direnv
+.ruff_cache
+.venv

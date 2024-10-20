@@ -1,5 +1,5 @@
 from sage.all import *
-from misc import *
+from src.misc import *
 
 
 MAX_M = 1000

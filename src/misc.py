@@ -1,5 +1,5 @@
 from sage.all import *
-from root_methods import groebner
+from src.root_methods import groebner
 from time import time
 
 

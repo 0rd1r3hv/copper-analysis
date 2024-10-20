@@ -1,7 +1,7 @@
 from sage.all import *
-from root_methods import groebner
+from src.root_methods import groebner
 from time import time
-from fplll_fmt import fplll_fmt, fplll_read
+from src.fplll_fmt import fplll_fmt, fplll_read
 import subprocess
 
 # Partial Key Exposure Attacks on RSA: Achieving the Boneh-Durfee Bound

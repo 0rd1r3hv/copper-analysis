@@ -1,8 +1,8 @@
 from sage.all import *
-from misc import *
-from practical_bounds import *
+from src.misc import *
+from src.practical_bounds import *
 # from mp import groebner
-from root_methods import groebner
+from src.root_methods import groebner
 from time import time
 import subprocess
 
@@ -62,7 +62,7 @@ def eq2(coefs, bounds, mt, test):
     return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0])
 
 
-# leaks = [d msb, d lsb], lens = [len msb, len lsb], mt = [m ,t], test = [d, p + q]
+# leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], mt = [m ,t], test = [d, p + q]
 def mixed_1(N, e, leaks, lens, mt=None, test=None):
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))
