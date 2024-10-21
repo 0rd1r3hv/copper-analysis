@@ -42,6 +42,51 @@ def get_partial_test(len_fac, len_control, len_m, len_l, control="d"):
     return p, N, e, d, get_leak(d, "high", len_m), get_leak(d, "low", len_l)
 
 
+def get_crt_partial_test(len_fac, len_dp, len_dq, len_l):
+    while True:
+        p = get_prime(len_fac)
+        q = get_prime(len_fac)
+        if (
+            gcd(p - 1, q - 1) == 2
+            and (p - 1).valuation(2) == 1
+            and (q - 1).valuation(2) == 1
+        ):
+            break
+    N = p * q
+    phi = (p - 1) * (q - 1)
+    while True:
+        dp = 2 * get_rand(len_dp - 1) + 1
+        dq = 2 * get_rand(len_dq - 1) + 1
+        if gcd(dp, p - 1) == 1 and gcd(dq, q - 1) == 1:
+            d = crt([dp, dq], [p - 1, q - 1])
+            e = inverse_mod(d, phi)
+            if gcd(e, N - 1) == 1 and e.nbits() == phi.nbits():
+                k = (e * dp - 1) // (p - 1)
+                l = (e * dq - 1) // (q - 1)
+                break
+    dp_l = get_leak(dp, 'low', len_l)
+    dq_l = get_leak(dq, 'low', len_l)
+    return p, N, e, dp, dq, dp_l, dq_l
+
+
+def ernst05_mixed_1_test(beta, delta, kappa, len_fac):
+    print(f"ernst05_mixed_1_test beta: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}")
+    len_d = ceil(2 * len_fac * beta)
+    len_m = ceil(2 * len_fac * (beta - delta - kappa))
+    len_l = ceil(2 * len_fac * kappa)
+    p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
+    return mixed_1(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+
+
+def ernst05_mixed_2_test(beta, delta, kappa, len_fac):
+    print(f"ernst05_mixed_2_test beta: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}")
+    len_d = ceil(2 * len_fac * beta)
+    len_m = ceil(2 * len_fac * (beta - delta - kappa))
+    len_l = ceil(2 * len_fac * kappa)
+    p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
+    return mixed_2(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+
+
 def tk14_msb_1_test(beta, delta, len_fac):
     print(f"tk14_msb_1_test beta: {beta}, delta: {delta}, len_fac: {len_fac}")
     len_d = ceil(2 * len_fac * beta)
@@ -60,114 +105,14 @@ def tk14_lsb_test(beta, delta, len_fac):
     return lsb(N, e, [d_l], [len_d, len_l], [None], [p]) == d
 
 
-def ernst05_mixed_1_test():
-    lp = 512
-    p = get_prime(lp)
-    q = get_prime(lp)
-    p_q = -(p + q)
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    beta = 0.4
-    delta = 0.15
-    high = 0.15
-    ld = ceil(N.nbits() * beta)
-    d, e = get_pair(ld, phi)
-    k = (e * d - 1) // phi
-    d_low = get_leak(d, "low", ceil(ld - lp * 2 * (delta + high)))
-    d_high = get_leak(d, "high", ceil(lp * 2 * high))
-    print(
-        f"N:{N}\ne:{e}\nd_msb d_lsb:{[d_high // (1 << (ld - ceil(lp * 2 * high))), d_low]}\nd_len, msb_len, lsb_len:{[ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))]}\n"
-    )
-    sol = mixed_1(
-        N,
-        e,
-        [d_high // (1 << (ld - ceil(lp * 2 * high))), d_low],
-        [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))],
-    )
-    assert sol == d
-
-
-def ernst05_mixed_2_test():
-    lp = 512
-    p = get_prime(lp)
-    q = get_prime(lp)
-    p_q = p + q
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    beta = 0.7
-    delta = 0.07
-    high = 0.6
-    ld = ceil(N.nbits() * beta)
-    d, e = get_pair(ld, phi)
-    k = (e * d - 1) // phi
-    d_low = get_leak(d, "low", ceil(ld - lp * 2 * (delta + high)))
-    d_high = get_leak(d, "high", ceil(lp * 2 * high))
-    sol = mixed_2(
-        N,
-        e,
-        [d_high // (1 << ceil(lp * 2 * high)), d_low],
-        [ld, ceil(lp * 2 * high), ceil(ld - lp * 2 * (delta + high))],
-        test=[d, p_q],
-    )
-    assert sol == d
-
-
-def tk14_high_leak_test():
-    lp = 512
-    p = get_prime(lp)
-    q = get_prime(lp)
-    p_q = -(p + q)
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    # beta = 0.3
-    # delta = 0.27
-    beta = 0.8
-    delta = 0.12
-    ld = ceil(N.nbits() * beta)
-    d, e = get_pair(ld, phi)
-    k = (e * d - 1) // phi
-    d_high = get_leak(d, "high", ceil(ld - lp * 2 * delta))
-    # sol = high_leak(N, e, d_high, ld, N + 1, 1 << floor(lp * 2 * delta), (1 << (N.nbits() // 2)), 19)
-    sol = high_leak(
-        N,
-        e,
-        d_high,
-        ld,
-        N + 1,
-        1 << ceil(lp * 2 * delta),
-        1 << (N.nbits() // 2),
-        6,
-        k,
-        p_q,
-    )
-    assert sol == d
-
-
-def tk14_low_leak_1_test():
-    lp = 512
-    p = get_prime(lp)
-    q = get_prime(lp)
-    p_q = -(p + q)
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    beta = 0.3
-    delta = 0.24
-    ld = ceil(N.nbits() * beta)
-    d, e = get_pair(ld, phi)
-    k = (e * d - 1) // phi
-    d_low = get_leak(d, "low", ceil(ld - lp * 2 * delta))
-    sol = low_leak_1(
-        N,
-        e,
-        d_low,
-        ld,
-        ceil(ld - lp * 2 * delta),
-        N + 1,
-        1 << ceil(N.nbits() * beta),
-        (1 << (N.nbits() // 2)),
-        6,
-    )
-    assert sol == d
+def mns21_dp_dq_with_lsb_test(delta1, delta2, leak, len_fac):
+    print(f"mns21_dp_dq_with_lsb_test delta1: {delta1}, delta2: {delta2}, leak: {leak}, len_fac: {len_fac}")
+    len_dp = ceil(2 * len_fac * delta1)
+    len_dq = ceil(2 * len_fac * delta2)
+    len_l = ceil(2 * len_fac * leak)
+    p, N, e, dp, dq, dp_l, dq_l = get_crt_partial_test(len_fac, len_dp, len_dq, len_l)
+    res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
+    return res == p or res == N // p
 
 
 def tk14_low_leak_2_test():
@@ -276,59 +221,6 @@ def tk17_small_dp_dq_test():
     assert res == p or res == q
 
 
-def mns21_test():
-    ln = 1000
-    beta = 0.5
-    delta1 = 0.07
-    delta2 = 0.07
-    lp = ceil(beta * ln)
-    lq = ceil(beta * ln)
-    ldp = ceil(delta1 * ln)
-    ldq = ceil(delta2 * ln)
-    leak_prop = 0.03
-    while True:
-        p = get_prime(lp - 1)
-        q = get_prime(lq - 1)
-        if (
-            gcd(p - 1, q - 1) == 2
-            and (p - 1).valuation(2) == 1
-            and (q - 1).valuation(2) == 1
-        ):
-            break
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    while True:
-        dp = 2 * get_rand(ldp - 1) + 1
-        dq = 2 * get_rand(ldq - 1) + 1
-        if gcd(dp, p - 1) == 1 and gcd(dq, q - 1) == 1:
-            d = crt([dp, dq], [p - 1, q - 1])
-            e = inverse_mod(d, phi)
-            if gcd(e, N - 1) == 1:
-                k = (e * dp - 1) // (p - 1)
-                l = (e * dq - 1) // (q - 1)
-                le = e.nbits()
-                alpha = le / ln
-                break
-    leak_1 = get_leak(dp, "low", ceil(dp.nbits() * leak_prop))
-    leak_2 = get_leak(dq, "low", ceil(dp.nbits() * leak_prop))
-    dp_dq_with_lsb(
-        N,
-        e,
-        delta1,
-        delta2,
-        leak_1,
-        leak_2,
-        (5, 2),
-        k,
-        k - 1,
-        p,
-        q,
-        l - 1,
-        l,
-        l_leak=ceil(dp.nbits() * leak_prop),
-    )
-
-
 # ernst05_mixed_1_test()
 # ernst05_mixed_2_test()
 # tk14_high_leak_test()
@@ -338,9 +230,12 @@ def mns21_test():
 # tk17_small_e_test()
 # tk17_small_dp_dq_test()
 # mns21_test()
-tk14_msb_1(0.3, 0.25)
+# tk14_msb_1(0.3, 0.25)
 # tk14_msb_1_test(0.37, 0.205, 512)
 # tk14_msb_1_test(0.292, 0.282, 512)
 # tk14_msb_1_test(0.31, 0.25, 512)
 # tk14_msb_1_test(0.31, 0.25, 512)
-tk14_lsb_test(0.3, 0.25, 512)
+# tk14_lsb_test(0.3, 0.25, 512)
+# ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
+# mns21_dp_dq_with_lsb(1, 0.02, 0.02, 0)
+mns21_dp_dq_with_lsb_test(0.02, 0.02, 0, 512)

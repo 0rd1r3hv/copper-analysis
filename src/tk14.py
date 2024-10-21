@@ -31,7 +31,6 @@ def msb_1(N, e, leaks, lens, params, test=None):
     bounds = [X, Y, Z]
     beta = len_d / N.nbits()
     gamma = (len_d - len_m) / N.nbits()
-    print(beta, gamma)
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
     if None in params:

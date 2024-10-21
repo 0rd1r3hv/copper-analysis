@@ -9,51 +9,62 @@ import subprocess
 
 # test = [x, y, z]
 # a * x + b * y + c * y * z + d = 0
-def eq1(coefs, bounds, mt, test):
+def eq1(coefs, bounds, params, test):
     x, y, z = ZZ['x, y, z'].gens()
     a, b, c, d = coefs
     f0 = a * x + b * y + c * y * z + d
     X, Y, Z, W = assure_coprime(bounds + [poly_norm(f0, bounds, 'inf')], d)
     bounds = [X, Y, Z]
-    if mt:
-        m, t = mt
-    else:
+    if None in params:
         m, t = ernst05_eq1(bounds + [W])
+    else:
+        m, t = params
     n = (X * Y * Z) ** m * Z ** t * W
     f = (inverse_mod(d, n) * f0) % n
     shifts = []
+    monomials = []
     for i in range(m + 2):
         j = m + 1 - i
         for k in range(j + t + 1):
+            monomials.append(x ** i * y ** j * z ** k)
             shifts.append(n * x ** i * y ** j * z ** k)
     for i in range(m + 1):
         for j in range(m - i + 1):
-            for k in range(j + t + 1):
+            for k in range(j + 1):
+                monomials.append(x ** i * y ** j * z ** k)
                 shifts.append(x ** i * y ** j * z ** k * f * X ** (m - i) * Y ** (m - j) * Z ** (m + t - k))
-    return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0])
+    for i in range(m + 1):
+        for j in range(m - i + 1):
+            for k in range(j + 1, j + t + 1):
+                monomials.append(x ** i * y ** j * z ** k)
+                shifts.append(x ** i * y ** j * z ** k * f * X ** (m - i) * Y ** (m - j) * Z ** (m + t - k))
+    return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0], monomials=None)
 
 
 # test = [x, y, z]
 # a * x + b * y + c * y * z + d * z + e = 0
-def eq2(coefs, bounds, mt, test):
+def eq2(coefs, bounds, params, test):
     x, y, z = ZZ['x, y, z'].gens()
     a, b, c, d, e = coefs
     f0 = a * x + b * y + c * y * z + d * z + e
     X, Y, Z, W = assure_coprime(bounds + [poly_norm(f0, bounds, 'inf')], e)
-    if mt:
-        m, t = mt
-    else:
+    if None in params:
         m, t = ernst05_eq2(bounds + [W])
+    else:
+        m, t = params
     n = (X * Y * Z) ** m * Y ** t * W
     f = (inverse_mod(e, n) * f0) % n
     shifts = []
+    monomials = []
     for i in range(m + 2):
         k = m + 1 - i
         for j in range(m + t + 1 - i + 1):
+            monomials.append(x ** i * y ** j * z ** k)
             shifts.append(n * x ** i * y ** j * z ** k)
     for i in range(m + 1):
         j = m + t + 1 - i
         for k in range(m - i + 1):
+            monomials.append(x ** i * y ** j ** z ** k)
             shifts.append(n * x ** i * y ** j * z ** k)
     for i in range(m + 1):
         for j in range(m - i + t + 1):
@@ -62,8 +73,8 @@ def eq2(coefs, bounds, mt, test):
     return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0])
 
 
-# leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], mt = [m ,t], test = [d, p + q]
-def mixed_1(N, e, leaks, lens, mt=None, test=None):
+# leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t], test = [p]
+def mixed_1(N, e, leaks, lens, params=None, test=None):
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))
     s_r = (1 << len_p) + N // (1 << len_p)
@@ -75,15 +86,17 @@ def mixed_1(N, e, leaks, lens, mt=None, test=None):
     coefs = [e << len_l, -A, 4, e * (d_m + d_l) - 1]
     bounds = [1 << (len_d - len_m - len_l), 1 << len_d, (s_r - s_l) >> 1]
     if test:
-        d, p_q = test
-        test = [(d - d_high - d_low) >> len_l, (e * d - 1) // (N + 1 - p_q), (p_q - s - ((N + 1 - s) % 4)) >> 2]
-    res = eq1(coefs, bounds, mt, test)
+        p, = test
+        p_q = p + N // p
+        d = inverse_mod(e, N + 1 - p_q)
+        test = [(d - d_m - d_l) >> len_l, (e * d - 1) // (N + 1 - p_q), (p_q - s - ((N + 1 - s) % 4)) >> 2]
+    res = eq1(coefs, bounds, params, test)
     if res:
         return d_m + (res << len_l) + d_l
 
 
-# leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], mt = [m, t], test = [d, p + q]
-def mixed_2(N, e, leaks, lens, mt=None, test=None):
+# leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t], test = [p]
+def mixed_2(N, e, leaks, lens, params=None, test=None):
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))
     s_r = (1 << len_p) + N // (1 << len_p)
@@ -96,8 +109,10 @@ def mixed_2(N, e, leaks, lens, mt=None, test=None):
     coefs = [e << len_l, -A, 4, 4 * k0, e * (d_m + d_l) - k0 * A - 1]
     bounds = [1 << (len_d - len_m - len_l), 1 << (max(len_d - len_m, len_d - len_p)), (s_r - s_l) >> 1]
     if test:
-        d, p_q = test
+        p, = test
+        p_q = p + N // p
+        d = inverse_mod(e, N + 1 - p_q)
         test = [(d - d_m - d_l) >> len_l, (e * d - 1) // (N + 1 - p_q) - k0, (p_q - s - ((N + 1 - s) % 4)) >> 2]
-    res = eq2(coefs, bounds, mt, test)
+    res = eq2(coefs, bounds, params, test)
     if res:
         return d_m + (res << len_l) + d_l

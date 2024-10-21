@@ -393,18 +393,6 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                                     s_M += deg
                                     s_eM += 2 * m - deg
                                     n += 1
-            print(
-                (
-                    s_X * (alpha + delta1 - 1 / 2)
-                    + s_Y / 2
-                    + s_Z * (alpha + delta2 - 1 / 2)
-                    + s_M * leak
-                    + s_eM * (alpha + leak)
-                    - n * 2 * m * (alpha + leak)
-                )
-                / n
-            )
-            print(n, m, thres)
             if s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (
                 alpha + delta2 - 1 / 2
             ) + s_M * leak + s_eM * (alpha + leak) < n * 2 * m * (alpha + leak):
