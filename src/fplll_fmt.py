@@ -2,6 +2,7 @@ from sage.all import *
 
 def fplll_fmt(M):
     m, n = M.dimensions()
+    print(f"fplll_fmt dimension: {m} {n}")
     s = "["
     for i in range(m):
         s += "["

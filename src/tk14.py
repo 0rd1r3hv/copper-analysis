@@ -1,7 +1,8 @@
 from sage.all import *
 from src.misc import *
 from src.practical_bounds import *
-from src.root_methods import groebner
+# from src.root_method import groebner
+from src.mp import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
 import subprocess
@@ -242,7 +243,7 @@ def high_leak(N, e, d_high, d_len, A, X, Y, m):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol)
 
-    print(time() - start)
+    print(f"high_leak flatter: {time() - start}")
     x0 = groebner(pols, x, X)
     if x0:
         return floor(((k0 + x0) * N) // e)
@@ -314,7 +315,7 @@ def low_leak_1(N, e, d_low, d_len, leak_len, A, X, Y, m):
 
     try:
         rst = subprocess.Popen(
-            "./scripts/tk14_flatter.nu",
+            "src/scripts/tk14_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,
@@ -330,7 +331,7 @@ def low_leak_1(N, e, d_low, d_len, leak_len, A, X, Y, m):
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol)
-    print(time() - start)
+    print(f"low_leak_1 flatter: {time() - start}")
     x0 = groebner(pols, x, X)
     if x0:
         return (x0 * N) // e
@@ -367,7 +368,7 @@ def low_leak_2(N, e, d_low, d_len, leak_len, A, X, Y, m, t):
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol)
-    print(time() - start)
+    print(f"low_leak_2 flatter: {time() - start}")
     x0 = groebner(pols, x, X)
     if x0:
         return (x0 * N) // e

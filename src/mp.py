@@ -4,8 +4,8 @@ from time import time
 import queue
 
 
-def groebner(pols, var, bound, max_fails=10, N=None):
-    def worker(R, num, p, pols, var, rsts, N):
+def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
+    def worker(R, num, p, pols, var, rsts, N=None):
         for i in range(len(pols), num - 1, -1):
             I = Ideal((R * pols[:i]).groebner_basis())
             if I.dimension() == 0:
@@ -23,7 +23,11 @@ def groebner(pols, var, bound, max_fails=10, N=None):
             rsts.put(None)
 
     start = time()
-
+    print(f"mp len(pols): {len(pols)}")
+    bound, var = bound_var
+    if bound < 0:
+        bound = -bound
+        neg = True
     R = pols[0].parent()
     num = R.ngens()
     p = Integer(1 << 27)
@@ -41,43 +45,60 @@ def groebner(pols, var, bound, max_fails=10, N=None):
         p = p.next_prime()
         R = R.change_ring(GF(p))
 
-        proc = multiprocessing.Process(target=worker, args=(R, num, p, pols, var, rsts, N))
+        proc = multiprocessing.Process(
+            target=worker, args=(R,num, p, pols, var, rsts, N)
+        )
         proc.start()
         procs.append(proc)
 
     # 轮询结果并补充新进程
     while True:
-        if fails >= max_fails:
+        if fails < max_fails and m >= bound:
             for p in procs:
                 p.terminate()
             for p in procs:
                 p.join()
-            print(f"fail: {time() - start}")
-            return None
+            print(f"groebner success: {time() - start}")
 
-        if m >= bound:
-            for p in procs:
-                p.terminate()
-            for p in procs:
-                p.join()
-            print(f"succ: {time() - start}")
             if N:
                 def recursive(res, m, d):
                     if d == len(crt_rem):
                         if N % res == 0:
                             return res
                         return None
-                    ret1 = recursive(crt([res, crt_rem[d][0]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                    ret1 = recursive(
+                        crt([res, crt_rem[d][0]], [m, crt_mod[d]]),
+                        m * crt_mod[d],
+                        d + 1,
+                    )
                     if ret1:
                         return ret1
-                    ret2 = recursive(crt([res, crt_rem[d][1]], [m, crt_mod[d]]), m * crt_mod[d], d + 1)
+                    ret2 = recursive(
+                        crt([res, crt_rem[d][1]], [m, crt_mod[d]]),
+                        m * crt_mod[d],
+                        d + 1,
+                    )
                     if ret2:
                         return ret2
 
+                res = recursive(crt_rem[0][0], crt_mod[0], 1)
+            else:
+                res = crt(crt_rem, crt_mod)
+            if neg is True:
+                m = 1
+                for mod in crt_mod:
+                    m *= mod
+                return res - m
+            else:
+                return res
 
-            return recursive(crt_rem[0][0], crt_mod[0], 1)
-        else:
-            return crt(crt_rem, crt_mod)
+        if fails >= max_fails:
+            for p in procs:
+                p.terminate()
+            for p in procs:
+                p.join()
+            print(f"groebner fail: {time() - start}")
+            return None
 
         procs = [p for p in procs if p.is_alive()]
         if len(procs) < max_proc:
@@ -92,7 +113,7 @@ def groebner(pols, var, bound, max_fails=10, N=None):
                 procs.append(proc)
 
         try:
-            r = rsts.get(timeout=0.01)
+            r = rsts.get(timeout=0.1)
             if r is None:
                 fails += 1
             else:
@@ -101,6 +122,3 @@ def groebner(pols, var, bound, max_fails=10, N=None):
                 m *= r[1]
         except queue.Empty:
             pass
-
-
-

@@ -47,6 +47,7 @@
               config.treefmt.build.devShell
             ];
             nativeBuildInputs = with pkgs; [
+              flatter
               qt6.wrapQtAppsHook
             ];
             shellHook = '''';

@@ -1,6 +1,6 @@
 from sage.all import *
-# from mp import groebner
-from src.root_methods import groebner
+from src.mp import groebner
+# from src.root_methods import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
 import subprocess
@@ -165,7 +165,7 @@ def dp_dq_with_lsb(N, e, delta1, delta2, ldp, ldq, m_thres, x1, x2, x3, x4, x5, 
 
     try:
         rst = subprocess.Popen(
-            "./scripts/mns21_flatter.nu",
+            "src/scripts/mns21_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,
@@ -181,7 +181,7 @@ def dp_dq_with_lsb(N, e, delta1, delta2, ldp, ldq, m_thres, x1, x2, x3, x4, x5, 
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol)
-    print(time() - start)
+    print(f"dp_dq_with_lsb flatter: {time() - start}")
     p0 = groebner(pols, yp, Y, N=N)
     assert p0 == x3
     return p0

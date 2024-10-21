@@ -1,7 +1,7 @@
 from sage.all import Matrix, ZZ, inverse_mod, Integer , gcd, ceil, floor
 
-# from mp import groebner
-from src.root_methods import groebner
+from src.mp import groebner
+# from src.root_methods import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
 import subprocess
@@ -60,7 +60,7 @@ def large_e(N, e, m, beta, delta):
 
     try:
         rst = subprocess.Popen(
-            "./scripts/tk17_flatter.nu",
+            "src/scripts/tk17_flatter.nu",
             text=True,
             stdout=subprocess.PIPE,
             shell=True,
@@ -78,7 +78,7 @@ def large_e(N, e, m, beta, delta):
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol(k - 1, k, p, q))
-    print(time() - start)
+    print(f"large_e flatter: {time() - start}")
     # p0 = groebner(pols, yp, Yp)
     p0 = groebner(pols, p, Yp)
     return p0
@@ -172,7 +172,7 @@ def small_e(N, e, m, beta, delta):
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol(k - 1, k, p, q))
-    print(time() - start)
+    print(f"small_e flatter: {time() - start}")
     # p0 = groebner(pols, yp, Yp)
     p0 = groebner(pols, p, Yp)
     return p0
@@ -315,25 +315,25 @@ def small_dp_dq(N, e, m, delta1, delta2):
         for j in range(i + 1):
             L[i, j] = shifts[i].monomial_coefficient(monomials[j])
     start = time()
-    L = L.LLL(delta=0.75)
+    # L = L.LLL(delta=0.75)
 
-    # s = fplll_fmt(L)
-    # file_name = "tk17_output.txt"
+    s = fplll_fmt(L)
+    file_name = "tk17_output.txt"
 
-    # with open(file_name, "w", encoding="utf-8") as file:
-    #     file.write(s)
+    with open(file_name, "w", encoding="utf-8") as file:
+        file.write(s)
 
-    # try:
-    #     rst = subprocess.Popen(
-    #         "./scripts/tk17_flatter.nu",
-    #         text=True,
-    #         stdout=subprocess.PIPE,
-    #         shell=True,
-    #     )
-    #     L = fplll_read(rst.stdout)
-    # except subprocess.CalledProcessError as e:
-    #     print(e)
-    #     return
+    try:
+        rst = subprocess.Popen(
+            "src/scripts/tk17_flatter.nu",
+            text=True,
+            stdout=subprocess.PIPE,
+            shell=True,
+        )
+        L = fplll_read(rst.stdout)
+    except subprocess.CalledProcessError as e:
+        print(e)
+        return
 
     # kp, kq, p, q = ZZ["kp, kq, p, q"].gens()
     # pols = [N - p * q]
@@ -343,7 +343,7 @@ def small_dp_dq(N, e, m, delta1, delta2):
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol)
-    print(time() - start)
+    print(f"small_dp_dq flatter: {time() - start}")
     p0 = groebner(pols, yp, Y, N=N)
     # p0 = groebner(pols, p, Y)
     return p0

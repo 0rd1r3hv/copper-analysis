@@ -124,8 +124,20 @@ def tk14_low_1(beta, gamma):
                 s_e += m - u
                 s_M += m - u + l
                 n += 1
-        if s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) < n * m * (1 + beta - gamma):
-            print((s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) - n * m * (1 + beta - gamma)) / n)
+        if s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (
+            beta - gamma
+        ) < n * m * (1 + beta - gamma):
+            print(
+                (
+                    s_X * beta
+                    + s_Y * 1 / 2
+                    + s_Z * (beta + 1 / 2)
+                    + s_e
+                    + s_M * (beta - gamma)
+                    - n * m * (1 + beta - gamma)
+                )
+                / n
+            )
             print(s_X, s_Y, s_Z, s_e, n, m)
             return m
 
@@ -145,8 +157,18 @@ def tk14_low_2(beta, gamma):
                     s_Y += u + j
                     s_eM += m - u
                     n += 1
-            if s_X * beta + s_Y * 1 / 2 + s_eM * (1 + beta - gamma) < n * m * (1 + beta - gamma):
-                print((s_X * beta + s_Y * 1 / 2 + s_eM * (1 + beta - gamma) - n * m * (1 + beta - gamma)) / n)
+            if s_X * beta + s_Y * 1 / 2 + s_eM * (1 + beta - gamma) < n * m * (
+                1 + beta - gamma
+            ):
+                print(
+                    (
+                        s_X * beta
+                        + s_Y * 1 / 2
+                        + s_eM * (1 + beta - gamma)
+                        - n * m * (1 + beta - gamma)
+                    )
+                    / n
+                )
                 print(s_X, s_Y, s_eM, n, m, t)
                 return m, t
 
@@ -275,19 +297,10 @@ def tk17_small_dp_dq(alpha, delta):
                     s_X += i1 + i2
                     s_Y += (i1 + i2) // 2 + j2
                     s_e += m - (i1 + i2)
-        if (
-            s_X * (alpha + delta - 1 / 2)
-            + s_Y / 2
-            + s_e * alpha
-            < n * m * alpha
-        ):
+        if s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha < n * m * alpha:
             print(
-                (
-                    s_X * (alpha + delta - 1 / 2)
-                    + s_Y / 2
-                    + s_e * alpha
-                    - n * m * alpha
-                ) / n
+                (s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha - n * m * alpha)
+                / n
             )
             print(s_X, s_Y, s_e, n, m)
             print(alpha + delta - 1 / 2, 1 / 2, alpha)
@@ -360,14 +373,20 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                                 s_eM += 2 * m - deg
                                 n += 1
                             if b == a + c:
-                                for i in range(max(1, thres - b // 2 + 1), floor(t * b - b // 2) + 1):
+                                for i in range(
+                                    max(1, thres - b // 2 + 1),
+                                    floor(t * b - b // 2) + 1,
+                                ):
                                     s_X += a
                                     s_Y += b // 2 + i
                                     s_Z += c
                                     s_M += deg
                                     s_eM += 2 * m - deg
                                     n += 1
-                                for i in range(max(1, thres - (b + 1) // 2 + 1), floor(t * b - (b + 1) // 2) + 1):
+                                for i in range(
+                                    max(1, thres - (b + 1) // 2 + 1),
+                                    floor(t * b - (b + 1) // 2) + 1,
+                                ):
                                     s_X += a
                                     s_Y += (b + 1) // 2 + i
                                     s_Z += c
@@ -382,17 +401,13 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                     + s_M * leak
                     + s_eM * (alpha + leak)
                     - n * 2 * m * (alpha + leak)
-                ) / n
+                )
+                / n
             )
             print(n, m, thres)
-            if (
-                s_X * (alpha + delta1 - 1 / 2)
-                + s_Y / 2
-                + s_Z * (alpha + delta2 - 1 / 2)
-                + s_M * leak
-                + s_eM * (alpha + leak)
-                < n * 2 * m * (alpha + leak)
-            ):
+            if s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (
+                alpha + delta2 - 1 / 2
+            ) + s_M * leak + s_eM * (alpha + leak) < n * 2 * m * (alpha + leak):
                 print(
                     (
                         s_X * (alpha + delta1 - 1 / 2)
@@ -401,7 +416,8 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                         + s_M * leak
                         + s_eM * (alpha + leak)
                         - n * 2 * m * (alpha + leak)
-                    ) / n
+                    )
+                    / n
                 )
                 print(s_X, s_Y, s_Z, s_eM, s_M, n, m, thres)
                 return m, thres

@@ -1,8 +1,8 @@
 from sage.all import *
 from src.misc import *
 from src.practical_bounds import *
-# from mp import groebner
-from src.root_methods import groebner
+from src.mp import groebner
+# from src.root_methods import groebner
 from time import time
 import subprocess
 
