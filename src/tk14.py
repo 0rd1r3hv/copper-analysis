@@ -120,7 +120,7 @@ def msb_1(N, e, leaks, lens, params, test=None):
         x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
         y0 = -(p + N // p - (N + 1 - A))
         test = [x0, y0, (k0 + x0) * y0 + 1]
-    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - (k0 + x) * y - 1])
+    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - (k0 + x) * y - 1], monomials=monomials)
     return ((k0 + res) * N) // e
 
 

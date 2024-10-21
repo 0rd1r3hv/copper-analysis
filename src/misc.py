@@ -41,14 +41,21 @@ def reduce_varsize(N):
 
 
 def solve_copper(
-    shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None
+    shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None
 ):
     if select_num is None:
         select_num = len(shifts)
-    pol_seq = Sequence(shifts)
-    L, monomials = pol_seq.coefficient_matrix()
-    scales = list(map(lambda e: e(bounds)[0], monomials))
+    if monomials:
+        dim = len(shifts)
+        L = Matrix(ZZ, dim)
+        for i in range(dim):
+            for j in range(i + 1):
+                L[i, j] = shifts[i].monomial_coefficient(monomials[j])
+    else:
+        pol_seq = Sequence(shifts)
+        L, monomials = pol_seq.coefficient_matrix()
     monomials = vector(monomials)
+    scales = list(map(lambda e: e(bounds), monomials))
     for col, scale in enumerate(scales):
         L.rescale_col(col, scale)
     start = time()
