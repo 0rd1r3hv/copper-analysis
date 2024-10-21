@@ -51,6 +51,15 @@ def tk14_msb_1_test(beta, delta, len_fac):
     return msb_1(N, e, [d_m], [len_d, len_m], [None], [p]) == d
 
 
+def tk14_lsb_test(beta, delta, len_fac):
+    print(f"tk14_lsb_test beta: {beta}, delta: {delta}, len_fac: {len_fac}")
+    len_d = ceil(2 * len_fac * beta)
+    len_l = ceil(2 * len_fac * (beta - delta))
+    len_m = 0
+    p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
+    return lsb(N, e, [d_l], [len_d, len_l], [None], [p]) == d
+
+
 def ernst05_mixed_1_test():
     lp = 512
     p = get_prime(lp)
@@ -329,7 +338,9 @@ def mns21_test():
 # tk17_small_e_test()
 # tk17_small_dp_dq_test()
 # mns21_test()
-# tk14_msb_1(0.3, 0.25)
-tk14_msb_1_test(0.37, 0.205, 512)
+tk14_msb_1(0.3, 0.25)
+# tk14_msb_1_test(0.37, 0.205, 512)
+# tk14_msb_1_test(0.292, 0.282, 512)
 # tk14_msb_1_test(0.31, 0.25, 512)
 # tk14_msb_1_test(0.31, 0.25, 512)
+tk14_lsb_test(0.3, 0.25, 512)

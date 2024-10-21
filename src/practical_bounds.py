@@ -103,7 +103,7 @@ def tk14_msb_1(beta, gamma):
             return m
 
 
-def tk14_low_1(beta, gamma):
+def tk14_lsb(beta, gamma):
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
     for m in range(1, MAX_M + 1):

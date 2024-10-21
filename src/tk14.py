@@ -19,7 +19,7 @@ def l_LSBs(x, km, t):
     return max(0, ceil((x - km) / t))
 
 
-# leaks = [d msb], lens = [len msb, len lsb], params = [m], test = [p]
+# leaks = [d msb], lens = [len d, len msb], params = [m], test = [p]
 def msb_1(N, e, leaks, lens, params, test=None):
     d_m, = leaks
     len_d, len_m = lens
@@ -31,6 +31,7 @@ def msb_1(N, e, leaks, lens, params, test=None):
     bounds = [X, Y, Z]
     beta = len_d / N.nbits()
     gamma = (len_d - len_m) / N.nbits()
+    print(beta, gamma)
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
     if None in params:
@@ -121,147 +122,36 @@ def msb_1(N, e, leaks, lens, params, test=None):
         y0 = -(p + N // p - (N + 1 - A))
         test = [x0, y0, (k0 + x0) * y0 + 1]
     res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - (k0 + x) * y - 1], monomials=monomials)
-    return ((k0 + res) * N) // e
+    if res:
+        return ((k0 + res) * N) // e
 
 
-# f_MSBs(x, y) = 1 + (k0 + x)(A + y) ≡ 0 (mod e)
-def high_leak(N, e, d_high, d_len, A, X, Y, m):
-    beta = d_len / N.nbits()
-    gamma = Integer(X).nbits() / N.nbits()
-    k0 = e * d_high // N
-    Z = k0 * Y
-    PR = ZZ["x, y, z"]
-    x, y, z = PR.gens()
-    Q = PR.quotient(x * y + 1 - z)
-    f = z + A * x
+# leaks = [d lsb], lens = [len d, len lsb], params = [m], test = [p]
+def lsb(N, e, leaks, lens, params, test=None):
+    d_l, = leaks
+    len_d, len_l = lens
+    X = 1 << len_d
+    A, Y = reduce_varsize(N)
+    Z = X * Y
+    bounds = [X, Y, Z]
+    beta = len_d / N.nbits()
+    gamma = (len_d - len_l) / N.nbits()
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
+    if None in params:
+        m = tk14_lsb(beta, gamma)
+    else:
+        m, = params
     km = k * m
-    shifts = []
-    monomials = []
-    trans_x = [z**0]
-    trans_y = [[z**0] * max(floor(km + t * m) + 1, floor(km) + 1)] + [
-        [z**0] for _ in range(m)
-    ]
-    for i in range(1, m + 1):
-        deg = l_MSBs(i, km, t)
-        if deg == 0:
-            trans_x.append((1 + x * y) ** i)
-        else:
-            pol = (x * y) ** (i - deg) * z**deg
-            rem = z**i - (z - 1) ** (i - deg) * z**deg
-            for d in range(deg, i):
-                pol += rem.monomial_coefficient(z**d) * trans_x[d]
-            trans_x.append(pol)
-    for u in range(1, m + 1):
-        for j in range(1, floor(km + t * u) + 1):
-            deg = l_MSBs(u + j, km, t)
-            if deg == 0:
-                trans_y[u].append((1 + x * y) ** u)
-            else:
-                pol = (x * y) ** (u - deg) * z**deg
-                rem = z**u - (z - 1) ** (u - deg) * z**deg
-                for d in range(deg, u):
-                    pol += rem.monomial_coefficient(z**d) * trans_y[d][j]
-                trans_y[u].append(pol)
-    for u in range(m + 1):
-        for i in range(u + 1):
-            orig = f**i
-            pol = 0
-            for mono in orig.monomials():
-                deg_z = mono.degree(z)
-                pol += (
-                    orig.monomial_coefficient(mono)
-                    * trans_x[deg_z]
-                    * mono
-                    // (z**deg_z)
-                )
-            pol = x ** (u - i) * (pol.subs(x=k0 + x))
-            assert pol.subs(z=(k0 + x) * y + 1) == x ** (u - i) * (
-                (f**i).subs(x=k0 + x, z=(k0 + x) * y + 1)
-            )
-            deg = l_MSBs(i, km, t)
-            monomials.append(x ** (u - deg) * y ** (i - deg) * z**deg)
-            shifts.append(pol(X * x, Y * y, Z * z) * e ** (m - i))
-        for j in range(1, floor(km + t * u) + 1):
-            orig = Q(y**j * f**u).lift()
-            pol = 0
-            for mono in orig.monomials():
-                deg_y = mono.degree(y)
-                deg_z = mono.degree(z)
-                if deg_y != 0:
-                    pol += (
-                        orig.monomial_coefficient(mono)
-                        * trans_y[deg_z][deg_y]
-                        * mono
-                        // (z**deg_z)
-                    )
-                else:
-                    pol += (
-                        orig.monomial_coefficient(mono)
-                        * trans_x[deg_z]
-                        * mono
-                        // (z**deg_z)
-                    )
-            pol = pol.subs(x=k0 + x)
-            assert pol.subs(z=(k0 + x) * y + 1) == (y**j * f**u).subs(
-                x=k0 + x, z=(k0 + x) * y + 1
-            )
-            deg = l_MSBs(u + j, km, t)
-            monomials.append(x ** (u - deg) * y ** (u + j - deg) * z**deg)
-            shifts.append(pol(X * x, Y * y, Z * z) * e ** (m - u))
-    scales = [mono(X, Y, Z) for mono in monomials]
-    n = len(shifts)
-    L = Matrix(ZZ, n)
-    for i in range(n):
-        for j in range(i + 1):
-            L[i, j] = shifts[i].monomial_coefficient(monomials[j])
-    start = time()
-    # L = L.LLL(delta=0.75)
-    s = fplll_fmt(L)
-    file_name = "tk14_output.txt"
-
-    with open(file_name, "w", encoding="utf-8") as file:
-        file.write(s)
-
-    try:
-        rst = subprocess.Popen(
-            "./scripts/tk14_flatter.nu",
-            text=True,
-            stdout=subprocess.PIPE,
-            shell=True,
-        )
-
-        L = fplll_read(rst.stdout)
-    except subprocess.CalledProcessError as e:
-        return
-
-    pols = [z - (k0 + x) * y - 1]
-    for i in range(n):
-        pol = 0
-        for j in range(n):
-            pol += L[i, j] * monomials[j] // scales[j]
-        pols.append(pol)
-
-    print(f"high_leak flatter: {time() - start}")
-    x0 = groebner(pols, x, X)
-    if x0:
-        return floor(((k0 + x0) * N) // e)
-
-
-def low_leak_1(N, e, d_low, d_len, leak_len, A, X, Y, m):
-    beta = d_len / N.nbits()
-    gamma = (d_len - leak_len) / N.nbits()
-    Z = X * Y
     PR = ZZ["x, y, z"]
     x, y, z = PR.gens()
     Q = PR.quotient(x * y + 1 - z)
     f1 = z + A * x
-    f2 = x * (A + y) + 1 - e * d_low
+    f2 = x * (A + y) + 1 - e * d_l
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
     km = k * m
-    M = 1 << leak_len
+    M = 1 << len_l
     eM = e * M
     shifts = []
     monomials = []
@@ -280,7 +170,7 @@ def low_leak_1(N, e, d_low, d_len, leak_len, A, X, Y, m):
     for u in range(m + 1):
         for i in range(u + 1):
             monomials.append(x**u * y**i)
-            shifts.append((x ** (u - i) * f2**i)(X * x, Y * y, Z * z) * eM ** (m - i))
+            shifts.append(x ** (u - i) * f2**i * eM ** (m - i))
         for j in range(1, floor(km + t * u) + 1):
             deg = l_LSBs(j, km, t)
             orig = Q(y**j * f1**deg * f2 ** (u - deg)).lift()
@@ -298,43 +188,15 @@ def low_leak_1(N, e, d_low, d_len, leak_len, A, X, Y, m):
                 else:
                     pol += orig.monomial_coefficient(mono) * mono.subs(z=x * y + 1)
             monomials.append(x ** (u - deg) * y ** (u + j - deg) * z**deg)
-            shifts.append(pol(X * x, Y * y, Z * z) * eM ** (m - u) * M**deg)
-    scales = [mono(X, Y, Z) for mono in monomials]
-    n = len(shifts)
-    L = Matrix(ZZ, n)
-    for i in range(n):
-        for j in range(i + 1):
-            L[i, j] = shifts[i].monomial_coefficient(monomials[j])
-    start = time()
-    # L = L.LLL(delta=0.75)
-    s = fplll_fmt(L)
-    file_name = "tk14_output.txt"
-
-    with open(file_name, "w", encoding="utf-8") as file:
-        file.write(s)
-
-    try:
-        rst = subprocess.Popen(
-            "src/scripts/tk14_flatter.nu",
-            text=True,
-            stdout=subprocess.PIPE,
-            shell=True,
-        )
-
-        L = fplll_read(rst.stdout)
-    except subprocess.CalledProcessError as e:
-        return
-
-    pols = [z - x * y - 1]
-    for i in range(n):
-        pol = 0
-        for j in range(n):
-            pol += L[i, j] * monomials[j] // scales[j]
-        pols.append(pol)
-    print(f"low_leak_1 flatter: {time() - start}")
-    x0 = groebner(pols, x, X)
-    if x0:
-        return (x0 * N) // e
+            shifts.append(pol * eM ** (m - u) * M**deg)
+    if test:
+        p, = test
+        x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p)
+        y0 = -(p + N // p - (N + 1 - A))
+        test = [x0, y0, x0 * y0 + 1]
+    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - x * y - 1], monomials=monomials)
+    if res:
+        return (res * N) // e
 
 
 def low_leak_2(N, e, d_low, d_len, leak_len, A, X, Y, m, t):
