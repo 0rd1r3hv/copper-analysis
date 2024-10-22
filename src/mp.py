@@ -46,7 +46,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
         R = R.change_ring(GF(p))
 
         proc = multiprocessing.Process(
-            target=worker, args=(R,num, p, pols, var, rsts, N)
+            target=worker, args=(R, num, p, pols, var, rsts, N)
         )
         proc.start()
         procs.append(proc)
@@ -58,7 +58,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
                 p.terminate()
             for p in procs:
                 p.join()
-            print(f"groebner success: {time() - start}")
+            print(f"groebner success: {time() - start}s")
 
             if N and type(crt_rem[0]) == list:
                 def recursive(res, m, d):
@@ -97,7 +97,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
                 p.terminate()
             for p in procs:
                 p.join()
-            print(f"groebner fail: {time() - start}")
+            print("groebner fail!")
             return None
 
         procs = [p for p in procs if p.is_alive()]

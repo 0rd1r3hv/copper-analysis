@@ -37,7 +37,10 @@ def ernst05_eq1(bounds=None, props=None):
                     sw += 1
                     dim += 1
             if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * z + w):
-                print(sx, sy, sz, sw, dim, m, t)
+                print(
+                    f"sx, sy, sz, sw, dim, m, t: {sx}, {sy}, {sz}, {sw}, {dim}, {m}, {t}",
+                    sep="",
+                )
                 return m, t
 
 
@@ -72,7 +75,9 @@ def ernst05_eq2(bounds=None, props=None):
                     sw += 1
                     dim += 1
             if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * y + w):
-                print(sx, sy, sz, sw, dim, m, t)
+                print(
+                    f"sx, sy, sz, sw, dim, m, t: {sx}, {sy}, {sz}, {sw}, {dim}, {m}, {t}"
+                )
                 return m, t
 
 
@@ -98,8 +103,10 @@ def tk14_msb_1(beta, gamma):
                 s_e += m - u
                 n += 1
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
-            print((s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n)
-            print(s_X, s_Y, s_Z, s_e, n, m)
+            print(
+                f"(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n: {(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n}"
+            )
+            print(f"s_X, s_Y, s_Z, s_e, n, m: {s_X}, {s_Y}, {s_Z}, {s_e}, {n}, {m}")
             return m
 
 

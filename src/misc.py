@@ -80,7 +80,7 @@ def solve_copper(
         return
 
     L = L.change_ring(QQ)
-    print(f"solve_copper flatter: {time() - start}")
+    print(f"solve_copper flatter: {time() - start}s")
     for col, scale in enumerate(scales):
         L.rescale_col(col, 1 / scale)
     selected = list(

@@ -50,7 +50,19 @@
               flatter
               qt6.wrapQtAppsHook
             ];
-            shellHook = '''';
+            shellHook = ''
+              if [ -z ${"\${DIRENVED+x}"} ]; then
+                echo "enter sage subshell"
+                export DIRENVED=1
+                if which sage >/dev/null 2>&1; then
+                  sage -sh
+                else
+                  echo "sage not found!"
+                fi
+              else
+                echo "sage subshell found."
+              fi
+            '';
           };
           treefmt.config = {
             inherit (config.flake-root) projectRootFile;

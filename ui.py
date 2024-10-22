@@ -76,14 +76,15 @@ class MainWinIniter:
 
     def _setup_sidebar_icon(self, cfg: Cfg):
         buttons = [
-            ("icon_lbl", f"{cfg.icon_dir}/徽标.png", 0, 0),
+            ("icon_lbl", f"{cfg.icon_dir}/密码学会.png", 0, 0),
             ("pnl_btn", f"{cfg.icon_dir}/展开面板.png", 1, 0),
             ("home_btn", f"{cfg.icon_dir}/主页.png", 2, 0),
             ("rsa_btn", f"{cfg.icon_dir}/RSA.png", 3, 0),
             ("crt_rsa_btn", f"{cfg.icon_dir}/CRT-RSA.png", 4, 0),
-            ("usr_btn", f"{cfg.icon_dir}/用户.png", 6, 0),
-            ("stg_btn", f"{cfg.icon_dir}/设置.png", 7, 0),
-            ("about_btn", f"{cfg.icon_dir}/关于.png", 8, 0),
+            ("auto_btn", f"{cfg.icon_dir}/自动.png", 5, 0),
+            ("usr_btn", f"{cfg.icon_dir}/用户.png", 7, 0),
+            ("stg_btn", f"{cfg.icon_dir}/设置.png", 8, 0),
+            ("about_btn", f"{cfg.icon_dir}/关于.png", 9, 0),
         ]
 
         for name, icon_path, row, col in buttons:
@@ -119,9 +120,10 @@ class MainWinIniter:
             ("home_lbl", 2, 1),
             ("rsa_lbl", 3, 1),
             ("crt_rsa_lbl", 4, 1),
-            ("usr_lbl", 6, 1),
-            ("stg_lbl", 7, 1),
-            ("about_lbl", 8, 1),
+            ("auto_lbl", 5, 1),
+            ("usr_lbl", 7, 1),
+            ("stg_lbl", 8, 1),
+            ("about_lbl", 9, 1),
         ]
 
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -143,14 +145,14 @@ class MainWinIniter:
         spacers = [
             (
                 "icon_vspc",
-                5,
+                6,
                 0,
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Minimum,
             ),
             (
                 "ext_vspc",
-                5,
+                6,
                 1,
                 QSizePolicy.Policy.Minimum,
                 QSizePolicy.Policy.Expanding,
@@ -209,6 +211,7 @@ class MainWinIniter:
             "home_page",
             "rsa_page",
             "crt_rsa_page",
+            "auto_page",
             "usr_page",
             "stg_page",
             "about_page",
@@ -220,11 +223,87 @@ class MainWinIniter:
             self.page_stk.addWidget(widget)
             setattr(self, page, widget)
 
+        self._setup_home_page(cfg)
         self._setup_rsa_page(cfg)
         self._setup_crt_rsa_page(cfg)
+        self._setup_auto_page(cfg)
+        self._setup_usr_page(cfg)
         self._setup_stg_page(cfg)
+        self._setup_about_page(cfg)
 
         self.cent_glo.addWidget(self.page_stk, 1, 1, 1, 1)
+
+    def _setup_home_page(self, cfg: Cfg):
+        # 创建主布局
+        home_vlo = QVBoxLayout(self.home_page)
+        home_vlo.setSpacing(20)
+        home_vlo.setContentsMargins(20, 20, 20, 20)
+
+        # 上半部分：图标和标题
+        upper_widget = QWidget()
+        upper_widget.setMaximumHeight(self.home_page.height() // 2)
+        upper_vlo = QVBoxLayout(upper_widget)
+        upper_vlo.setAlignment(Qt.AlignCenter)
+
+        icon_label = QLabel()
+        icon_pixmap = QPixmap(f"{cfg.icon_dir}/徽标.png").scaled(
+            192, 192, Qt.KeepAspectRatio, Qt.SmoothTransformation
+        )
+        icon_label.setPixmap(icon_pixmap)
+        icon_label.setAlignment(Qt.AlignCenter)
+
+        title_label = QLabel("自动化公钥密码系统 Coppersmith 格攻击工具")
+        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setStyleSheet("font-size: 24pt; font-weight: bold;")
+
+        upper_vlo.addWidget(icon_label)
+        upper_vlo.addWidget(title_label)
+
+        # 下半部分：三个框架
+        lower_widget = QWidget()
+        lower_hlo = QHBoxLayout(lower_widget)
+        lower_hlo.setSpacing(20)
+
+        frames = [
+            "针对 RSA 的攻击",
+            "针对 CRT-RSA 的攻击",
+            "单变元模方程攻击",
+            "自动化通用攻击",
+        ]
+        for frame_title in frames:
+            frame = QGroupBox(frame_title)
+            frame.setStyleSheet("QGroupBox { border-color: #00CA9A; font-size: 14pt; }")
+            frame_vlo = QVBoxLayout(frame)
+            if frame_title == "针对 RSA 的攻击":
+                text = """<p>已实现多种特定情形下已知上界最好的 d 泄露攻击。包括五大功能：</p>
+<p>Takayasu, Kunihiro 对高位和低位泄露攻击的改进方案（无泄露等价 Boneh-Durfee 最优方案）；</p>
+<p>Ernst 等人对高低位混合泄露的两种攻击方案；</p>
+<p>Takayasu, Kunihiro 对 Ernst 等人混合泄露方案的等价替代。</p>
+"""
+            elif frame_title == "针对 CRT-RSA 的攻击":
+                text = """<p>已实现多种特定情形下已知上界最好的 CRT-RSA d<sub>p</sub>, d<sub>q</sub> 部分泄露攻击。六大功能包括：</p>
+<p>Takayasu 等人对小 d<sub>p</sub> 和对小 d<sub>p</sub>, d<sub>q</sub> 的三种攻击方案；</p>
+<p>May 等人对 d<sub>p</sub>, d<sub>q</sub> 的纯低位泄露攻击；</p>
+<p>May 等人对小 e 下 d<sub>p</sub>, d<sub>q</sub> 的纯高位和纯低位泄露攻击。</p>"""
+            elif frame_title == "单变元模方程攻击":
+                text = """<p>已实现以下攻击类型：</p>
+<p>Coppersmith 对模 N 单变元方程的攻击；</p>
+<p>Howgrave-Graham 对模 N 的未知因数的单变元方程的攻击；</p>
+<p>May 等人对模未知因数的已知倍数的单变元线性方程的攻击。</p>"""
+            else:
+                text = """<p>已实现 Meers, Nowakowski 对 Coppersmith 方法的自动化，针对所给方程自动构造优选移位多项式。</p>"""
+            text_label = QLabel(text)
+            text_label.setOpenExternalLinks(True)
+            text_label.setMinimumWidth(192)
+            text_label.setWordWrap(True)
+            text_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+            text_label.setStyleSheet("QLabel { font-size: 14pt; }")
+            frame_vlo.addWidget(text_label)
+            lower_hlo.addWidget(frame)
+
+        # 将上下两部分添加到主布局
+        home_vlo.addWidget(upper_widget)
+        home_vlo.addWidget(lower_widget)
 
     def _setup_rsa_page(self, cfg: Cfg):
         self.rsa_hlo = QHBoxLayout(self.rsa_page)
@@ -232,7 +311,7 @@ class MainWinIniter:
         self.parma_cont = QWidget()
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         self.parma_cont.setSizePolicy(sizePolicy)
-        self.parma_cont.setFixedWidth(480)
+        self.parma_cont.setFixedWidth(640)
         sizePolicy = QSizePolicy(
             QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
         )
@@ -251,14 +330,16 @@ class MainWinIniter:
         atk_hlo.setAlignment(Qt.AlignLeft)
         atk_lbl = QLabel("攻击方法")
         atk_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        atk_lbl.setMinimumWidth(96)
-        atk_lbl.setStyleSheet("QLabel {font-size: 12pt;}")
+        atk_lbl.setMinimumWidth(120)
+        atk_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
         atk_cb = QComboBox()
         atk_cb.setFixedWidth(120)
         atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
         atk_cb.setObjectName("atk_cb")
         atk_cb.setMinimumHeight(40)
-        atk_cb.addItems(["May", "BD", "Ernst1", "Ernst2"])  # 添加攻击方法选项
+        atk_cb.addItems(
+            ["Tk14 MSB", "Tk14 LSB", "Tk14 Mixed", "Ernst Mixed1", "Ernst Mixed2"]
+        )  # 添加攻击方法选项
         setattr(self, "atk_cb", atk_cb)
         atk_hlo.addWidget(atk_lbl)
         atk_hlo.addWidget(atk_cb)
@@ -271,8 +352,8 @@ class MainWinIniter:
             "私钥 d 长度",
             "MSB 长度",
             "LSB 长度",
-            "m",
-            "t",
+            "m（可选）",
+            "t（可选）",
             "私钥 MSB",
             "私钥 LSB",
         ]
@@ -284,8 +365,8 @@ class MainWinIniter:
             param_hlo.setSpacing(16)
             param_lbl = QLabel(name)
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            param_lbl.setMinimumWidth(96)
-            param_lbl.setStyleSheet("QLabel {font-size: 12pt;}")
+            param_lbl.setMinimumWidth(120)
+            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
             param_le = QLineEdit()
             param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
             param_le.setObjectName(f"rsa_{param}_le")
@@ -295,6 +376,8 @@ class MainWinIniter:
             param_hlo.addWidget(param_le)
             self.parma_vlo.addWidget(param_frm)
 
+        self.m_le.setPlaceholderText("（自动选取）")
+        self.t_le.setPlaceholderText("（自动选取）")
         self.parma_vlo.addStretch(1)
         self.parma_vlo.addItem(
             QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
@@ -305,6 +388,7 @@ class MainWinIniter:
         self.parma_vlo.addWidget(self.atk_btn)
         self.rsa_hlo.addWidget(self.parma_cont)
         self.rsa_text_display = QTextEdit()
+        self.rsa_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.rsa_text_display.setObjectName("rsa_text_display")
         self.rsa_text_display.setReadOnly(True)
 
@@ -404,6 +488,12 @@ class MainWinIniter:
 
         self.crt_rsa_hlo.addWidget(self.crt_rsa_text_display)
 
+    def _setup_auto_page(self, cfg: Cfg):
+        pass
+
+    def _setup_usr_page(self, cfg: Cfg):
+        pass
+
     def _setup_stg_page(self, cfg: Cfg):
         self.stg_scroll_area = QScrollArea(self.stg_page)
         self.stg_scroll_area.setWidgetResizable(True)
@@ -479,21 +569,23 @@ class MainWinIniter:
         setattr(self, f"icon_{opt_name}_lbl", icon_opt_lbl)
         return icon_opt_lbl
 
+    def _setup_about_page(self, cfg: Cfg):
+        pass
+
     def _finalize_lo(self, main_win: QMainWindow):
         main_win.setCentralWidget(self.cent)
         self.retranslateUi(main_win)
         QMetaObject.connectSlotsByName(main_win)
 
     def retranslateUi(self, main_win: QMainWindow):
-        main_win.setWindowTitle(
-            QCoreApplication.translate("Genshin Impact", "原神", None)
-        )
+        main_win.setWindowTitle(QCoreApplication.translate("CSyde", "铜钥 CSyde", None))
         self.rsa_lbl.setText(QCoreApplication.translate("main_win", "RSA 攻击", None))
         self.crt_rsa_lbl.setText(
             QCoreApplication.translate("main_win", "CRT-RSA 攻击", None)
         )
         self.usr_lbl.setText(QCoreApplication.translate("main_win", "用户", None))
-        self.tit_lbl.setText(QCoreApplication.translate("main_win", "原神", None))
+        self.tit_lbl.setText(QCoreApplication.translate("main_win", "铜钥", None))
+        self.auto_lbl.setText(QCoreApplication.translate("main_win", "自动化", None))
         self.stg_lbl.setText(QCoreApplication.translate("main_win", "设置", None))
         self.home_lbl.setText(QCoreApplication.translate("main_win", "主页", None))
         self.about_lbl.setText(QCoreApplication.translate("main_win", "关于", None))

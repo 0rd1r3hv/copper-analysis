@@ -4,11 +4,12 @@ from PySide6.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
     QParallelAnimationGroup,
-    QTimer
+    QTimer,
 )
 from sage.all import *
 from PySide6.QtGui import QIcon, QTextCursor
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel,
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
+from PySide6.QtCore import Qt
 from ui import MainWinIniter
 from qt_material import apply_stylesheet
 from src.cfg import Cfg
@@ -21,6 +22,10 @@ class MainWin(QMainWindow):
         self.cfg = cfg
         self.ui = MainWinIniter()
         self.ui.setup_ui(self)
+        self.setStyleSheet("font-size: 14pt;")
+
+        self.tx_redirector = StdoutRedirector(self.ui.rsa_text_display)
+        self.crt_tx_redirector = StdoutRedirector(self.ui.crt_rsa_text_display)
 
         self._init_ui()
         self.cnct_sgl()
@@ -47,9 +52,17 @@ class MainWin(QMainWindow):
 
     def cnct_sgl(self):
         self.ui.pnl_btn.toggled["bool"].connect(self.tgl_pnl)
+        self._cnct_rsa_btn()
+        self._cnct_crt_btn()
         self._cnct_page_btn()
         self._cnct_atk_btn()
         self.ui.主题_cb.currentTextChanged.connect(self.chg_th)
+
+    def _cnct_rsa_btn(self):
+        self.ui.rsa_btn.clicked.connect(self.tx_redirector.redirect_stdout)
+
+    def _cnct_crt_btn(self):
+        self.ui.crt_rsa_btn.clicked.connect(self.crt_tx_redirector.redirect_stdout)
 
     def _cnct_atk_btn(self):
         self.ui.atk_btn.clicked.connect(self._exec_atk)
@@ -57,10 +70,11 @@ class MainWin(QMainWindow):
     def _exec_atk(self):
         攻击方法序列 = self.ui.atk_cb.currentIndex()
         攻击函数 = [
-            self._attack_function_1,
-            self._attack_function_2,
-            self.ernst1,
-            self.ernst2,
+            self.tk14msb,
+            self.tk14lsb,
+            self.tk14mixed,
+            self.ernstmixed1,
+            self.ernstmixed2,
         ]
 
         if 0 <= 攻击方法序列 < len(攻击函数):
@@ -68,16 +82,18 @@ class MainWin(QMainWindow):
         else:
             print("无效的攻击选项")
 
-    def _attack_function_1(self):
-        print("执行攻击函数1")
+    def tk14msb(self):
+        print("Tk14 MSB")
 
-    def _attack_function_2(self):
-        print("执行攻击函数2")
+    def tk14lsb(self):
+        print("Tk14 LSB")
 
-    def ernst1(self):
-        redirect_stdout(self)
-        print("Ernst1")
-        mixed_1(
+    def tk14mixed(self):
+        print("Tk14 Mixed")
+
+    def ernstmixed1(self):
+        print("Ernst Mixed 1", sep="")
+        rst = mixed_1(
             Integer(self.ui.N_le.text()),
             Integer(self.ui.e_le.text()),
             (Integer(self.ui.d_msb_le.text()), Integer(self.ui.d_lsb_le.text())),
@@ -87,10 +103,11 @@ class MainWin(QMainWindow):
                 Integer(self.ui.lsb_len_le.text()),
             ),
         )
+        print(f"攻击成功！私钥 d = {rst}", sep="")
 
-    def ernst2(self):
-        print("Ernst2")
-        mixed_2(
+    def ernstmixed2(self):
+        print("Ernst Mixed 2")
+        rst = mixed_2(
             Integer(self.ui.N_le.text()),
             Integer(self.ui.e_le.text()),
             (
@@ -103,15 +120,17 @@ class MainWin(QMainWindow):
                 Integer(self.ui.lsb_len_le.text()),
             ),
         )
+        print(f"攻击成功！私钥 d = {rst}")
 
     def _cnct_page_btn(self):
         btn_list = [
             (self.ui.home_btn, 0),
             (self.ui.rsa_btn, 1),
             (self.ui.crt_rsa_btn, 2),
-            (self.ui.usr_btn, 3),
-            (self.ui.stg_btn, 4),
-            (self.ui.about_btn, 5),
+            (self.ui.auto_btn, 3),
+            (self.ui.usr_btn, 4),
+            (self.ui.stg_btn, 5),
+            (self.ui.about_btn, 6),
         ]
         for btn, idx in btn_list:
             btn.clicked.connect(
@@ -157,11 +176,11 @@ class StdoutRedirector(io.StringIO):
 
     def write(self, string):
         self.text_widget.append(string)
-        self.text_widget.moveCursor(QTextCursor.End)
+        # self.text_widget.moveCursor(QTextCursor.End)
         QApplication.processEvents()
 
     def redirect_stdout(self):
-        self.stdout_redirector = StdoutRedirector(self.ui.output_te)
+        self.stdout_redirector = StdoutRedirector(self.text_widget)
         sys.stdout = self.stdout_redirector
 
     def restore_stdout(self):

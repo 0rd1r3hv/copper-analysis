@@ -78,7 +78,7 @@ def large_e(N, e, m, beta, delta):
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol(k - 1, k, p, q))
-    print(f"large_e flatter: {time() - start}")
+    print(f"large_e flatter: {time() - start}s")
     # p0 = groebner(pols, yp, Yp)
     p0 = groebner(pols, p, Yp)
     return p0
@@ -172,7 +172,7 @@ def small_e(N, e, m, beta, delta):
         for j in range(n):
             pol += L[i, j] * monomials[j] // scales[j]
         pols.append(pol(k - 1, k, p, q))
-    print(f"small_e flatter: {time() - start}")
+    print(f"small_e flatter: {time() - start}s")
     # p0 = groebner(pols, yp, Yp)
     p0 = groebner(pols, p, Yp)
     return p0
