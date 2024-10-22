@@ -105,6 +105,16 @@ def tk14_lsb_test(beta, delta, len_fac):
     return lsb(N, e, [d_l], [len_d, len_l], [None], [p]) == d
 
 
+def tk17_small_dp_dq_test(delta1, delta2, len_fac):
+    print(f"tk17_small_dp_dq_test delta1: {delta1}, delta2: {delta2}, len_fac: {len_fac}")
+    len_dp = ceil(2 * len_fac * delta1)
+    len_dq = ceil(2 * len_fac * delta2)
+    len_l = 0
+    p, N, e, dp, dq, dp_l, dq_l = get_crt_partial_test(len_fac, len_dp, len_dq, len_l)
+    res = small_dp_dq(N, e, [len_dp, len_dq], [None], test=[p])
+    return res == p or res == N // p
+
+
 def mns21_dp_dq_with_lsb_test(delta1, delta2, leak, len_fac):
     print(f"mns21_dp_dq_with_lsb_test delta1: {delta1}, delta2: {delta2}, leak: {leak}, len_fac: {len_fac}")
     len_dp = ceil(2 * len_fac * delta1)
@@ -185,42 +195,6 @@ def tk17_small_e_test():
     assert small_e(N, e, tk17_small_e(alpha, beta, delta), lp / ln, ldq / ln) == p
 
 
-def tk17_small_dp_dq_test():
-    ln = 1000
-    beta = 0.5
-    delta1 = 0.062
-    delta2 = 0.062
-    lp = ceil(beta * ln)
-    lq = ceil(beta * ln)
-    ldp = ceil(delta1 * ln)
-    ldq = ceil(delta2 * ln)
-    while True:
-        p = get_prime(lp)
-        q = get_prime(lq)
-        if (
-            gcd(p - 1, q - 1) == 2
-            and (p - 1).valuation(2) == 1
-            and (q - 1).valuation(2) == 1
-        ):
-            break
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    while True:
-        dp = 2 * get_rand(ldp - 1) + 1
-        dq = 2 * get_rand(ldq - 1) + 1
-        if gcd(dp, p - 1) == 1 and gcd(dq, q - 1) == 1:
-            d = crt([dp, dq], [p - 1, q - 1])
-            e = inverse_mod(d, phi)
-            if gcd(e, N - 1) == 1:
-                le = e.nbits()
-                alpha = le / ln
-                break
-    res = small_dp_dq(N, e, 4, delta1, delta2)
-    print(res)
-    print(p, q)
-    assert res == p or res == q
-
-
 # ernst05_mixed_1_test()
 # ernst05_mixed_2_test()
 # tk14_high_leak_test()
@@ -238,4 +212,4 @@ def tk17_small_dp_dq_test():
 # tk14_lsb_test(0.3, 0.25, 512)
 # ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # mns21_dp_dq_with_lsb(1, 0.02, 0.02, 0)
-mns21_dp_dq_with_lsb_test(0.02, 0.02, 0, 512)
+mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)

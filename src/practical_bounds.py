@@ -303,7 +303,6 @@ def tk17_small_dp_dq(alpha, delta):
                 / n
             )
             print(s_X, s_Y, s_e, n, m)
-            print(alpha + delta - 1 / 2, 1 / 2, alpha)
             return m
 
 

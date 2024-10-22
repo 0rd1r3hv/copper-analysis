@@ -4,7 +4,7 @@ from time import time
 import queue
 
 
-def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
+def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
     def worker(R, num, p, pols, var, rsts, N=None):
         for i in range(len(pols), num - 1, -1):
             I = Ideal((R * pols[:i]).groebner_basis())
@@ -60,7 +60,7 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
                 p.join()
             print(f"groebner success: {time() - start}")
 
-            if N:
+            if N and type(crt_rem[0]) == list:
                 def recursive(res, m, d):
                     if d == len(crt_rem):
                         if N % res == 0:
@@ -107,7 +107,7 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
                 R = R.change_ring(GF(p))
 
                 proc = multiprocessing.Process(
-                    target=worker, args=(R, num, p, pols, var, rsts)
+                    target=worker, args=(R, num, p, pols, var, rsts, N)
                 )
                 proc.start()
                 procs.append(proc)
