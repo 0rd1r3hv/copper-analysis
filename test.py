@@ -194,6 +194,6 @@ def tk17_small_e_test():
 # ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # mns21_dp_dq_with_lsb(1, 0.02, 0.02, 0)
 # mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
-tk14_mixed(Rational(0.35), Rational(0.22))
+tk14_mixed(Rational(0.35), Rational(0.24))
 ernst05_eq1(props=[Rational(0.24), Rational(0.35), Rational(0.5), Rational(1 + 0.35)])
 # tk14_mixed_test(0.35, 0.22, 0, 512)

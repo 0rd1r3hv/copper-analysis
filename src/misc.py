@@ -51,25 +51,9 @@ def solve_copper(
         for i in range(dim):
             for j in range(i + 1):
                 L[i, j] = shifts[i].monomial_coefficient(monomials[j])
-        assert L.is_triangular()
     else:
-        monomials = set()
-        for shift in shifts:
-            monomials.update(shift.monomials())
-        monomials = sorted(monomials)
-        shifts = sorted(shifts)
-        dim = len(shifts)
-        L = Matrix(ZZ, dim)
-        for i in range(dim):
-            for j in range(dim):
-                print(monomials[j])
-                print(monomials[j].parent())
-                L[i, j] = shifts[i].monomial_coefficient(monomials[j])
-        assert L.is_triangular()
-        '''
         pol_seq = Sequence(shifts)
         L, monomials = pol_seq.coefficient_matrix()
-        '''
     monomials = vector(monomials)
     scales = list(map(lambda e: e(bounds), monomials))
     for col, scale in enumerate(scales):
