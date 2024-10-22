@@ -105,6 +105,15 @@ def tk14_lsb_test(beta, delta, len_fac):
     return lsb(N, e, [d_l], [len_d, len_l], [None], [p]) == d
 
 
+def tk14_mixed_test(beta, delta, kappa, len_fac):
+    print(f"tk14_mixed_test: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}")
+    len_d = ceil(2 * len_fac * beta)
+    len_m = ceil(2 * len_fac * (beta - delta - kappa))
+    len_l = ceil(2 * len_fac * kappa)
+    p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
+    return mixed(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+
+
 def tk17_small_dp_dq_test(delta1, delta2, len_fac):
     print(f"tk17_small_dp_dq_test delta1: {delta1}, delta2: {delta2}, len_fac: {len_fac}")
     len_dp = ceil(2 * len_fac * delta1)
@@ -123,34 +132,6 @@ def mns21_dp_dq_with_lsb_test(delta1, delta2, leak, len_fac):
     p, N, e, dp, dq, dp_l, dq_l = get_crt_partial_test(len_fac, len_dp, len_dq, len_l)
     res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
     return res == p or res == N // p
-
-
-def tk14_low_leak_2_test():
-    lp = 512
-    p = get_prime(lp)
-    q = get_prime(lp)
-    p_q = -(p + q)
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    beta = 0.4
-    delta = 0.17
-    ld = ceil(N.nbits() * beta)
-    d, e = get_pair(ld, phi)
-    k = (e * d - 1) // phi
-    d_low = get_leak(d, "low", ceil(ld - lp * 2 * delta))
-    sol = low_leak_2(
-        N,
-        e,
-        d_low,
-        ld,
-        ceil(ld - lp * 2 * delta),
-        N + 1,
-        1 << ceil(N.nbits() * beta),
-        (1 << (N.nbits() // 2)),
-        7,
-        3,
-    )
-    assert sol == d
 
 
 def tk17_large_e_test():
@@ -212,4 +193,7 @@ def tk17_small_e_test():
 # tk14_lsb_test(0.3, 0.25, 512)
 # ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # mns21_dp_dq_with_lsb(1, 0.02, 0.02, 0)
-mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
+# mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
+tk14_mixed(Rational(0.35), Rational(0.22))
+ernst05_eq1(props=[Rational(0.24), Rational(0.35), Rational(0.5), Rational(1 + 0.35)])
+# tk14_mixed_test(0.35, 0.22, 0, 512)

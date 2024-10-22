@@ -142,6 +142,30 @@ def tk14_lsb(beta, gamma):
             return m
 
 
+def tk14_mixed(beta, delta, eta=Rational('1/2')):
+    for m in range(1, MAX_M + 1):
+        for t in range(m + 1):
+            s_w = s_x = s_y = s_em = dim = 0
+            for u in range(m + 1):
+                for i in range(u + 1):
+                    deg = max(0, i - t)
+                    s_w += deg
+                    s_x += u - deg
+                    s_y += i
+                    s_em += m - i
+                    dim += 1
+                for j in range(1, t + 1):
+                    deg = max(0, u + j - t)
+                    s_w += deg
+                    s_x += u - deg
+                    s_y += u + j
+                    s_em += m - u
+                    dim += 1
+            if s_w * beta + s_x * delta + s_y * eta + s_em < dim * m:
+                print(s_x, s_y, s_em, dim, m, t)
+                return m, t
+
+
 def tk14_low_2(beta, gamma):
     for m in range(1, MAX_M + 1):
         for t in range(m + 1):

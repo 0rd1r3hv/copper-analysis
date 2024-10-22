@@ -198,38 +198,54 @@ def lsb(N, e, leaks, lens, params, test=None):
         return (res * N) // e
 
 
-def low_leak_2(N, e, d_low, d_len, leak_len, A, X, Y, m, t):
-    beta = d_len / N.nbits()
-    gamma = (d_len - leak_len) / N.nbits()
-    PR = ZZ["x, y"]
-    x, y = PR.gens()
-    f = x * (A + y) + 1 - e * d_low
-    M = 1 << leak_len
+# leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t]
+def mixed(N, e, leaks, lens, params, test=None):
+    d_m, d_l = leaks
+    len_d, len_m, len_l = lens
+    d_m <<= len_d - len_m
+    k0 = e * d_m // N
+    X = 1 << (len_d - len_m)
+    A, Y = reduce_varsize(N)
+    W = k0 + X
+    M = 1 << len_l
     eM = e * M
+    bounds = [W, X, Y]
+    beta = len_d / N.nbits()
+    delta = (len_d - len_m - len_l) / N.nbits()
+    kappa = len_l / N.nbits()
+    if None in params:
+        m, t = tk14_mixed(beta, delta)
+    else:
+        m, t = params
+    PR = ZZ["w, x, y"]
+    w, x, y = PR.gens()
+    f = 1 - e * d_l + w * (A + y)
     shifts = []
     monomials = []
     for u in range(m + 1):
         for i in range(u + 1):
-            monomials.append(x**u * y**i)
-            shifts.append((x ** (u - i) * f**i)(X * x, Y * y) * eM ** (m - i))
-        for j in range(1, t):
-            monomials.append(x**u * y ** (u + j))
-            shifts.append((y**j * f**u)(X * x, Y * y) * eM ** (m - u))
-    scales = [mono(X, Y) for mono in monomials]
-    n = len(shifts)
-    L = Matrix(ZZ, n)
-    for i in range(n):
-        for j in range(i + 1):
-            L[i, j] = shifts[i].monomial_coefficient(monomials[j])
-    start = time()
-    L = L.LLL(delta=0.75)
-    pols = []
-    for i in range(n):
-        pol = 0
-        for j in range(n):
-            pol += L[i, j] * monomials[j] // scales[j]
-        pols.append(pol)
-    print(f"low_leak_2 flatter: {time() - start}")
-    x0 = groebner(pols, x, X)
-    if x0:
-        return (x0 * N) // e
+            deg = max(0, i - t)
+            monomials.append(w**deg * x**(u - deg) * y**i)
+            orig = x**(u - i) * f**i
+            pol = 0
+            for mono in orig.monomials():
+                deg = max(0, mono.degree(y) - t)
+                pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
+            shifts.append(pol * eM**(m - i))
+        for j in range(1, t + 1):
+            deg = max(0, u + j - t)
+            monomials.append(w**deg * x**(u - deg) * y**(u  + j))
+            orig = y**j * f**u
+            pol = 0
+            for mono in orig.monomials():
+                deg = max(0, mono.degree(y) - t)
+                pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
+            shifts.append(pol * eM**(m - u))
+    if test:
+        p, = test
+        x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
+        y0 = -(p + N // p - (N + 1 - A))
+        test = [k0 + x0, x0, y0]
+    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials)
+    if res:
+        return ((k0 + res) * N) // e
