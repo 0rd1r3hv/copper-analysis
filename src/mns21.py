@@ -1,4 +1,4 @@
-from sage.all import gcd, inverse_mod, ZZ, floor
+from sage.all import gcd, inverse_mod, ZZ, floor, Rational
 
 # from src.mp import groebner
 # from src.root_methods import groebner
@@ -25,17 +25,19 @@ def transform(PR, Q, pol, mono, mod, i):
 
 # leaks = [dp_l, dq_l], lens = [len_dp, len_dq, len_l], params = [m, s], test = [p]
 def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
-    print("开始May, Nowakowski, Sarkar的dp, dq纯低位泄露攻击...")
+    print("开始执行 May, Nowakowski, Sarkar 的 dp, dq 纯低位泄露攻击…")
     dp_l, dq_l = leaks
     len_dp, len_dq, len_l = lens
     len_N = N.nbits()
     len_e = e.nbits()
-    alpha = len_e / len_N
-    delta1 = len_dp / len_N
-    delta2 = len_dq / len_N
-    leak = len_l / len_N
+    alpha = Rational(len_e, len_N)
+    delta1 = Rational(len_dp, len_N)
+    delta2 = Rational(len_dq, len_N)
+    leak = Rational(len_l, len_N)
     print("密钥参数：")
-    print(f"α = {alpha.n(digits=3)}, δ1 = {delta1.n(digits=3)}, δ2 = {delta2.n(digits=3)}, κ = {leak.n(digits=3)}")
+    print(
+        f"α = {alpha.n(digits=3)}, δ1 = {delta1.n(digits=3)}, δ2 = {delta2.n(digits=3)}, κ = {leak.n(digits=3)}"
+    )
     if None in params:
         print("未指定攻击参数，自动选择攻击参数'm', 's'...")
         m, thres = mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak)
