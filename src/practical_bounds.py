@@ -103,12 +103,6 @@ def tk14_msb_1(beta, gamma):
             print(
                 f"格行列式中各项幂次：s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}"
             )
-            print("自动使用攻击参数：")
-            print(f"m = {m}")
-            print(f"格的维度：")
-            print(f"dim = {n}")
-            print("格行列式中各项幂次：")
-            print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}")
             return m
 
 
@@ -407,12 +401,11 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
             if s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (
                 alpha + delta2 - 1 / 2
             ) + s_M * leak + s_eM * (alpha + leak) < dim * 2 * m * (alpha + leak):
-                print("自动使用攻击参数：")
-                print(f"m = {m}, s = {thres}")
-                print(f"格的维度：")
-                print(f"dim = {dim}")
-                print("格行列式中各项幂次：")
-                print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}")
+                print(f"自动使用攻击参数：m = {m}, s = {thres}")
+                print(f"格的维度：dim = {dim}")
+                print(
+                    f"格行列式中各项幂次：s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_eM}, s_M = {s_eM+s_M}"
+                )
                 return m, thres
 
 
