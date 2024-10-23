@@ -1,22 +1,18 @@
 import sys
 import io
-import threading
 from PySide6.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
     QParallelAnimationGroup,
     QTimer,
-    QObject,
 )
 from sage.all import Integer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
-from PySide6.QtCore import Qt, QMetaObject, Slot, Q_ARG, QThread
 from ui import MainWinIniter
 from qt_material import apply_stylesheet
 from src.cfg import Cfg
 from src.ernst05 import mixed_1, mixed_2
-from src.tk14 import msb_1, lsb, mixed
 from src.mns21 import dp_dq_with_lsb
 
 
@@ -88,21 +84,22 @@ class MainWin(QMainWindow):
             print("无效的攻击选项")
 
     def tk14msb(self):
-        print("Tk14 MSB")
-        try:
-            rst = msb_1(
-                Integer(self.ui.N_le.text()),
-                Integer(self.ui.e_le.text()),
-                (Integer(self.ui.d_msb_le.text()),),
-                (
-                    Integer(self.ui.d_len_le.text()),
-                    Integer(self.ui.msb_len_le.text()),
-                ),
-                (None,),
-            )
-            self.显示结果(f"攻击成功！私钥 d = {rst}")
-        except Exception as e:
-            self.显示结果(f"攻击失败：{str(e)}")
+        pass
+        # tk14_msb_1_test(0.37, 0.216, 512)
+        # try:
+        #     rst = msb_1(
+        #         Integer(self.ui.N_le.text()),
+        #         Integer(self.ui.e_le.text()),
+        #         (Integer(self.ui.d_msb_le.text()),),
+        #         (
+        #             Integer(self.ui.d_len_le.text()),
+        #             Integer(self.ui.msb_len_le.text()),
+        #         ),
+        #         (None,),
+        #     )
+        #     self.显示结果(f"攻击成功！私钥 d = {rst}")
+        # except Exception as e:
+        #     self.显示结果(f"攻击失败：{str(e)}")
 
     def tk14lsb(self):
         print("Tk14 LSB")
@@ -186,10 +183,11 @@ class MainWin(QMainWindow):
             (self.ui.home_btn, 0),
             (self.ui.rsa_btn, 1),
             (self.ui.crt_rsa_btn, 2),
-            (self.ui.auto_btn, 3),
-            (self.ui.usr_btn, 4),
-            (self.ui.stg_btn, 5),
-            (self.ui.about_btn, 6),
+            (self.ui.var_btn, 3),
+            (self.ui.auto_btn, 4),
+            (self.ui.usr_btn, 5),
+            (self.ui.stg_btn, 6),
+            (self.ui.about_btn, 7),
         ]
         for btn, idx in btn_list:
             btn.clicked.connect(

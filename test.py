@@ -199,16 +199,17 @@ def tk17_small_e_test():
 # tk17_small_dp_dq_test()
 # mns21_test()
 # tk14_msb_1(0.3, 0.25)
-# tk14_msb_1_test(0.37, 0.205, 512)
+# tk14_msb_1_test(0.37, 0.216, 512)
 # tk14_msb_1_test(0.292, 0.282, 512)
 # tk14_msb_1_test(0.31, 0.25, 512)
 # tk14_msb_1_test(0.31, 0.25, 512)
 # tk14_lsb_test(0.3, 0.25, 512)
 # ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # mns21_dp_dq_with_lsb(1, 0.02, 0.02, 0)
-# mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
+mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
 # tk14_mixed(Rational(0.49), Rational(0.155))
 # ernst05_eq1(props=[Rational(0.155), Rational(0.49), Rational(0.5), Rational(1 + 0.49)])
+# print(f"get_partial_test: {get_partial_test(768, 400, 70, 70)}")
 # print(f"p, N, e, dp, dq, dp_l, dq_l: {get_crt_partial_test(256, 120, 120, 100)}")
 '''
 print(
@@ -237,5 +238,5 @@ print(
     ),
 )
 '''
-# tk14_mixed_test(0.292, 0.248, 0, 512, brute=False, triangluarize=True)
-tk14_msb_1_test(0.292, 0.25, 512)
+# tk14_mixed_test(0.29, 0.248, 0, 512, brute=True, triangluarize=False)
+# tk14_msb_1_test(0.292, 0.25, 512)

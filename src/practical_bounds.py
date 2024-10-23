@@ -98,6 +98,11 @@ def tk14_msb_1(beta, gamma):
                 s_e += m - u
                 n += 1
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
+            print(f"自动使用参数：m = {m}")
+            print(f"格的维度：dim = {n}")
+            print(
+                f"格行列式中各项幂次：s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}"
+            )
             print("自动使用攻击参数：")
             print(f"m = {m}")
             print(f"格的维度：")

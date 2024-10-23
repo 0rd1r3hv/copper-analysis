@@ -22,7 +22,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
         else:
             rsts.put(None)
 
-    print("开始在小素域并行求解Gröbner基...")
+    print("开始在小素域并行求解 Gröbner 基…")
     start = time()
     bound, var = bound_var
     if bound < 0:
@@ -53,7 +53,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
     # 轮询结果并补充新进程
     while True:
         if fails < max_fails and m >= bound:
-            print(f"求解成功！用时{round(time() - start, 3)}s")
+            print(f"求解成功！用时 {round(time() - start, 3)}s")
             print("使用素域：")
             print(", ".join(f"GF({prime})" for prime in crt_mod))
             for p in procs:
@@ -61,7 +61,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
             for p in procs:
                 p.join()
 
-            if N and type(crt_rem[0]) == list:
+            if N and isinstance(crt_rem[0], list):
 
                 def recursive(res, m, d):
                     if d == len(crt_rem):

@@ -81,10 +81,11 @@ class MainWinIniter:
             ("home_btn", f"{cfg.icon_dir}/主页.png", 2, 0),
             ("rsa_btn", f"{cfg.icon_dir}/RSA.png", 3, 0),
             ("crt_rsa_btn", f"{cfg.icon_dir}/CRT-RSA.png", 4, 0),
-            ("auto_btn", f"{cfg.icon_dir}/自动.png", 5, 0),
-            ("usr_btn", f"{cfg.icon_dir}/用户.png", 7, 0),
-            ("stg_btn", f"{cfg.icon_dir}/设置.png", 8, 0),
-            ("about_btn", f"{cfg.icon_dir}/关于.png", 9, 0),
+            ("var_btn", f"{cfg.icon_dir}/单变元.png", 5, 0),
+            ("auto_btn", f"{cfg.icon_dir}/自动.png", 6, 0),
+            ("usr_btn", f"{cfg.icon_dir}/用户.png", 8, 0),
+            ("stg_btn", f"{cfg.icon_dir}/设置.png", 9, 0),
+            ("about_btn", f"{cfg.icon_dir}/关于.png", 10, 0),
         ]
 
         for name, icon_path, row, col in buttons:
@@ -120,10 +121,11 @@ class MainWinIniter:
             ("home_lbl", 2, 1),
             ("rsa_lbl", 3, 1),
             ("crt_rsa_lbl", 4, 1),
-            ("auto_lbl", 5, 1),
-            ("usr_lbl", 7, 1),
-            ("stg_lbl", 8, 1),
-            ("about_lbl", 9, 1),
+            ("var_lbl", 5, 1),
+            ("auto_lbl", 6, 1),
+            ("usr_lbl", 8, 1),
+            ("stg_lbl", 9, 1),
+            ("about_lbl", 10, 1),
         ]
 
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
@@ -145,14 +147,14 @@ class MainWinIniter:
         spacers = [
             (
                 "icon_vspc",
-                6,
+                7,
                 0,
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Minimum,
             ),
             (
                 "ext_vspc",
-                6,
+                7,
                 1,
                 QSizePolicy.Policy.Minimum,
                 QSizePolicy.Policy.Expanding,
@@ -211,6 +213,7 @@ class MainWinIniter:
             "home_page",
             "rsa_page",
             "crt_rsa_page",
+            "var_page",
             "auto_page",
             "usr_page",
             "stg_page",
@@ -275,23 +278,23 @@ class MainWinIniter:
             frame.setStyleSheet("QGroupBox { border-color: #00CA9A; font-size: 14pt; }")
             frame_vlo = QVBoxLayout(frame)
             if frame_title == "针对 RSA 的攻击":
-                text = """<p>已实现多种特定情形下已知上界最好的 d 泄露攻击。包括五大功能：</p>
+                text = """<p>已实现多种特定情形下已知上界最好的 d 泄露攻击。本工具提供五种攻击类型：</p>
 <p>Takayasu, Kunihiro 对高位和低位泄露攻击的改进方案（无泄露等价 Boneh-Durfee 最优方案）；</p>
 <p>Ernst 等人对高低位混合泄露的两种攻击方案；</p>
 <p>Takayasu, Kunihiro 对 Ernst 等人混合泄露方案的等价替代。</p>
 """
             elif frame_title == "针对 CRT-RSA 的攻击":
-                text = """<p>已实现多种特定情形下已知上界最好的 CRT-RSA d<sub>p</sub>, d<sub>q</sub> 部分泄露攻击。六大功能包括：</p>
-<p>Takayasu 等人对小 d<sub>p</sub> 和对小 d<sub>p</sub>, d<sub>q</sub> 的三种攻击方案；</p>
-<p>May 等人对 d<sub>p</sub>, d<sub>q</sub> 的纯低位泄露攻击；</p>
-<p>May 等人对小 e 下 d<sub>p</sub>, d<sub>q</sub> 的纯高位和纯低位泄露攻击。</p>"""
+                text = """<p>已实现多种特定情形下已知上界最优的 CRT-RSA d<sub>p</sub>, d<sub>q</sub> 部分泄露攻击方案。本工具所提供的六大功能包括：</p>
+<p>Takayasu 等人提出的针对小 d<sub>p</sub>和小 d<sub>p</sub>,d<sub>q</sub> 的三种攻击方案；</p>
+<p>May 等人针对 d<sub>p</sub>,d<sub>q</sub> 的纯低位泄露攻击；</p>
+<p>May 等人针对小 e 情况下 d<sub>p</sub>,d<sub>q</sub> 的纯高位和纯低位泄露攻击。</p>"""
             elif frame_title == "单变元模方程攻击":
-                text = """<p>已实现以下攻击类型：</p>
-<p>Coppersmith 对模 N 单变元方程的攻击；</p>
+                text = """<p>本工具实现了以下单变元模多项式方程攻击类型：</p>
+<p>Coppersmith 格基模 N 单变元方程的攻击方法；</p>
 <p>Howgrave-Graham 对模 N 的未知因数的单变元方程的攻击；</p>
 <p>May 等人对模未知因数的已知倍数的单变元线性方程的攻击。</p>"""
             else:
-                text = """<p>已实现 Meers, Nowakowski 提出的 Coppersmith 攻击的自动化构造算法，这种新型方法针对所给的一系列模方程和指定的单项式集合，自动选择该单项式集合下的最优移位多项式供后续求解使用。对于形式复杂的多项式，该自动化方法的应用将使求解的进行变得极其便捷。</p>"""
+                text = """<p>本工具实现了 Meers, Nowakowski 提出的 Coppersmith 攻击的自动化构造算法。该种新型方法针对所给的一系列模方程和指定的单项式集合，自动分析并选择该单项式集合下的最优移位多项式供后续求解使用；对于形式较为复杂的多项式，该自动化方法的应用将使求解的进行变得极其便捷。</p>"""
             text_label = QLabel(text)
             text_label.setOpenExternalLinks(True)
             text_label.setMinimumWidth(192)
@@ -338,7 +341,7 @@ class MainWinIniter:
         atk_cb.setObjectName("atk_cb")
         atk_cb.setMinimumHeight(40)
         atk_cb.addItems(
-            ["Tk14 MSB", "Tk14 LSB", "Tk14 Mixed", "Ernst Mixed1", "Ernst Mixed2"]
+            ["TK14 MSB", "TK14 LSB", "TK14 Mixed", "Ernst Mixed1", "Ernst Mixed2"]
         )  # 添加攻击方法选项
         setattr(self, "atk_cb", atk_cb)
         atk_hlo.addWidget(atk_lbl)
@@ -390,7 +393,7 @@ class MainWinIniter:
         self.rsa_text_display = QTextEdit()
         self.rsa_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.rsa_text_display.setObjectName("rsa_text_display")
-        self.rsa_text_display.setReadOnly(True)
+        # self.rsa_text_display.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.rsa_text_display.setSizePolicy(size_policy)
@@ -429,7 +432,7 @@ class MainWinIniter:
         crt_atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
         crt_atk_cb.setObjectName("crt_atk_cb")
         crt_atk_cb.setMinimumHeight(40)
-        crt_atk_cb.addItems(["Mns21", "TLP"])
+        crt_atk_cb.addItems(["MNS21"])
         setattr(self, "crt_atk_cb", crt_atk_cb)
         crt_atk_hlo.addWidget(crt_atk_lbl)
         crt_atk_hlo.addWidget(crt_atk_cb)
@@ -591,9 +594,11 @@ class MainWinIniter:
         self.crt_rsa_lbl.setText(
             QCoreApplication.translate("main_win", "CRT-RSA 攻击", None)
         )
+        self.var_lbl.setText(QCoreApplication.translate("main_win", "单变元攻击", None))
+        self.auto_lbl.setText(QCoreApplication.translate("main_win", "自动化", None))
         self.usr_lbl.setText(QCoreApplication.translate("main_win", "用户", None))
         self.tit_lbl.setText(QCoreApplication.translate("main_win", "铜钥", None))
-        self.auto_lbl.setText(QCoreApplication.translate("main_win", "自动化", None))
+        
         self.stg_lbl.setText(QCoreApplication.translate("main_win", "设置", None))
         self.home_lbl.setText(QCoreApplication.translate("main_win", "主页", None))
         self.about_lbl.setText(QCoreApplication.translate("main_win", "关于", None))

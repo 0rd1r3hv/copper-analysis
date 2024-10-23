@@ -20,7 +20,7 @@ def l_LSBs(x, km, t):
 
 # leaks = [d msb], lens = [len d, len msb], params = [m], test = [p]
 def msb_1(N, e, leaks, lens, params, test=None):
-    print("开始Takayasu, Kunihiro的d纯高位泄露攻击...")
+    print("开始执行 Takayasu, Kunihiro 的 d 纯高位泄露攻击…")
     (d_m,) = leaks
     len_d, len_m = lens
     d_m <<= len_d - len_m
@@ -31,14 +31,12 @@ def msb_1(N, e, leaks, lens, params, test=None):
     bounds = [X, Y, Z]
     beta = len_d / N.nbits()
     gamma = (len_d - len_m) / N.nbits()
-    print("密钥参数：")
-    print(f"β = {beta.n(digits=3)}, γ = {gamma.n(digits=3)}")
+    print(f"密钥参数：β = {beta.n(digits=3)}, γ = {gamma.n(digits=3)}")
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
-    print("有益格基参数：")
-    print(f"κ = {k.n(digits=3)}, τ = {t.n(digits=3)}")
+    print(f"有益格基参数：κ = {k.n(digits=3)}, τ = {t.n(digits=3)}")
     if None in params:
-        print("未指定攻击参数，自动选择攻击参数'm'...")
+        print("未指定参数，自动选择参数'm'…")
         m = tk14_msb_1(beta, gamma)
     else:
         (m,) = params
@@ -238,12 +236,14 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
         shifts = []
         for u in range(m + 1):
             for i in range(u + 1):
-                shifts.append(x**(u - i) * f**i * eM**(m - i))
+                shifts.append(x ** (u - i) * f**i * eM ** (m - i))
             for j in range(1, t + 1):
-                shifts.append(y**j * f**u * eM**(m - u))
+                shifts.append(y**j * f**u * eM ** (m - u))
         if test:
-            p, = test
-            x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
+            (p,) = test
+            x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (
+                N + 1 - p - N // p
+            ) - k0
             y0 = -(p + N // p - (N + 1 - A))
             test = [x0, y0]
         res = solve_copper(shifts, [X, x], [X, Y], test, brute=[Y, y])
@@ -256,29 +256,41 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
         for u in range(m + 1):
             for i in range(u + 1):
                 deg = max(0, i - t)
-                monomials.append(w**deg * x**(u - deg) * y**i)
-                orig = x**(u - i) * f**i
+                monomials.append(w**deg * x ** (u - deg) * y**i)
+                orig = x ** (u - i) * f**i
                 pol = 0
                 for mono in orig.monomials():
                     deg = max(0, mono.degree(y) - t)
-                    pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
-                shifts.append(pol * eM**(m - i))
+                    pol += (
+                        orig.monomial_coefficient(mono)
+                        * (mono // (w**deg)).subs(w=k0 + x)
+                        * (w**deg)
+                    )
+                shifts.append(pol * eM ** (m - i))
             for j in range(1, t + 1):
                 deg = max(0, u + j - t)
-                monomials.append(w**deg * x**(u - deg) * y**(u  + j))
+                monomials.append(w**deg * x ** (u - deg) * y ** (u + j))
                 orig = y**j * f**u
                 pol = 0
                 for mono in orig.monomials():
                     deg = max(0, mono.degree(y) - t)
-                    pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
-                shifts.append(pol * eM**(m - u))
+                    pol += (
+                        orig.monomial_coefficient(mono)
+                        * (mono // (w**deg)).subs(w=k0 + x)
+                        * (w**deg)
+                    )
+                shifts.append(pol * eM ** (m - u))
         if test:
-            p, = test
-            x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
+            (p,) = test
+            x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (
+                N + 1 - p - N // p
+            ) - k0
             y0 = -(p + N // p - (N + 1 - A))
             test = [k0 + x0, x0, y0]
         if triangluarize == False:
             monomials = None
-        res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials)
+        res = solve_copper(
+            shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials
+        )
     if res:
         return ((k0 + res) * N) // e
