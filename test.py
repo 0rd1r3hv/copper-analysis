@@ -92,12 +92,16 @@ def ernst05_mixed_2_test(beta, delta, kappa, len_fac):
 
 
 def tk14_msb_1_test(beta, delta, len_fac):
-    print(f"tk14_msb_1_test beta: {beta}, delta: {delta}, len_fac: {len_fac}")
+    # print(f"tk14_msb_1_test beta: {beta}, delta: {delta}, len_fac: {len_fac}")
     len_d = ceil(2 * len_fac * beta)
     len_m = ceil(2 * len_fac * (beta - delta))
     len_l = 0
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
-    return msb_1(N, e, [d_m], [len_d, len_m], [None], [p]) == d
+    with open('tk14_msb_1_test.txt', "w", encoding="utf-8") as file:
+        file.write(f"len_d: {len_d}\nlen_m: {len_m}\nlen_l: {len_l}\np: {p}\nN: {N}\ne: {e}\nd: {d}\nd_m: {d_m}\nd_l: {d_l}")
+    res = msb_1(N, e, [d_m], [len_d, len_m], [None], [p])
+    if res == d:
+        print(f"攻击成功！\nd = {d}\np = {p}\nq = {N // p}")
 
 
 def tk14_lsb_test(beta, delta, len_fac):
@@ -207,8 +211,8 @@ def tk17_small_e_test():
 # mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
 # tk14_mixed(Rational(0.49), Rational(0.155))
 # ernst05_eq1(props=[Rational(0.155), Rational(0.49), Rational(0.5), Rational(1 + 0.49)])
-# tk14_mixed_test(0.35, 0.22, 0, 512)
 # print(f"p, N, e, dp, dq, dp_l, dq_l: {get_crt_partial_test(256, 120, 120, 100)}")
+'''
 print(
     msb_1(
         Integer(
@@ -234,3 +238,6 @@ print(
         (None, None),
     ),
 )
+'''
+# tk14_mixed_test(0.292, 0.248, 0, 512, brute=False, triangluarize=True)
+tk14_msb_1_test(0.292, 0.25, 512)

@@ -42,7 +42,7 @@ def reduce_varsize(N):
 
 
 def solve_copper(
-    shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False, mod=None
+    shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False
 ):
     if select_num is None:
         select_num = len(shifts)
@@ -56,6 +56,8 @@ def solve_copper(
         pol_seq = Sequence(shifts)
         L, monomials = pol_seq.coefficient_matrix()
     monomials = vector(monomials)
+    # print("单项式集合：")
+    # print("{" + str(monomials)[1:-1] + "}")
     scales = list(map(lambda e: e(bounds), monomials))
     for col, scale in enumerate(scales):
         L.rescale_col(col, scale)
@@ -86,6 +88,7 @@ def solve_copper(
         L = L_.LLL(delta)
         print(f"solve_copper recurred fpLLL: {time() - start}")
     else:
+        print("开始使用flatter约化格基...")
         s = fplll_fmt(L)
         file_name = "misc_output.txt"
 
@@ -103,9 +106,9 @@ def solve_copper(
             L = fplll_read(rst.stdout)
         except subprocess.CalledProcessError as e:
             print(e)
-        return
+            return
 
-        print(f"solve_copper flatter: {time() - start}")
+        print(f"约化完成！用时{round(time() - start, 3)}s")
 
     L = L.change_ring(QQ)
     for col, scale in enumerate(scales):

@@ -98,10 +98,12 @@ def tk14_msb_1(beta, gamma):
                 s_e += m - u
                 n += 1
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
-            print(
-                f"(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n: {(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n}"
-            )
-            print(f"s_X: {s_X} s_Y: {s_Y} s_Z: {s_Z} s_e: {s_e} n: {n} m: {m}")
+            print("自动使用参数：")
+            print(f"m = {m}")
+            print(f"格的维度：")
+            print(f"dim = {n}")
+            print("格行列式中各项幂次：")
+            print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}")
             return m
 
 

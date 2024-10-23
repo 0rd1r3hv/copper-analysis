@@ -20,6 +20,7 @@ def l_LSBs(x, km, t):
 
 # leaks = [d msb], lens = [len d, len msb], params = [m], test = [p]
 def msb_1(N, e, leaks, lens, params, test=None):
+    print("开始Takayasu, Kunihiro的d纯高位泄露攻击...")
     (d_m,) = leaks
     len_d, len_m = lens
     d_m <<= len_d - len_m
@@ -30,9 +31,14 @@ def msb_1(N, e, leaks, lens, params, test=None):
     bounds = [X, Y, Z]
     beta = len_d / N.nbits()
     gamma = (len_d - len_m) / N.nbits()
+    print("密钥参数：")
+    print(f"β = {beta.n(digits=3)}, γ = {gamma.n(digits=3)}")
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
+    print("有益格基参数：")
+    print(f"κ = {k.n(digits=3)}, τ = {t.n(digits=3)}")
     if None in params:
+        print("未指定参数，自动选择参数'm'...")
         m = tk14_msb_1(beta, gamma)
     else:
         (m,) = params
@@ -240,7 +246,7 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
             x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
             y0 = -(p + N // p - (N + 1 - A))
             test = [x0, y0]
-        res = solve_copper(shifts, [X, x], [X, Y], test, brute=[Y, y], mod=eM**m)
+        res = solve_copper(shifts, [X, x], [X, Y], test, brute=[Y, y])
     else:
         PR = ZZ["w, x, y"]
         w, x, y = PR.gens()
@@ -273,6 +279,6 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
             test = [k0 + x0, x0, y0]
         if triangluarize == False:
             monomials = None
-        res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials, mod=eM**m)
+        res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials)
     if res:
         return ((k0 + res) * N) // e
