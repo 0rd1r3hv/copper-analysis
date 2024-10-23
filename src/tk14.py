@@ -207,7 +207,7 @@ def lsb(N, e, leaks, lens, params, test=None):
 
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t]
-def mixed(N, e, leaks, lens, params, test=None):
+def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True):
     d_m, d_l = leaks
     len_d, len_m, len_l = lens
     d_m <<= len_d - len_m
@@ -225,45 +225,54 @@ def mixed(N, e, leaks, lens, params, test=None):
         m, t = tk14_mixed(beta, delta)
     else:
         m, t = params
-    PR = ZZ["w, x, y"]
-    w, x, y = PR.gens()
-    f = 1 - e * d_l + w * (A + y)
-    shifts = []
-    monomials = []
-    for u in range(m + 1):
-        for i in range(u + 1):
-            deg = max(0, i - t)
-            monomials.append(w**deg * x ** (u - deg) * y**i)
-            orig = x ** (u - i) * f**i
-            pol = 0
-            for mono in orig.monomials():
-                deg = max(0, mono.degree(y) - t)
-                pol += (
-                    orig.monomial_coefficient(mono)
-                    * (mono // (w**deg)).subs(w=k0 + x)
-                    * (w**deg)
-                )
-            shifts.append(pol * eM ** (m - i))
-        for j in range(1, t + 1):
-            deg = max(0, u + j - t)
-            monomials.append(w**deg * x ** (u - deg) * y ** (u + j))
-            orig = y**j * f**u
-            pol = 0
-            for mono in orig.monomials():
-                deg = max(0, mono.degree(y) - t)
-                pol += (
-                    orig.monomial_coefficient(mono)
-                    * (mono // (w**deg)).subs(w=k0 + x)
-                    * (w**deg)
-                )
-            shifts.append(pol * eM ** (m - u))
-    if test:
-        (p,) = test
-        x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
-        y0 = -(p + N // p - (N + 1 - A))
-        test = [k0 + x0, x0, y0]
-    res = solve_copper(
-        shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials
-    )
+    if brute:
+        PR = ZZ["x, y"]
+        x, y = PR.gens()
+        f = 1 - e * d_l + (k0 + x) * (A - Y + y)
+        shifts = []
+        for u in range(m + 1):
+            for i in range(u + 1):
+                shifts.append(x**(u - i) * f**i * eM**(m - i))
+            for j in range(1, t + 1):
+                shifts.append(y**j * f**u * eM**(m - u))
+        if test:
+            p, = test
+            x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
+            y0 = -(p + N // p - (N + 1 - A))
+            test = [x0, y0]
+        res = solve_copper(shifts, [X, x], [X, Y], test, brute=[Y, y], mod=eM**m)
+    else:
+        PR = ZZ["w, x, y"]
+        w, x, y = PR.gens()
+        f = 1 - e * d_l + w * (A + y)
+        shifts = []
+        monomials = []
+        for u in range(m + 1):
+            for i in range(u + 1):
+                deg = max(0, i - t)
+                monomials.append(w**deg * x**(u - deg) * y**i)
+                orig = x**(u - i) * f**i
+                pol = 0
+                for mono in orig.monomials():
+                    deg = max(0, mono.degree(y) - t)
+                    pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
+                shifts.append(pol * eM**(m - i))
+            for j in range(1, t + 1):
+                deg = max(0, u + j - t)
+                monomials.append(w**deg * x**(u - deg) * y**(u  + j))
+                orig = y**j * f**u
+                pol = 0
+                for mono in orig.monomials():
+                    deg = max(0, mono.degree(y) - t)
+                    pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
+                shifts.append(pol * eM**(m - u))
+        if test:
+            p, = test
+            x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
+            y0 = -(p + N // p - (N + 1 - A))
+            test = [k0 + x0, x0, y0]
+        if triangluarize == False:
+            monomials = None
+        res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials, mod=eM**m)
     if res:
         return ((k0 + res) * N) // e

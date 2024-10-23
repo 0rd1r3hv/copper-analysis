@@ -23,7 +23,6 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
             rsts.put(None)
 
     start = time()
-    print(f"mp groebner pols_len: {len(pols)}")
     bound, var = bound_var
     if bound < 0:
         bound = -bound
@@ -35,7 +34,6 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
     fails = 0
     crt_rem = []
     crt_mod = []
-
     max_proc = 8
     procs = []
     rsts = multiprocessing.Queue()

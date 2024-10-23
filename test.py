@@ -109,15 +109,13 @@ def tk14_lsb_test(beta, delta, len_fac):
     return lsb(N, e, [d_l], [len_d, len_l], [None], [p]) == d
 
 
-def tk14_mixed_test(beta, delta, kappa, len_fac):
-    print(
-        f"tk14_mixed_test: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}"
-    )
+def tk14_mixed_test(beta, delta, kappa, len_fac, brute, triangluarize):
+    print(f"tk14_mixed_test: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}")
     len_d = ceil(2 * len_fac * beta)
     len_m = ceil(2 * len_fac * (beta - delta - kappa))
     len_l = ceil(2 * len_fac * kappa)
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
-    return mixed(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+    return mixed(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p], brute=brute, triangluarize=triangluarize) == d
 
 
 def tk17_small_dp_dq_test(delta1, delta2, len_fac):

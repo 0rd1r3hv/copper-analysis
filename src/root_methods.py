@@ -4,7 +4,6 @@ from time import time
 
 def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
     start = time()
-    print(f"groebner pols_len: {len(pols)}")
     bound, var = bound_var
     if bound < 0:
         bound = -bound

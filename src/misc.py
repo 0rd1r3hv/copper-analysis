@@ -42,15 +42,7 @@ def reduce_varsize(N):
 
 
 def solve_copper(
-    shifts,
-    bound_var,
-    bounds,
-    test,
-    delta=0.75,
-    ex_pols=[],
-    select_num=None,
-    N=None,
-    monomials=None,
+    shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False, mod=None
 ):
     if select_num is None:
         select_num = len(shifts)
@@ -67,30 +59,55 @@ def solve_copper(
     scales = list(map(lambda e: e(bounds), monomials))
     for col, scale in enumerate(scales):
         L.rescale_col(col, scale)
-    start = time()
     L = L.dense_matrix()
+    start = time()
 
-    s = fplll_fmt(L)
-    file_name = "misc_output.txt"
+    if brute:
+        L = L.LLL(delta)
+        print(f"solve_copper original fpLLL: {time() - start}")
+        h, w = L.dimensions()
+        L_ = L.change_ring(QQ)
+        for col, scale in enumerate(scales):
+            L_.rescale_col(col, 1 / scale)
+        L_ = L_.change_ring(ZZ)
+        start = time()
+        for i in range(h):
+            pol = 0
+            for j in range(w):
+                pol += L_[i, j] * monomials[j]
+            bound, var = brute
+            pol = pol.subs({var: var + bound})
+            for j in range(w):
+                L_[i, j] = pol.monomial_coefficient(monomials[j])
+        for col, scale in enumerate(scales):
+            L_.rescale_col(col, scale)
+        print(f"transformation time: {time() - start}")
+        start = time()
+        L = L_.LLL(delta)
+        print(f"solve_copper recurred fpLLL: {time() - start}")
+    else:
+        s = fplll_fmt(L)
+        file_name = "misc_output.txt"
 
-    with open(file_name, "w", encoding="utf-8") as file:
-        file.write(s)
+        with open(file_name, "w", encoding="utf-8") as file:
+            file.write(s)
 
-    try:
-        rst = subprocess.Popen(
-            "src/scripts/misc_flatter.nu",
-            text=True,
-            stdout=subprocess.PIPE,
-            shell=True,
-        )
+        try:
+            rst = subprocess.Popen(
+                "src/scripts/misc_flatter.nu",
+                text=True,
+                stdout=subprocess.PIPE,
+                shell=True,
+            )
 
-        L = fplll_read(rst.stdout)
-    except subprocess.CalledProcessError as e:
-        print(e)
+            L = fplll_read(rst.stdout)
+        except subprocess.CalledProcessError as e:
+            print(e)
         return
 
+        print(f"solve_copper flatter: {time() - start}")
+
     L = L.change_ring(QQ)
-    print(f"solve_copper flatter: {time() - start}s")
     for col, scale in enumerate(scales):
         L.rescale_col(col, 1 / scale)
     selected = list(
