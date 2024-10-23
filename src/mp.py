@@ -23,7 +23,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
             rsts.put(None)
 
     start = time()
-    print(f"mp len(pols): {len(pols)}")
+    print(f"mp groebner pols_len: {len(pols)}")
     bound, var = bound_var
     if bound < 0:
         bound = -bound
@@ -54,13 +54,14 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
     # 轮询结果并补充新进程
     while True:
         if fails < max_fails and m >= bound:
+            print(f"mp groebner success: {time() - start}s")
             for p in procs:
                 p.terminate()
             for p in procs:
                 p.join()
-            print(f"groebner success: {time() - start}s")
 
             if N and type(crt_rem[0]) == list:
+
                 def recursive(res, m, d):
                     if d == len(crt_rem):
                         if N % res == 0:
@@ -97,7 +98,7 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
                 p.terminate()
             for p in procs:
                 p.join()
-            print("groebner fail!")
+            print(f"mp groebner fail: {time() - start}s")
             return None
 
         procs = [p for p in procs if p.is_alive()]

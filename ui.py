@@ -291,7 +291,7 @@ class MainWinIniter:
 <p>Howgrave-Graham 对模 N 的未知因数的单变元方程的攻击；</p>
 <p>May 等人对模未知因数的已知倍数的单变元线性方程的攻击。</p>"""
             else:
-                text = """<p>已实现 Meers, Nowakowski 对 Coppersmith 方法的自动化，针对所给方程自动构造优选移位多项式。</p>"""
+                text = """<p>已实现 Meers, Nowakowski 提出的 Coppersmith 攻击的自动化构造算法，这种新型方法针对所给的一系列模方程和指定的单项式集合，自动选择该单项式集合下的最优移位多项式供后续求解使用。对于形式复杂的多项式，该自动化方法的应用将使求解的进行变得极其便捷。</p>"""
             text_label = QLabel(text)
             text_label.setOpenExternalLinks(True)
             text_label.setMinimumWidth(192)
@@ -403,7 +403,12 @@ class MainWinIniter:
         self.crt_parma_cont = QWidget()
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         self.crt_parma_cont.setSizePolicy(sizePolicy)
-        self.crt_parma_cont.setFixedWidth(480)
+        self.crt_parma_cont.setFixedWidth(640)
+        sizePolicy = QSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
+        )
+        self.crt_parma_cont.setSizePolicy(sizePolicy)
+
         self.crt_parma_vlo = QVBoxLayout(self.crt_parma_cont)
         self.crt_parma_vlo.setSpacing(4)
         self.crt_parma_vlo.setContentsMargins(0, 0, 0, 0)
@@ -417,14 +422,14 @@ class MainWinIniter:
         crt_atk_hlo.setAlignment(Qt.AlignLeft)
         crt_atk_lbl = QLabel("攻击方法")
         crt_atk_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        crt_atk_lbl.setMinimumWidth(96)
-        crt_atk_lbl.setStyleSheet("QLabel {font-size: 12pt;}")
+        crt_atk_lbl.setMinimumWidth(120)
+        crt_atk_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
         crt_atk_cb = QComboBox()
         crt_atk_cb.setFixedWidth(120)
         crt_atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
         crt_atk_cb.setObjectName("crt_atk_cb")
         crt_atk_cb.setMinimumHeight(40)
-        crt_atk_cb.addItems(["BM", "TLP"])
+        crt_atk_cb.addItems(["Mns21", "TLP"])
         setattr(self, "crt_atk_cb", crt_atk_cb)
         crt_atk_hlo.addWidget(crt_atk_lbl)
         crt_atk_hlo.addWidget(crt_atk_cb)
@@ -437,13 +442,15 @@ class MainWinIniter:
             "dq_len",
             "lsb_len",
             "dp_msb",
-            "dq_msb," "dp_lsb",
+            "dq_msb",
+            "dp_lsb",
             "dq_lsb",
         ]
         crt_params_name = [
             "模数 N",
             "公钥 e",
             "d<sub>p</sub> 长度",
+            "d<sub>q</sub> 长度",
             "LSB 长度",
             "d<sub>p</sub> MSB",
             "d<sub>q</sub> MSB",
@@ -458,13 +465,13 @@ class MainWinIniter:
             param_hlo.setSpacing(16)
             param_lbl = QLabel(name)
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            param_lbl.setMinimumWidth(96)
-            param_lbl.setStyleSheet("QLabel {font-size: 12pt;}")
+            param_lbl.setMinimumWidth(120)
+            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
             param_le = QLineEdit()
             param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setObjectName(f"crt_rsa_{param}_le")
             param_le.setMinimumHeight(40)
             setattr(self, f"crt_rsa_{param}_le", param_le)
-
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
             self.crt_parma_vlo.addWidget(param_frm)
@@ -480,6 +487,7 @@ class MainWinIniter:
 
         self.crt_rsa_hlo.addWidget(self.crt_parma_cont)
         self.crt_rsa_text_display = QTextEdit()
+        self.crt_rsa_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.crt_rsa_text_display.setObjectName("crt_rsa_text_display")
         self.crt_rsa_text_display.setReadOnly(True)
 

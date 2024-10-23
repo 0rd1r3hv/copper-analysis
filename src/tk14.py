@@ -1,11 +1,10 @@
-from sage.all import *
-from src.misc import *
-from src.practical_bounds import *
+from sage.all import ceil, floor, inverse_mod, ZZ
+from src.misc import reduce_varsize, solve_copper
+from src.practical_bounds import tk14_msb_1, tk14_lsb, tk14_mixed
 # from src.root_method import groebner
-from src.mp import groebner
-from time import time
-from src.fplll_fmt import fplll_fmt, fplll_read
-import subprocess
+# from src.mp import groebner
+# from time import time
+# from src.fplll_fmt import fplll_fmt, fplll_read
 
 
 # Partial Key Exposure Attacks on RSA: Achieving the Boneh-Durfee Bound
@@ -21,7 +20,7 @@ def l_LSBs(x, km, t):
 
 # leaks = [d msb], lens = [len d, len msb], params = [m], test = [p]
 def msb_1(N, e, leaks, lens, params, test=None):
-    d_m, = leaks
+    (d_m,) = leaks
     len_d, len_m = lens
     d_m <<= len_d - len_m
     k0 = e * d_m // N
@@ -36,7 +35,7 @@ def msb_1(N, e, leaks, lens, params, test=None):
     if None in params:
         m = tk14_msb_1(beta, gamma)
     else:
-        m, = params
+        (m,) = params
     km = k * m
     PR = ZZ["x, y, z"]
     x, y, z = PR.gens()
@@ -53,10 +52,10 @@ def msb_1(N, e, leaks, lens, params, test=None):
         if deg == 0:
             trans_x.append((1 + x * y) ** i)
         else:
-            pol = (x * y) ** (i - deg) * z ** deg
-            rem = z ** i - (z - 1) ** (i - deg) * z ** deg
+            pol = (x * y) ** (i - deg) * z**deg
+            rem = z**i - (z - 1) ** (i - deg) * z**deg
             for d in range(deg, i):
-                pol += rem.monomial_coefficient(z ** d) * trans_x[d]
+                pol += rem.monomial_coefficient(z**d) * trans_x[d]
             trans_x.append(pol)
     for u in range(1, m + 1):
         for j in range(1, floor(km + t * u) + 1):
@@ -64,10 +63,10 @@ def msb_1(N, e, leaks, lens, params, test=None):
             if deg == 0:
                 trans_y[u].append((1 + x * y) ** u)
             else:
-                pol = (x * y) ** (u - deg) * z ** deg
-                rem = z ** u - (z - 1) ** (u - deg) * z ** deg
+                pol = (x * y) ** (u - deg) * z**deg
+                rem = z**u - (z - 1) ** (u - deg) * z**deg
                 for d in range(deg, u):
-                    pol += rem.monomial_coefficient(z ** d) * trans_y[d][j]
+                    pol += rem.monomial_coefficient(z**d) * trans_y[d][j]
                 trans_y[u].append(pol)
     for u in range(m + 1):
         for i in range(u + 1):
@@ -116,18 +115,25 @@ def msb_1(N, e, leaks, lens, params, test=None):
             monomials.append(x ** (u - deg) * y ** (u + j - deg) * z**deg)
             shifts.append(pol * e ** (m - u))
     if test:
-        p, = test
+        (p,) = test
         x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
         y0 = -(p + N // p - (N + 1 - A))
         test = [x0, y0, (k0 + x0) * y0 + 1]
-    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - (k0 + x) * y - 1], monomials=monomials)
+    res = solve_copper(
+        shifts,
+        [X, x],
+        bounds,
+        test,
+        ex_pols=[z - (k0 + x) * y - 1],
+        monomials=monomials,
+    )
     if res:
         return ((k0 + res) * N) // e
 
 
 # leaks = [d lsb], lens = [len d, len lsb], params = [m], test = [p]
 def lsb(N, e, leaks, lens, params, test=None):
-    d_l, = leaks
+    (d_l,) = leaks
     len_d, len_l = lens
     X = 1 << len_d
     A, Y = reduce_varsize(N)
@@ -140,7 +146,7 @@ def lsb(N, e, leaks, lens, params, test=None):
     if None in params:
         m = tk14_lsb(beta, gamma)
     else:
-        m, = params
+        (m,) = params
     km = k * m
     PR = ZZ["x, y, z"]
     x, y, z = PR.gens()
@@ -189,11 +195,13 @@ def lsb(N, e, leaks, lens, params, test=None):
             monomials.append(x ** (u - deg) * y ** (u + j - deg) * z**deg)
             shifts.append(pol * eM ** (m - u) * M**deg)
     if test:
-        p, = test
+        (p,) = test
         x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p)
         y0 = -(p + N // p - (N + 1 - A))
         test = [x0, y0, x0 * y0 + 1]
-    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[z - x * y - 1], monomials=monomials)
+    res = solve_copper(
+        shifts, [X, x], bounds, test, ex_pols=[z - x * y - 1], monomials=monomials
+    )
     if res:
         return (res * N) // e
 
@@ -225,27 +233,37 @@ def mixed(N, e, leaks, lens, params, test=None):
     for u in range(m + 1):
         for i in range(u + 1):
             deg = max(0, i - t)
-            monomials.append(w**deg * x**(u - deg) * y**i)
-            orig = x**(u - i) * f**i
+            monomials.append(w**deg * x ** (u - deg) * y**i)
+            orig = x ** (u - i) * f**i
             pol = 0
             for mono in orig.monomials():
                 deg = max(0, mono.degree(y) - t)
-                pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
-            shifts.append(pol * eM**(m - i))
+                pol += (
+                    orig.monomial_coefficient(mono)
+                    * (mono // (w**deg)).subs(w=k0 + x)
+                    * (w**deg)
+                )
+            shifts.append(pol * eM ** (m - i))
         for j in range(1, t + 1):
             deg = max(0, u + j - t)
-            monomials.append(w**deg * x**(u - deg) * y**(u  + j))
+            monomials.append(w**deg * x ** (u - deg) * y ** (u + j))
             orig = y**j * f**u
             pol = 0
             for mono in orig.monomials():
                 deg = max(0, mono.degree(y) - t)
-                pol += orig.monomial_coefficient(mono) * (mono // (w ** deg)).subs(w=k0 + x) * (w ** deg)
-            shifts.append(pol * eM**(m - u))
+                pol += (
+                    orig.monomial_coefficient(mono)
+                    * (mono // (w**deg)).subs(w=k0 + x)
+                    * (w**deg)
+                )
+            shifts.append(pol * eM ** (m - u))
     if test:
-        p, = test
+        (p,) = test
         x0 = (e * inverse_mod(e, N + 1 - p - N // p) - 1) // (N + 1 - p - N // p) - k0
         y0 = -(p + N // p - (N + 1 - A))
         test = [k0 + x0, x0, y0]
-    res = solve_copper(shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials)
+    res = solve_copper(
+        shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials
+    )
     if res:
         return ((k0 + res) * N) // e

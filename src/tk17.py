@@ -1,6 +1,8 @@
-from sage.all import Matrix, ZZ, inverse_mod, Integer , gcd, ceil, floor
+from sage.all import Matrix, ZZ, inverse_mod, gcd, ceil, floor
 from src.mp import groebner
-from src.practical_bounds import *
+from src.practical_bounds import tk17_small_dp_dq
+from src.misc import solve_copper
+
 # from src.root_methods import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
@@ -190,7 +192,7 @@ def small_dp_dq(N, e, lens, params, test=None):
     if None in params:
         m = tk17_small_dp_dq(alpha, delta)
     else:
-        m, = params
+        (m,) = params
     PR = ZZ["xp1, xq1, xp2, xq2, yp, yq"]
     xp1, xq1, xp2, xq2, yp, yq = PR.gens()
     Q = PR.quotient(N - yp * yq)
@@ -306,12 +308,20 @@ def small_dp_dq(N, e, lens, params, test=None):
         # shifts.append(pol(X * xp1, X * xq1, X * xp2, X * xq2, Yp * yp, Yq * yq) * e ** (m - i1 - i2))
         shifts.append(pol * e ** (m - i1 - i2))
     if test:
-        p, = test
+        (p,) = test
         q = N // p
         dp = inverse_mod(e, p - 1)
         dq = inverse_mod(e, q - 1)
         k = (e * dp - 1) // (p - 1)
         l = (e * dq - 1) // (q - 1)
         test = [l - 1, l, k, k - 1, p, q]
-    res = solve_copper(shifts, [Y, yp], bounds, test, ex_pols=[N - yp * yq, xp1 - xq1 + 1, xp2 - xq2 - 1], monomials=monomials, N=N)
+    res = solve_copper(
+        shifts,
+        [Y, yp],
+        bounds,
+        test,
+        ex_pols=[N - yp * yq, xp1 - xq1 + 1, xp2 - xq2 - 1],
+        monomials=monomials,
+        N=N,
+    )
     return res

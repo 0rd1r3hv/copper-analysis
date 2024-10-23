@@ -1,10 +1,10 @@
-from sage.all import *
+from sage.all import Ideal, Integer, QQ, ZZ, GF, crt, jacobian, vector
 from time import time
 
 
 def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
     start = time()
-    print(len(pols))
+    print(f"groebner pols_len: {len(pols)}")
     bound, var = bound_var
     if bound < 0:
         bound = -bound
@@ -14,8 +14,8 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
     p = Integer(1 << 27)
     m = 1
     fails = 0
-    test_sol = []
-    test_prime = 0
+    # test_sol = []
+    # test_prime = 0
     crt_rem = []
     crt_mod = []
     while m < bound and fails < max_fails:
@@ -40,9 +40,10 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
                     break
         else:
             fails += 1
-    print(f"groebner: {time() - start}s")
     if fails < max_fails:
+        print(f"groebner success: {time() - start}s")
         if N:
+
             def recursive(res, m, d):
                 if d == len(crt_rem):
                     if N % res == 0:
@@ -62,13 +63,14 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
             res = recursive(crt_rem[0][0], crt_mod[0], 1)
         else:
             res = crt(crt_rem, crt_mod)
-        if neg == True:
+        if neg:
             m = 1
             for mod in crt_mod:
                 m *= mod
             return res - m
         else:
             return res
+    print(f"groebner failed: {time() - start}s")
 
 
 def newton(sys, boundslst, it=20):
@@ -81,9 +83,9 @@ def newton(sys, boundslst, it=20):
         for i in range(it):
             fv0 = vector(ZZ, [eq.subs(v0) for eq in sys])
             if fv0 == 0:
-                print(f"newton: {time() - st}")
+                print(f"newton done: {time() - st}s")
                 return v0
             v0 -= jacob.subs(v0).solve_right(fv0)
             for j in range(l):
                 v0[j] = round(v0[j])
-        print("Newton Failed")
+        print("newton failed!")

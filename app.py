@@ -1,19 +1,23 @@
 import sys
 import io
+import threading
 from PySide6.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
     QParallelAnimationGroup,
     QTimer,
+    QObject,
 )
-from sage.all import *
-from PySide6.QtGui import QIcon, QTextCursor
+from sage.all import Integer
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QMetaObject, Slot, Q_ARG, QThread
 from ui import MainWinIniter
 from qt_material import apply_stylesheet
 from src.cfg import Cfg
 from src.ernst05 import mixed_1, mixed_2
+from src.tk14 import msb_1, lsb, mixed
+from src.mns21 import dp_dq_with_lsb
 
 
 class MainWin(QMainWindow):
@@ -56,6 +60,7 @@ class MainWin(QMainWindow):
         self._cnct_crt_btn()
         self._cnct_page_btn()
         self._cnct_atk_btn()
+        self._cnct_crt_atk_btn()
         self.ui.主题_cb.currentTextChanged.connect(self.chg_th)
 
     def _cnct_rsa_btn(self):
@@ -84,6 +89,20 @@ class MainWin(QMainWindow):
 
     def tk14msb(self):
         print("Tk14 MSB")
+        try:
+            rst = msb_1(
+                Integer(self.ui.N_le.text()),
+                Integer(self.ui.e_le.text()),
+                (Integer(self.ui.d_msb_le.text()),),
+                (
+                    Integer(self.ui.d_len_le.text()),
+                    Integer(self.ui.msb_len_le.text()),
+                ),
+                (None,),
+            )
+            self.显示结果(f"攻击成功！私钥 d = {rst}")
+        except Exception as e:
+            self.显示结果(f"攻击失败：{str(e)}")
 
     def tk14lsb(self):
         print("Tk14 LSB")
@@ -92,7 +111,7 @@ class MainWin(QMainWindow):
         print("Tk14 Mixed")
 
     def ernstmixed1(self):
-        print("Ernst Mixed 1", sep="")
+        print("Ernst Mixed 1")
         rst = mixed_1(
             Integer(self.ui.N_le.text()),
             Integer(self.ui.e_le.text()),
@@ -102,8 +121,9 @@ class MainWin(QMainWindow):
                 Integer(self.ui.msb_len_le.text()),
                 Integer(self.ui.lsb_len_le.text()),
             ),
+            (None, None),
         )
-        print(f"攻击成功！私钥 d = {rst}", sep="")
+        print(f"攻击成功！私钥 d = {rst}")
 
     def ernstmixed2(self):
         print("Ernst Mixed 2")
@@ -119,8 +139,47 @@ class MainWin(QMainWindow):
                 Integer(self.ui.msb_len_le.text()),
                 Integer(self.ui.lsb_len_le.text()),
             ),
+            (None, None),
         )
         print(f"攻击成功！私钥 d = {rst}")
+
+    def _cnct_crt_atk_btn(self):
+        self.ui.crt_atk_btn.clicked.connect(self._exec_crt_atk)
+
+    def _exec_crt_atk(self):
+        攻击方法序列 = self.ui.crt_atk_cb.currentIndex()
+        攻击函数 = [
+            self.mns21,
+        ]
+
+        if 0 <= 攻击方法序列 < len(攻击函数):
+            攻击函数[攻击方法序列]()
+        else:
+            print("无效的攻击选项")
+
+    def mns21(self):
+        print("Mns21")
+        try:
+            rst = dp_dq_with_lsb(
+                Integer(self.ui.crt_rsa_N_le.text()),
+                Integer(self.ui.crt_rsa_e_le.text()),
+                (
+                    Integer(self.ui.crt_rsa_dp_lsb_le.text()),
+                    Integer(self.ui.crt_rsa_dq_lsb_le.text()),
+                ),
+                (
+                    Integer(self.ui.crt_rsa_dp_len_le.text()),
+                    Integer(self.ui.crt_rsa_dq_len_le.text()),
+                    Integer(self.ui.crt_rsa_lsb_len_le.text()),
+                ),
+                (None, None),
+            )
+            self.显示结果(f"攻击成功！私钥 d = {rst}")
+        except Exception as e:
+            self.显示结果(f"攻击失败：{str(e)}")
+
+    def 显示结果(self, 结果):
+        print(结果)
 
     def _cnct_page_btn(self):
         btn_list = [

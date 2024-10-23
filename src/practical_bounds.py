@@ -1,5 +1,5 @@
-from sage.all import *
-from src.misc import *
+from sage.all import ceil, floor, Rational
+from src.misc import calc_bits
 
 
 MAX_M = 1000
@@ -37,10 +37,7 @@ def ernst05_eq1(bounds=None, props=None):
                     sw += 1
                     dim += 1
             if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * z + w):
-                print(
-                    f"sx, sy, sz, sw, dim, m, t: {sx}, {sy}, {sz}, {sw}, {dim}, {m}, {t}",
-                    sep="",
-                )
+                print(f"sx: {sx} sy: {sy} sz: {sz} sw: {sw} dim: {dim} m: {m} t: {t}")
                 return m, t
 
 
@@ -75,9 +72,7 @@ def ernst05_eq2(bounds=None, props=None):
                     sw += 1
                     dim += 1
             if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * y + w):
-                print(
-                    f"sx, sy, sz, sw, dim, m, t: {sx}, {sy}, {sz}, {sw}, {dim}, {m}, {t}"
-                )
+                print(f"sx: {sx} sy: {sy} sz: {sz} sw: {sw} dim: {dim} m: {m} t: {t}")
                 return m, t
 
 
@@ -106,7 +101,7 @@ def tk14_msb_1(beta, gamma):
             print(
                 f"(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n: {(s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e - n * m) / n}"
             )
-            print(f"s_X, s_Y, s_Z, s_e, n, m: {s_X}, {s_Y}, {s_Z}, {s_e}, {n}, {m}")
+            print(f"s_X: {s_X} s_Y: {s_Y} s_Z: {s_Z} s_e: {s_e} n: {n} m: {m}")
             return m
 
 
@@ -135,21 +130,15 @@ def tk14_lsb(beta, gamma):
             beta - gamma
         ) < n * m * (1 + beta - gamma):
             print(
-                (
-                    s_X * beta
-                    + s_Y * 1 / 2
-                    + s_Z * (beta + 1 / 2)
-                    + s_e
-                    + s_M * (beta - gamma)
-                    - n * m * (1 + beta - gamma)
-                )
-                / n
+                f"s_X: {s_X} s_Y: {s_Y} s_Z: {s_Z} s_e: {s_e} s_M: {s_M} n: {n} m: {m}"
             )
-            print(s_X, s_Y, s_Z, s_e, n, m)
+            print(
+                f"s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) - n * m * (1 + beta - gamma): {(s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) - n * m * (1 + beta - gamma)) / n}"
+            )
             return m
 
 
-def tk14_mixed(beta, delta, eta=Rational('1/2')):
+def tk14_mixed(beta, delta, eta=Rational("1/2")):
     for m in range(1, MAX_M + 1):
         for t in range(m + 1):
             s_w = s_x = s_y = s_em = dim = 0
@@ -169,11 +158,13 @@ def tk14_mixed(beta, delta, eta=Rational('1/2')):
                     s_em += m - u
                     dim += 1
             if s_w * beta + s_x * delta + s_y * eta + s_em < dim * m:
-                print(s_x, s_y, s_em, dim, m, t)
+                print(
+                    f"s_w: {s_w} s_x: {s_x} s_y: {s_y} s_em: {s_em} dim: {dim} m: {m} t: {t}"
+                )
                 return m, t
 
 
-def tk14_low_2(beta, gamma):
+def tk14_low_2(kbeta, gamma):
     for m in range(1, MAX_M + 1):
         for t in range(m + 1):
             s_X = s_Y = s_eM = n = 0
@@ -188,19 +179,13 @@ def tk14_low_2(beta, gamma):
                     s_Y += u + j
                     s_eM += m - u
                     n += 1
-            if s_X * beta + s_Y * 1 / 2 + s_eM * (1 + beta - gamma) < n * m * (
-                1 + beta - gamma
+            if s_X * kbeta + s_Y * 1 / 2 + s_eM * (1 + kbeta - gamma) < n * m * (
+                1 + kbeta - gamma
             ):
+                print(f"s_X: {s_X} s_Y: {s_Y} s_eM: {s_eM} n: {n} m: {m}")
                 print(
-                    (
-                        s_X * beta
-                        + s_Y * 1 / 2
-                        + s_eM * (1 + beta - gamma)
-                        - n * m * (1 + beta - gamma)
-                    )
-                    / n
+                    f"s_X * kbeta + s_Y * 1 / 2 + s_eM * (1 + kbeta - gamma) - n * m * (1 + kbeta - gamma): {s_X * kbeta + s_Y * 1 / 2 + s_eM * (1 + kbeta - gamma) - n * m * (1 + kbeta - gamma)}"
                 )
-                print(s_X, s_Y, s_eM, n, m, t)
                 return m, t
 
 
@@ -233,18 +218,13 @@ def tk17_large_e(alpha, beta, delta):
             + s_e * alpha
             < n * m * alpha
         ):
+            print(f"s_X: {s_X} s_Yp: {s_Yp} s_Yq: {s_Yq} s_e: {s_e} n: {n} m: {m}")
             print(
-                (
-                    s_X * (alpha + beta + delta - 1)
-                    + s_Yp * beta
-                    + s_Yq * (1 - beta)
-                    + s_e * alpha
-                    - n * m * alpha
-                )
-                / n
+                f"s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha: {(s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha) / n}"
             )
-            print(s_X, s_Yp, s_Yq, s_e, n, m)
-            print(alpha + beta + delta - 1, beta, 1 - beta, alpha)
+            print(
+                f"alpha + beta + delta - 1: {alpha + beta + delta - 1} beta: {beta} 1 - beta: {1 - beta} alpha: {alpha}"
+            )
             return m
 
 
@@ -273,18 +253,13 @@ def tk17_small_e(alpha, beta, delta):
             + s_e * alpha
             < n * m * alpha
         ):
+            print(f"s_X: {s_X} s_Yp: {s_Yp} s_Yq: {s_Yq} s_e: {s_e} n: {n} m: {m}")
             print(
-                (
-                    s_X * (alpha + beta + delta - 1)
-                    + s_Yp * beta
-                    + s_Yq * (1 - beta)
-                    + s_e * alpha
-                    - n * m * alpha
-                )
-                / n
+                f"s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha: {(s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha) / n}"
             )
-            print(s_X, s_Yp, s_Yq, s_e, n, m)
-            print(alpha + beta + delta - 1, beta, 1 - beta, alpha)
+            print(
+                f"alpha + beta + delta - 1: {alpha + beta + delta - 1} beta: {beta} 1 - beta: {1 - beta} alpha: {alpha}"
+            )
             return m
 
 
@@ -329,11 +304,10 @@ def tk17_small_dp_dq(alpha, delta):
                     s_Y += (i1 + i2) // 2 + j2
                     s_e += m - (i1 + i2)
         if s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha < n * m * alpha:
+            print(f"s_X: {s_X} s_Y: {s_Y} s_e: {s_e} n: {n} m: {m}")
             print(
-                (s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha - n * m * alpha)
-                / n
+                f"s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha - n * m * alpha: {(s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha - n * m * alpha) / n}"
             )
-            print(s_X, s_Y, s_e, n, m)
             return m
 
 
@@ -427,17 +401,11 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                 alpha + delta2 - 1 / 2
             ) + s_M * leak + s_eM * (alpha + leak) < n * 2 * m * (alpha + leak):
                 print(
-                    (
-                        s_X * (alpha + delta1 - 1 / 2)
-                        + s_Y / 2
-                        + s_Z * (alpha + delta2 - 1 / 2)
-                        + s_M * leak
-                        + s_eM * (alpha + leak)
-                        - n * 2 * m * (alpha + leak)
-                    )
-                    / n
+                    f"s_X: {s_X} s_Y: {s_Y} s_Z: {s_Z} s_eM: {s_eM} s_M: {s_M} n: {n} m: {m}"
                 )
-                print(s_X, s_Y, s_Z, s_eM, s_M, n, m, thres)
+                print(
+                    f"s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (alpha + delta2 - 1 / 2) + s_M * leak + s_eM * (alpha + leak) - n * 2 * m * (alpha + leak): {(s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (alpha + delta2 - 1 / 2) + s_M * leak + s_eM * (alpha + leak) - n * 2 * m * (alpha + leak)) / n}"
+                )
                 return m, thres
 
 

@@ -1,6 +1,7 @@
 import subprocess
-from sage.all import *
+from sage.all import floor, gcd, Integer, Matrix, QQ, ZZ, prod, sqrt, Sequence, vector
 from src.mp import groebner
+
 # from src.root_methods import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
@@ -41,7 +42,15 @@ def reduce_varsize(N):
 
 
 def solve_copper(
-    shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None
+    shifts,
+    bound_var,
+    bounds,
+    test,
+    delta=0.75,
+    ex_pols=[],
+    select_num=None,
+    N=None,
+    monomials=None,
 ):
     if select_num is None:
         select_num = len(shifts)
@@ -77,6 +86,7 @@ def solve_copper(
 
         L = fplll_read(rst.stdout)
     except subprocess.CalledProcessError as e:
+        print(e)
         return
 
     L = L.change_ring(QQ)
@@ -85,7 +95,7 @@ def solve_copper(
         L.rescale_col(col, 1 / scale)
     selected = list(
         filter(
-            lambda e: test == None or e(test) == 0,
+            lambda e: test is None or e(test) == 0,
             L.change_ring(ZZ)[: select_num + 1] * monomials,
         )
     )
