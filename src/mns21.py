@@ -25,6 +25,7 @@ def transform(PR, Q, pol, mono, mod, i):
 
 # leaks = [dp_l, dq_l], lens = [len_dp, len_dq, len_l], params = [m, s], test = [p]
 def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
+    print("开始May, Nowakowski, Sarkar的dp, dq纯低位泄露攻击...")
     dp_l, dq_l = leaks
     len_dp, len_dq, len_l = lens
     len_N = N.nbits()
@@ -33,7 +34,10 @@ def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
     delta1 = len_dp / len_N
     delta2 = len_dq / len_N
     leak = len_l / len_N
+    print("密钥参数：")
+    print(f"α = {alpha.n(digits=3)}, δ1 = {delta1.n(digits=3)}, δ2 = {delta2.n(digits=3)}, κ = {leak.n(digits=3)}")
     if None in params:
+        print("未指定攻击参数，自动选择攻击参数'm', 's'...")
         m, thres = mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak)
     else:
         m, thres = params
@@ -174,7 +178,6 @@ def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
     ords_monos_shifts = [(order[i], monomials[i], shifts[i]) for i in range(n)]
     ords_monos_shifts.sort(key=lambda e: (e[0][0], e[0][1], e[0][2]))
     monomials = [_[1] for _ in ords_monos_shifts]
-    # scales = [mono(X, X, Y, Y, Z, Z) for mono in monomials]
     shifts = [_[2] for _ in ords_monos_shifts]
     if test:
         (p,) = test

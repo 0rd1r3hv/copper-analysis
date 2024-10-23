@@ -98,7 +98,7 @@ def tk14_msb_1(beta, gamma):
                 s_e += m - u
                 n += 1
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
-            print("自动使用参数：")
+            print("自动使用攻击参数：")
             print(f"m = {m}")
             print(f"格的维度：")
             print(f"dim = {n}")
@@ -317,7 +317,7 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
     t = max(1 - 2 * max(delta1, delta2), 1 / 2)
     for m in range(1, MAX_M + 1):
         for thres in range(m + 1):
-            s_X = s_Y = s_Z = s_M = s_eM = n = 0
+            s_X = s_Y = s_Z = s_M = s_eM = dim = 0
             for c in range(m + 1):
                 for a in range(m + 1):
                     b = 0
@@ -348,7 +348,7 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                         s_Y += (b + 1) // 2
                         s_Z += c
                         s_eM += 2 * m - deg
-                        n += 1
+                        dim += 1
                         b += 1
             for c in range(m + 1):
                 for a in range(m + 1):
@@ -377,7 +377,7 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                                 s_Z += c
                                 s_M += deg
                                 s_eM += 2 * m - deg
-                                n += 1
+                                dim += 1
                             if b == a + c:
                                 for i in range(
                                     max(1, thres - b // 2 + 1),
@@ -388,7 +388,7 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                                     s_Z += c
                                     s_M += deg
                                     s_eM += 2 * m - deg
-                                    n += 1
+                                    dim += 1
                                 for i in range(
                                     max(1, thres - (b + 1) // 2 + 1),
                                     floor(t * b - (b + 1) // 2) + 1,
@@ -398,16 +398,16 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                                     s_Z += c
                                     s_M += deg
                                     s_eM += 2 * m - deg
-                                    n += 1
+                                    dim += 1
             if s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (
                 alpha + delta2 - 1 / 2
-            ) + s_M * leak + s_eM * (alpha + leak) < n * 2 * m * (alpha + leak):
-                print(
-                    f"s_X: {s_X} s_Y: {s_Y} s_Z: {s_Z} s_eM: {s_eM} s_M: {s_M} n: {n} m: {m}"
-                )
-                print(
-                    f"s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (alpha + delta2 - 1 / 2) + s_M * leak + s_eM * (alpha + leak) - n * 2 * m * (alpha + leak): {(s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (alpha + delta2 - 1 / 2) + s_M * leak + s_eM * (alpha + leak) - n * 2 * m * (alpha + leak)) / n}"
-                )
+            ) + s_M * leak + s_eM * (alpha + leak) < dim * 2 * m * (alpha + leak):
+                print("自动使用攻击参数：")
+                print(f"m = {m}, s = {thres}")
+                print(f"格的维度：")
+                print(f"dim = {dim}")
+                print("格行列式中各项幂次：")
+                print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}")
                 return m, thres
 
 

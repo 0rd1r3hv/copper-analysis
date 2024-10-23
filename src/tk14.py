@@ -38,7 +38,7 @@ def msb_1(N, e, leaks, lens, params, test=None):
     print("有益格基参数：")
     print(f"κ = {k.n(digits=3)}, τ = {t.n(digits=3)}")
     if None in params:
-        print("未指定参数，自动选择参数'm'...")
+        print("未指定攻击参数，自动选择攻击参数'm'...")
         m = tk14_msb_1(beta, gamma)
     else:
         (m,) = params

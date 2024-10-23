@@ -135,18 +135,16 @@ def tk17_small_dp_dq_test(delta1, delta2, len_fac):
 
 
 def mns21_dp_dq_with_lsb_test(delta1, delta2, leak, len_fac):
-    print(
-        f"mns21_dp_dq_with_lsb_test delta1: {delta1}, delta2: {delta2}, leak: {leak}, len_fac: {len_fac}"
-    )
+    # print(f"mns21_dp_dq_with_lsb_test delta1: {delta1}, delta2: {delta2}, leak: {leak}, len_fac: {len_fac}")
     len_dp = ceil(2 * len_fac * delta1)
     len_dq = ceil(2 * len_fac * delta2)
     len_l = ceil(2 * len_fac * leak)
     p, N, e, dp, dq, dp_l, dq_l = get_crt_partial_test(len_fac, len_dp, len_dq, len_l)
-    print(
-        f"p: {p}, N: {N}, e: {e}, dp: {dp}, dq: {dq}, dp_l: {dp_l}, dq_l: {dq_l}, len_dp: {len_dp}, len_dq: {len_dq}, len_l: {len_l}"
-    )
+    with open('mns21_dp_dq_with_lsb_test', "w", encoding="utf-8") as file:
+        file.write(f"p: {p}, N: {N}, e: {e}, dp: {dp}, dq: {dq}, dp_l: {dp_l}, dq_l: {dq_l}, len_dp: {len_dp}, len_dq: {len_dq}, len_l: {len_l}")
     res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
-    return res == p or res == N // p
+    if res == p or res == N // p:
+        print(f"攻击成功！\ndp = {dp}\ndq = {dq}\np = {p}\nq = {N // p}")
 
 
 def tk17_large_e_test():
