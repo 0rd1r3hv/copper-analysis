@@ -141,6 +141,7 @@ def tk14_lsb(beta, gamma):
 
 
 def tk14_mixed(beta, delta, eta=Rational("1/2")):
+    print(f"beta: {beta} delta: {delta} eta: {eta}")
     for m in range(1, MAX_M + 1):
         for t in range(m + 1):
             s_w = s_x = s_y = s_em = dim = 0

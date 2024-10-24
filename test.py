@@ -1,5 +1,14 @@
-from sage.all import crt, Integer, ceil, inverse_mod, gcd, randint, random_prime, Rational
-from src.tk14 import mixed, msb_1, lsb, tk14_mixed
+from sage.all import (
+    crt,
+    Integer,
+    ceil,
+    inverse_mod,
+    gcd,
+    randint,
+    random_prime,
+    Rational,
+)
+from src.tk14 import mixed, msb_1, lsb
 from src.tk17 import large_e, small_e, small_dp_dq
 from src.mns21 import dp_dq_with_lsb
 from src.mns22 import mixed_kp
@@ -108,8 +117,10 @@ def tk14_msb_1_test(beta, delta, len_fac):
     len_m = ceil(2 * len_fac * (beta - delta))
     len_l = 0
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
-    with open('tk14_msb_1_test.txt', "w", encoding="utf-8") as file:
-        file.write(f"len_d: {len_d}\nlen_m: {len_m}\nlen_l: {len_l}\np: {p}\nN: {N}\ne: {e}\nd: {d}\nd_m: {d_m}\nd_l: {d_l}")
+    with open("tk14_msb_1_test.txt", "w", encoding="utf-8") as file:
+        file.write(
+            f"len_d: {len_d}\nlen_m: {len_m}\nlen_l: {len_l}\np: {p}\nN: {N}\ne: {e}\nd: {d}\nd_m: {d_m}\nd_l: {d_l}"
+        )
     res = msb_1(N, e, [d_m], [len_d, len_m], [None], [p])
     if res == d:
         print(f"攻击成功！\nd = {d}\np = {p}\nq = {N // p}")
@@ -125,12 +136,26 @@ def tk14_lsb_test(beta, delta, len_fac):
 
 
 def tk14_mixed_test(beta, delta, kappa, len_fac, brute, triangluarize):
-    print(f"tk14_mixed_test: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}")
+    print(
+        f"tk14_mixed_test: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}"
+    )
     len_d = ceil(2 * len_fac * beta)
     len_m = ceil(2 * len_fac * (beta - delta - kappa))
     len_l = ceil(2 * len_fac * kappa)
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
-    return mixed(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p], brute=brute, triangluarize=triangluarize) == d
+    return (
+        mixed(
+            N,
+            e,
+            [d_m, d_l],
+            [len_d, len_m, len_l],
+            [None],
+            [p],
+            brute=brute,
+            triangluarize=triangluarize,
+        )
+        == d
+    )
 
 
 def tk17_small_dp_dq_test(delta1, delta2, len_fac):
@@ -245,12 +270,12 @@ def tk17_small_e_test():
 # tk14_lsb_test(0.3, 0.25, 512)
 # ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # mns21_dp_dq_with_lsb(1, 0.02, 0.02, 0)
-mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
+# mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
 # tk14_mixed(Rational(0.49), Rational(0.155))
 # ernst05_eq1(props=[Rational(0.155), Rational(0.49), Rational(0.5), Rational(1 + 0.49)])
 # print(f"get_partial_test: {get_partial_test(768, 400, 70, 70)}")
 # print(f"p, N, e, dp, dq, dp_l, dq_l: {get_crt_partial_test(256, 120, 120, 100)}")
-'''
+"""
 print(
     msb_1(
         Integer(
