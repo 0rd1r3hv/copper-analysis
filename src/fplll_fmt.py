@@ -1,4 +1,4 @@
-from sage.all import Matrix, ZZ
+from sage.all import Matrix, ZZ, Integer
 
 
 def fplll_fmt(M):
@@ -22,7 +22,7 @@ def fplll_read(s):
         if len(line) == 0:
             break
 
-        row = [int(x) for x in line.split(" ") if len(x) > 0 and x != "]"]
+        row = [Integer(x) for x in line.split(" ") if len(x) > 0 and x != "]"]
         rows += [row]
     m = len(rows)
     n = len(rows[0])

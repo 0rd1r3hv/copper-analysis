@@ -56,8 +56,6 @@ def solve_copper(
         pol_seq = Sequence(shifts)
         L, monomials = pol_seq.coefficient_matrix()
     monomials = vector(monomials)
-    # print("单项式集合：")
-    # print("{" + str(monomials)[1:-1] + "}")
     scales = list(map(lambda e: e(bounds), monomials))
     for col, scale in enumerate(scales):
         L.rescale_col(col, scale)
@@ -119,4 +117,13 @@ def solve_copper(
             L.change_ring(ZZ)[: select_num + 1] * monomials,
         )
     )
-    return groebner(ex_pols + selected, bound_var, N=N)
+    if len(bounds) > 1:
+        return groebner(ex_pols + selected, bound_var, N=N)
+    else:
+        print(f"开始求解单变元方程...")
+        start = time()
+        for pol in selected:
+            roots = pol.roots(multiplicities=False)
+            if roots:
+                print(f"求解成功！用时{round(time() - start, 3)}s")
+                return roots[0]

@@ -2,8 +2,9 @@ from sage.all import crt, Integer, ceil, inverse_mod, gcd, randint, random_prime
 from src.tk14 import mixed, msb_1, lsb, tk14_mixed
 from src.tk17 import large_e, small_e, small_dp_dq
 from src.mns21 import dp_dq_with_lsb
+from src.mns22 import mixed_kp
 from src.ernst05 import mixed_1, mixed_2
-from src.practical_bounds import tk17_large_e, tk17_small_e
+from src.practical_bounds import *
 
 
 def get_prime(length, proof=True):
@@ -40,6 +41,16 @@ def get_partial_test(len_fac, len_control, len_m, len_l, control="d"):
     else:
         e, d = get_pair(len_control, phi)
     return p, N, e, d, get_leak(d, "high", len_m), get_leak(d, "low", len_l)
+
+
+def get_kp_partial_test(len_N, len_p, len_k, len_m, len_l):
+    p = get_prime(len_p)
+    q = get_prime(len_N - len_p)
+    N = p * q
+    k = 2 * get_rand(len_k - 1) + 1
+    kp = k * p
+    len_kp = kp.nbits()
+    return p, k, N, get_leak(kp, "high", len_m), get_leak(kp, "low", len_l), len_kp
 
 
 def get_crt_partial_test(len_fac, len_dp, len_dq, len_l):
@@ -140,13 +151,39 @@ def mns21_dp_dq_with_lsb_test(delta1, delta2, leak, len_fac):
     len_dq = ceil(2 * len_fac * delta2)
     len_l = ceil(2 * len_fac * leak)
     p, N, e, dp, dq, dp_l, dq_l = get_crt_partial_test(len_fac, len_dp, len_dq, len_l)
-    with open('mns21_dp_dq_with_lsb_test', "w", encoding="utf-8") as file:
+    with open('mns21_dp_dq_with_lsb_test.txt', "w", encoding="utf-8") as file:
         file.write(f"p: {p}, N: {N}, e: {e}, dp: {dp}, dq: {dq}, dp_l: {dp_l}, dq_l: {dq_l}, len_dp: {len_dp}, len_dq: {len_dq}, len_l: {len_l}")
     res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
     if res == p or res == N // p:
         print(f"攻击成功！\ndp = {dp}\ndq = {dq}\np = {p}\nq = {N // p}")
     else:
         print(f"攻击失败！\nres = {res}")
+
+
+def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
+    len_p = ceil(len_N * beta)
+    len_k = ceil(len_N * mu)
+    len_l = ceil(len_N * kappa)
+    len_m = ceil(len_N * (beta + mu - delta - kappa))
+    p, k, N, kp_m, kp_l, len_kp = get_kp_partial_test(len_N, len_p, len_k, len_m, len_l)
+    with open('mns21_dp_dq_with_lsb_test.txt', "w", encoding="utf-8") as file:
+        file.write(f"p: {p}, k: {k}, N: {N}, kp_m: {kp_m}, kp_l: {kp_l}, len_kp: {len_kp}, len_p: {len_p}, len_k: {len_k}, len_l, len_m")
+    res = mixed_kp(N, k, [kp_m, kp_l], [len_kp, len_m, len_l], [None], test=[p])
+    if res:
+        print(f"攻击成功！\np = {p}\nq = {N // p}")
+
+
+def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
+    len_p = ceil(len_N * beta)
+    len_k = ceil(len_N * mu)
+    len_l = ceil(len_N * kappa)
+    len_m = ceil(len_N * (beta + mu - delta - kappa))
+    p, k, N, kp_m, kp_l, len_kp = get_kp_partial_test(len_N, len_p, len_k, len_m, len_l)
+    with open('mns21_dp_dq_with_lsb_test.txt', "w", encoding="utf-8") as file:
+        file.write(f"p: {p}, k: {k}, N: {N}, kp_m: {kp_m}, kp_l: {kp_l}, len_kp: {len_kp}, len_p: {len_p}, len_k: {len_k}, len_l, len_m")
+    res = mixed_kp(N, k, [kp_m, kp_l], [len_kp, len_m, len_l], [None], test=[p])
+    if res:
+        print(f"攻击成功！\np = {p}\nq = {N // p}")
 
 
 def tk17_large_e_test():
@@ -240,7 +277,9 @@ print(
     ),
 )
 '''
-# tk14_mixed_test(0.29, 0.248, 0, 512, brute=True, triangluarize=False)
+# tk14_mixed_test(0.292, 0.248, 0, 512, brute=False, triangluarize=True)
 # tk14_msb_1_test(0.292, 0.25, 512)
-tk14_mixed(Rational(0.29), Rational(0.248),Rational('513/1023'))
-tk14_mixed(Rational(0.29), Rational(0.248),Rational('509/1023'))
+# mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
+# tk14_mixed(Rational(0.292), Rational(0.26), Rational('513/1023'))
+# tk14_mixed(Rational(0.292), Rational(0.26), Rational('509/1023'))
+mns22_mixed_kp_test(0.5, 0.1, 0.345, 0.1, 1024)

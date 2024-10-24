@@ -1,4 +1,5 @@
 from sage.all import gcd, inverse_mod, ZZ, floor, Rational
+from sage.all import gcd, inverse_mod, ZZ, floor, Rational
 
 # from src.mp import groebner
 # from src.root_methods import groebner
@@ -35,6 +36,7 @@ def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
     delta2 = len_dq / len_N
     leak = len_l / len_N
     print("密钥参数：")
+    print(f"α = {Rational(alpha).n(digits=3)}, δ1 = {delta1.n(digits=3)}, δ2 = {delta2.n(digits=3)}, κ = {leak.n(digits=3)}")
     print(f"α = {Rational(alpha).n(digits=3)}, δ1 = {delta1.n(digits=3)}, δ2 = {delta2.n(digits=3)}, κ = {leak.n(digits=3)}")
     if None in params:
         print("未指定攻击参数，自动选择攻击参数'm', 's'…")

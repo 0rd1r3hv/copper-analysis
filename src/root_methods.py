@@ -13,8 +13,6 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
     p = Integer(1 << 27)
     m = 1
     fails = 0
-    # test_sol = []
-    # test_prime = 0
     crt_rem = []
     crt_mod = []
     while m < bound and fails < max_fails:
