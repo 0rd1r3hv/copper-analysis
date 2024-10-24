@@ -25,7 +25,6 @@ def groebner(pols, bound_var, max_fails=40, N=None, neg=False):
             rsts.put(None)
 
     print("开始在小素域并行求解 Gröbner 基…")
-    # print(len(pols))
     start = time()
     bound, var = bound_var
     if bound < 0:

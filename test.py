@@ -14,6 +14,7 @@ from src.mns21 import dp_dq_with_lsb
 from src.mns22 import mixed_kp
 from src.ernst05 import mixed_1, mixed_2
 from src.practical_bounds import *
+from src.mn23 import *
 
 
 def get_prime(length, proof=True):
@@ -204,6 +205,49 @@ def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
         print(f"攻击失败！\nres = {res}")
 
 
+def mn23(n, k, m):
+
+
+    def split(x, bits):
+        lsb = (x % (1 << bits))
+        msb = x - lsb
+        return msb, lsb
+
+
+    p = next_prime(ZZ.random_element(1 << (n - 1), 1 << n))
+    while p % 4 != 3:
+        p = next_prime(p + 1)
+
+    A = ZZ(GF(p).random_element())
+    B = (2 * (A + 6) * inverse_mod(-A + 2, p)) % p
+    C = (2 * (A - 6) * inverse_mod(A + 2, p)) % p
+
+    unknown_bits = n - k
+
+    A_MSB, A_LSB = split(A, unknown_bits)
+    B_MSB, B_LSB = split(B, unknown_bits)
+    C_MSB, C_LSB = split(C, unknown_bits)
+
+    x, y, z = ZZ['x, y, z'].gens()
+
+    f = (A_MSB + x)*(B_MSB + y) + 2 * (A_MSB + x) - 2 * (B_MSB + y) + 12
+    g = (C_MSB + z)*(B_MSB + y) + 2 * (B_MSB + y) - 2 * (C_MSB + z) + 12
+    h = (A_MSB + x)*(C_MSB + z) - 2 * (A_MSB + x) + 2 * (C_MSB + z) + 12
+
+    X = 1 << unknown_bits
+    Y = 1 << unknown_bits
+    Z = 1 << unknown_bits
+    i = m // 3
+    polys = [f, g, h]
+    bounds = [X, Y, Z]
+    solutions_verify = [A_LSB, B_LSB, C_LSB]
+    with open('mn23.txt', "w", encoding="utf-8") as file:
+        file.write(f"m: {m}\nf: {str(f)}\ng: {str(g)}\nh: {str(h)}\nx: {A_LSB}\ny: {B_LSB}\nz: {C_LSB}")
+    res = automated(polys, [X, x], bounds, (prod(polys) ** i).monomials(), p, 3 * i, solutions_verify)
+    if res:
+        print(f"攻击成功！\nx = {A_LSB}\ny = {B_LSB}\nz = {C_LSB}")
+
+
 def tk17_large_e_test():
     ln = 1000
     alpha = 1
@@ -264,6 +308,7 @@ def tk17_small_e_test():
 # ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # mns21_dp_dq_with_lsb(1, 0.02, 0.02, 0)
 # mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
+# mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
 # tk14_mixed(Rational(0.49), Rational(0.155))
 # ernst05_eq1(props=[Rational(0.155), Rational(0.49), Rational(0.5), Rational(1 + 0.49)])
 # print(f"get_partial_test: {get_partial_test(768, 400, 70, 70)}")
@@ -296,8 +341,9 @@ print(
 )
 """
 # tk14_mixed_test(0.292, 0.248, 0, 512, brute=False, triangluarize=True)
-# tk14_msb_1_test(0.292, 0.25, 512)
+# tk14_msb_1_test(0.292, 0.26, 512)
 # mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
 # tk14_mixed(Rational(0.292), Rational(0.26), Rational('513/1023'))
 # tk14_mixed(Rational(0.292), Rational(0.26), Rational('509/1023'))
-mns22_mixed_kp_test(0.5, 0.1, 0.345, 0.1, 1024)
+# mns22_mixed_kp_test(0.5, 0.1, 0.347, 0.1, 1024)
+mn23(512, 300, 6)
