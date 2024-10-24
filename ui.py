@@ -444,6 +444,7 @@ class MainWinIniter:
             "e",
             "dp_len",
             "dq_len",
+            "msb_len",
             "lsb_len",
             "dp_msb",
             "dq_msb",
@@ -455,6 +456,7 @@ class MainWinIniter:
             "公钥 e",
             "d<sub>p</sub> 长度",
             "d<sub>q</sub> 长度",
+            "MSB 长度",
             "LSB 长度",
             "d<sub>p</sub> MSB",
             "d<sub>q</sub> MSB",
@@ -516,14 +518,37 @@ class MainWinIniter:
         self.var_parma_vlo.setSpacing(4)
         self.var_parma_vlo.setContentsMargins(0, 0, 0, 0)
 
+        var_atk_frm = QFrame()
+        var_atk_frm.setMinimumHeight(64)
+        var_atk_hlo = QHBoxLayout(var_atk_frm)
+        var_atk_hlo.setContentsMargins(12, 0, 12, 0)
+        var_atk_hlo.setSpacing(16)
+        var_atk_hlo.setAlignment(Qt.AlignLeft)
+        var_atk_lbl = QLabel("攻击方法")
+        var_atk_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        var_atk_lbl.setMinimumWidth(120)
+        var_atk_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+        var_atk_cb = QComboBox()
+        var_atk_cb.setFixedWidth(120)
+        var_atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
+        var_atk_cb.setObjectName("var_atk_cb")
+        var_atk_cb.setMinimumHeight(40)
+        var_atk_cb.addItems(["MNS22"])
+        setattr(self, "var_atk_cb", var_atk_cb)
+        var_atk_hlo.addWidget(var_atk_lbl)
+        var_atk_hlo.addWidget(var_atk_cb)
+        self.var_parma_vlo.addWidget(var_atk_frm)
+
         # 添加参数输入框
-        var = ["N", "k", "p_len", "msb_len", "lsb_len", "mod_eq"]
+        var = ["N", "k", "p_len", "msb_len", "lsb_len", "kp_msb", "kp_lsb", "mod_eq"]
         var_params = [
             "模数 N",
             "倍数 k",
             "因数 p 长度",
-            "k<sub>p</sub> MSB 长度",
-            "k<sub>p</sub> LSB 长度",
+            "kp MSB 长度",
+            "kp LSB 长度",
+            "kp MSB",
+            "kp LSB",
             "模方程",
         ]
         for param, name in zip(var, var_params):
@@ -558,6 +583,7 @@ class MainWinIniter:
         self.var_text_display = QTextEdit()
         self.var_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.var_text_display.setObjectName("var_text_display")
+        # self.var_text_display.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.var_text_display.setSizePolicy(size_policy)
@@ -683,7 +709,6 @@ class MainWinIniter:
         inno_gb_layout = QVBoxLayout(inno_gb)
         inno_gb_layout.addWidget(inno_lbl)
         about_upper_hlo.addWidget(inno_gb)
-
 
         left_vlo = QVBoxLayout()
         left_lower = QWidget()
