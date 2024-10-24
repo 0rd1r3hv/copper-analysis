@@ -37,7 +37,6 @@ def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
     leak = len_l / len_N
     print("密钥参数：")
     print(f"α = {Rational(alpha).n(digits=3)}, δ1 = {delta1.n(digits=3)}, δ2 = {delta2.n(digits=3)}, κ = {leak.n(digits=3)}")
-    print(f"α = {Rational(alpha).n(digits=3)}, δ1 = {delta1.n(digits=3)}, δ2 = {delta2.n(digits=3)}, κ = {leak.n(digits=3)}")
     if None in params:
         print("未指定攻击参数，自动选择攻击参数'm', 's'…")
         m, thres = mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak)
