@@ -229,6 +229,7 @@ class MainWinIniter:
         self._setup_home_page(cfg)
         self._setup_rsa_page(cfg)
         self._setup_crt_rsa_page(cfg)
+        self._setup_var_page(cfg)
         self._setup_auto_page(cfg)
         self._setup_usr_page(cfg)
         self._setup_stg_page(cfg)
@@ -499,6 +500,70 @@ class MainWinIniter:
 
         self.crt_rsa_hlo.addWidget(self.crt_rsa_text_display)
 
+    def _setup_var_page(self, cfg: Cfg):
+        self.var_hlo = QHBoxLayout(self.var_page)
+        self.var_hlo.setObjectName("var_hlo")
+        self.var_parma_cont = QWidget()
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        self.var_parma_cont.setSizePolicy(sizePolicy)
+        self.var_parma_cont.setFixedWidth(640)
+        sizePolicy = QSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
+        )
+        self.var_parma_cont.setSizePolicy(sizePolicy)
+
+        self.var_parma_vlo = QVBoxLayout(self.var_parma_cont)
+        self.var_parma_vlo.setSpacing(4)
+        self.var_parma_vlo.setContentsMargins(0, 0, 0, 0)
+
+        # 添加参数输入框
+        var = ["N", "k", "p_len", "msb_len", "lsb_len", "mod_eq"]
+        var_params = [
+            "模数 N",
+            "倍数 k",
+            "因数 p 长度",
+            "k<sub>p</sub> MSB 长度",
+            "k<sub>p</sub> LSB 长度",
+            "模方程",
+        ]
+        for param, name in zip(var, var_params):
+            param_frm = QFrame()
+            param_frm.setMinimumHeight(64)
+            param_hlo = QHBoxLayout(param_frm)
+            param_hlo.setContentsMargins(12, 0, 12, 0)
+            param_hlo.setSpacing(16)
+            param_lbl = QLabel(name)
+            param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            param_lbl.setMinimumWidth(120)
+            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_le = QLineEdit()
+            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setObjectName(f"var_{param.lower().replace(' ', '_')}_le")
+            param_le.setMinimumHeight(40)
+            setattr(self, f"var_{param.lower().replace(' ', '_')}_le", param_le)
+            param_hlo.addWidget(param_lbl)
+            param_hlo.addWidget(param_le)
+            self.var_parma_vlo.addWidget(param_frm)
+
+        self.var_parma_vlo.addStretch(1)
+        self.var_parma_vlo.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        )
+        self.var_atk_btn = QPushButton("开始攻击")
+        self.var_atk_btn.setObjectName("var_atk_btn")
+        self.var_atk_btn.setMinimumSize(cfg.btn_size)
+        self.var_parma_vlo.addWidget(self.var_atk_btn)
+
+        self.var_hlo.addWidget(self.var_parma_cont)
+        self.var_text_display = QTextEdit()
+        self.var_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.var_text_display.setObjectName("var_text_display")
+
+        size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.var_text_display.setSizePolicy(size_policy)
+
+        self.var_hlo.addWidget(self.var_text_display)
+
     def _setup_auto_page(self, cfg: Cfg):
         pass
 
@@ -581,42 +646,70 @@ class MainWinIniter:
         return icon_opt_lbl
 
     def _setup_about_page(self, cfg: Cfg):
-        about_hlo = QHBoxLayout(self.about_page)
-        about_hlo.setSpacing(4)
-        about_hlo.setContentsMargins(12, 12, 12, 12)
+        about_vlo = QVBoxLayout(self.about_page)
+        about_vlo.setContentsMargins(20, 20, 20, 20)
+        about_upper_hlo = QHBoxLayout()
+        about_upper_hlo.setAlignment(Qt.AlignTop)
+        about_upper_hlo.setSpacing(20)
+        about_upper_hlo.setContentsMargins(20, 20, 20, 20)
+        about_vlo.addLayout(about_upper_hlo)
+        about_lower_hlo = QHBoxLayout()
+        about_lower_hlo.setAlignment(Qt.AlignBottom)
+        about_vlo.addLayout(about_lower_hlo)
+        intro_gb = QGroupBox("关于本工具")
+        intro_lbl = QLabel(
+            """<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>铜钥（CSyde）</b>自动化公钥密码系统 Coppersmith 格攻击工具由 <a href="https://www.sagemath.org/">SageMath</a> 数学引擎驱动，基于 <a href="https://doc.qt.io/qtforpython-6/">PySide6</a> 可视化框架实现图形交互，根据底层组件声明而遵循 GPL v3 开源协议许可证。</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;我们整合重现了数十年来相关作品中提出的多种攻击方案，并将<b>创新性优化</b>改进集成其中，实现了对 RSA、CRT-RSA、单变元攻击和自动化 Coppersmith 方法的全面支持和高效执行。在极大提高原有方案执行效率并提升实际攻击上界的同时，我们还提供了对复杂多项式方程的移位多项式的自动化构造，以便密码和安全从业者便捷地进行 RSA 及其变体密码系统中密钥参数的选取以及相关秘密参数泄露对系统安全性影响的评估，使用者不必耗费大量精力研究各具体攻击方案的实现和性能调优即可开展多种情形下的最优攻击。</p>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本软件同样面向密码或网安专业的学生和初学者等，对于公钥密码的知识普及、安全评估、分析研究将会产生良好的推进作用。</p>"""
+        )
+        intro_lbl.setStyleSheet("QLabel { font-size: 16pt; }")
+        intro_lbl.setWordWrap(True)
+        intro_gb_layout = QVBoxLayout(intro_gb)
+        intro_gb_layout.addWidget(intro_lbl)
+        about_upper_hlo.addWidget(intro_gb)
 
-        # 左侧区域
+        inno_gb = QGroupBox("我们的创新")
+        inno_lbl = QLabel(
+            """<p>1. 对于含有 p+q 相关变元的攻击，我们将变元上界<b>至少缩小 4 个比特</b>，进而<b>提升了攻击的实际上界</b>。</p>
+            <p>2. 求解变元大小逼近攻击上界的方程时，我们提出格基递推方法的一种扩展，在维度为 50 至 130 时，<b>将后续的格基约化时间缩减了 30% 至 80%</b>。</p>
+            <p>3. 针对实际攻击维度极高的瓶颈，我们利用攻击界相同的低维格基，成功缩减了格维度的渐进复杂度。</p>
+            <p>4. 通过实现特殊攻击的格基矩阵的三角化，我们<b>将这类格基的约化用时缩减了 50% 至 70%</b>。</p>
+            <p>5. 在求根算法上，我们挖掘算法并行性，给出了新的多进程版本，并实现了一种更加实用的多项式筛选方法。</p>
+            <p>6. 对于复杂多项式方程的移位多项式的构造，通过实现<b>自动化 Coppersmith 方法</b>来解决手动选择困难的问题。</p>
+            """
+        )
+        inno_lbl.setStyleSheet("QLabel { font-size: 16pt; }")
+        inno_lbl.setWordWrap(True)
+        inno_gb_layout = QVBoxLayout(inno_gb)
+        inno_gb_layout.addWidget(inno_lbl)
+        about_upper_hlo.addWidget(inno_gb)
+
+
         left_vlo = QVBoxLayout()
-        left_upper = QWidget()
         left_lower = QWidget()
-        left_lower.setMaximumHeight(288)
-        left_vlo.addWidget(left_upper)
+        left_lower.setMaximumHeight(320)
         left_vlo.addWidget(left_lower)
-        about_hlo.addLayout(left_vlo)
+        about_lower_hlo.addLayout(left_vlo)
 
-        # 右侧区域
         right_vlo = QVBoxLayout()
-        right_upper = QWidget()
         right_lower = QWidget()
-        right_vlo.addWidget(right_upper)
         right_vlo.addWidget(right_lower)
-        about_hlo.addLayout(right_vlo)
+        about_lower_hlo.addLayout(right_vlo)
 
         names = [
             "樊宸华(0rd1r3hv)",
             "张九洲(observer-297)",
             "任宇涵(Kh05ifr4nD)",
-            "c1phr34k",
+            "C1phr34k from XDU",
         ]
-        # 在左下区域添加四个frame
-        left_lower_vlo = QVBoxLayout(left_lower)
-        left_lower_vlo.setSpacing(4)
-        left_lower_vlo.setContentsMargins(0, 0, 0, 0)
-        left_lower_vlo.setStretch(0, 1)
+
+        left_vlo.setSpacing(4)
+        left_vlo.setContentsMargins(20, 20, 20, 20)
+        left_vlo.setStretch(0, 1)
         for name in names:
             frame = QFrame()
-            frame.setMaximumWidth(288)
-            frame.setMaximumHeight(64)
+            frame.setMaximumWidth(384)
+            frame.setMaximumHeight(96)
             frame.setStyleSheet("QFrame { border: 1px solid #00CA9A; }")
             frame_hlo = QHBoxLayout(frame)
 
@@ -624,56 +717,56 @@ class MainWinIniter:
             if name == "樊宸华(0rd1r3hv)":
                 icon_label.setPixmap(
                     QPixmap(f"{cfg.icon_dir}/fch.jpg").scaled(
-                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
             elif name == "张九洲(observer-297)":
                 icon_label.setPixmap(
                     QPixmap(f"{cfg.icon_dir}/zjz.jpg").scaled(
-                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
             elif name == "任宇涵(Kh05ifr4nD)":
                 icon_label.setPixmap(
                     QPixmap(f"{cfg.icon_dir}/ryh.png").scaled(
-                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
-            elif name == "c1phr34k":
+            elif name == "C1phr34k from XDU":
                 icon_label.setPixmap(
-                    QPixmap(f"{cfg.icon_dir}/密码学会.png").scaled(
-                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                    QPixmap(f"{cfg.icon_dir}/xdu.png").scaled(
+                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
 
             icon_label.setStyleSheet("QLabel { border: none; }")
 
             text_label = QLabel(name)
-            text_label.setStyleSheet("QLabel { border: none; font-size: 16pt; }")
+            text_label.setStyleSheet("QLabel { border: none; font-size: 20pt; }")
 
             frame_hlo.addWidget(icon_label)
             frame_hlo.addWidget(text_label)
-            frame_hlo.setAlignment(Qt.AlignLeft)
+            frame_hlo.setAlignment(Qt.AlignLeft | Qt.AlignBottom)
 
-            left_lower_vlo.addWidget(frame)
+            left_vlo.addWidget(frame)
 
         # 在右下角添加图标和标签
-        right_lower_hlo = QHBoxLayout(right_lower)
-        right_lower_hlo.setAlignment(Qt.AlignRight | Qt.AlignBottom)
+        right_hlo = QHBoxLayout(right_lower)
+        right_hlo.setAlignment(Qt.AlignRight | Qt.AlignBottom)
 
         icon_label = QLabel()
         icon_label.setPixmap(
-            QPixmap(f"{cfg.icon_dir}/xdu.png").scaled(
-                48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            QPixmap(f"{cfg.icon_dir}/密码学会.png").scaled(
+                64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
             )
         )
         icon_label.setStyleSheet("QLabel { border: none; }")
 
         text_label = QLabel("铜钥 CSyde v0.4.1")
-        text_label.setStyleSheet("QLabel { border: none; font-size: 20pt; }")
+        text_label.setStyleSheet("QLabel { border: none; font-size: 24pt; }")
 
-        right_lower_hlo.addWidget(icon_label)
-        right_lower_hlo.addWidget(text_label)
+        right_hlo.addWidget(icon_label)
+        right_hlo.addWidget(text_label)
 
     def _finalize_lo(self, main_win: QMainWindow):
         main_win.setCentralWidget(self.cent)

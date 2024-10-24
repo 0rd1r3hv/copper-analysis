@@ -202,21 +202,6 @@ def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
         print(f"攻击成功！\np = {p}\nq = {N // p}")
 
 
-def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
-    len_p = ceil(len_N * beta)
-    len_k = ceil(len_N * mu)
-    len_l = ceil(len_N * kappa)
-    len_m = ceil(len_N * (beta + mu - delta - kappa))
-    p, k, N, kp_m, kp_l, len_kp = get_kp_partial_test(len_N, len_p, len_k, len_m, len_l)
-    with open("mns21_dp_dq_with_lsb_test.txt", "w", encoding="utf-8") as file:
-        file.write(
-            f"p: {p}, k: {k}, N: {N}, kp_m: {kp_m}, kp_l: {kp_l}, len_kp: {len_kp}, len_p: {len_p}, len_k: {len_k}, len_l, len_m"
-        )
-    res = mixed_kp(N, k, [kp_m, kp_l], [len_kp, len_m, len_l], [None], test=[p])
-    if res:
-        print(f"攻击成功！\np = {p}\nq = {N // p}")
-
-
 def tk17_large_e_test():
     ln = 1000
     alpha = 1

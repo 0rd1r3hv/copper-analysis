@@ -406,7 +406,9 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
                 print(f"自动使用攻击参数：m = {m}, s = {thres}")
                 print(f"格的维度：dim = {dim}")
                 print("格行列式中各项幂次：")
-                print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_eM}, s_M = {s_eM + s_M}")
+                print(
+                    f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_eM}, s_M = {s_eM + s_M}"
+                )
                 return m, thres
 
 
@@ -425,13 +427,12 @@ def mns22_mixed_kp(beta, mu, delta):
                 s_k += t - i
                 dim += 1
             if s_X * delta + s_k * mu + s_N < dim * ((m + t) * mu + m * beta):
-                print("自动使用攻击参数：")
-                print(f"m = {m}, t = {t}")
-                print(f"格的维度：")
-                print(f"dim = {dim}")
+                print(f"自动使用攻击参数：m = {m}, t = {t}")
+                print(f"格的维度：dim = {dim}")
                 print("格行列式中各项幂次：")
                 print(f"s_X = {s_X}, s_k = {s_k}, s_N = {s_N}")
                 return m, t
+
 
 # mns21_dp_dq_with_lsb(1, 0.07, 0.07, 0.03)
 # tk17_small_dp_dq(1, 0.05)
