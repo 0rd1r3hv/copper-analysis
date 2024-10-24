@@ -224,7 +224,7 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
     bounds = [W, X, Y]
     beta = len_d / N.nbits()
     delta = (len_d - len_m - len_l) / N.nbits()
-    kappa = len_l / N.nbits()
+    # kappa = len_l / N.nbits()
     if None in params:
         m, t = tk14_mixed(beta, delta)
     else:
@@ -287,7 +287,7 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
             ) - k0
             y0 = -(p + N // p - (N + 1 - A))
             test = [k0 + x0, x0, y0]
-        if triangluarize == False:
+        if not triangluarize:
             monomials = None
         res = solve_copper(
             shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials

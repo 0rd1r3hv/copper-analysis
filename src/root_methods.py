@@ -21,9 +21,9 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
         p = p.next_prime()
         R = R.change_ring(GF(p))
         for i in range(len(pols), num - 1, -1):
-            I = Ideal((R * pols[:i]).groebner_basis())
-            if I.dimension() == 0:
-                sols = I.variety()
+            Id = Ideal((R * pols[:i]).groebner_basis())
+            if Id.dimension() == 0:
+                sols = Id.variety()
                 sol_var = set()
                 sol_var.update([sol[var] for sol in sols])
                 sol_var = list(Integer(e) for e in sol_var)
@@ -74,7 +74,7 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
 
 def newton(sys, boundslst, it=20):
     st = time()
-    l = len(sys)
+    sys_l = len(sys)
     varlst = sys[0].parent().gens()
     jacob = jacobian(sys, varlst)
     for bounds in boundslst:
@@ -85,6 +85,6 @@ def newton(sys, boundslst, it=20):
                 print(f"newton done: {time() - st}s")
                 return v0
             v0 -= jacob.subs(v0).solve_right(fv0)
-            for j in range(l):
+            for j in range(sys_l):
                 v0[j] = round(v0[j])
         print("newton failed!")

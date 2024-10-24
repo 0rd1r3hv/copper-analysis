@@ -90,7 +90,7 @@ def small_e(N, e, m, beta, delta):
     PR = ZZ["xp, xq, yp, yq"]
     xp, xq, yp, yq = PR.gens()
     Q = PR.quotient(N - yp * yq)
-    l = (1 - beta - delta) / beta
+    ll = (1 - beta - delta) / beta
     t = (1 - beta - delta) / (1 - beta)
     X = 1 << (e.nbits() + floor(N.nbits() * (delta + beta - 1)))
     Yp = 1 << (floor(N.nbits() * beta))
@@ -99,15 +99,15 @@ def small_e(N, e, m, beta, delta):
     monomials = []
     for i in range(m + 1):
         for j in range(m - i + 1):
-            if i == 0 or ceil(l * i) - ceil(l * (i - 1)) == 1:
-                monomials.append(xp ** (i + j) * yp ** ceil(l * i))
+            if i == 0 or ceil(ll * i) - ceil(ll * (i - 1)) == 1:
+                monomials.append(xp ** (i + j) * yp ** ceil(ll * i))
             else:
-                monomials.append(xq ** (i + j) * yq ** floor((1 - l) * i))
+                monomials.append(xq ** (i + j) * yq ** floor((1 - ll) * i))
             if i != 0:
                 orig = Q(
                     xp**j
-                    * (N * xq - xp * yp) ** ceil(l * i)
-                    * (xq * yq - xp) ** floor((1 - l) * i)
+                    * (N * xq - xp * yp) ** ceil(ll * i)
+                    * (xq * yq - xp) ** floor((1 - ll) * i)
                 ).lift()
                 pt1 = orig.subs(yq=0)
                 pt2 = orig - pt1
@@ -121,16 +121,16 @@ def small_e(N, e, m, beta, delta):
             else:
                 shifts.append((X * xp) ** j * e**m)
     for i in range(1, m + 1):
-        for j in range(1, ceil(t * i) - floor((1 - l) * i) + 1):
+        for j in range(1, ceil(t * i) - floor((1 - ll) * i) + 1):
             orig = Q(
                 yq**j
-                * (N * xq - xp * yp) ** ceil(l * i)
-                * (xq * yq - xp) ** floor((1 - l) * i)
+                * (N * xq - xp * yp) ** ceil(ll * i)
+                * (xq * yq - xp) ** floor((1 - ll) * i)
             ).lift()
             pt1 = orig.subs(yq=0)
             pt2 = orig - pt1
             trans = pt1.subs(xq=xp + 1) + pt2.subs(xp=xq - 1)
-            monomials.append(xq**i * yq ** (floor((1 - l) * i + j)))
+            monomials.append(xq**i * yq ** (floor((1 - ll) * i + j)))
             times = trans.monomial_coefficient(monomials[-1]).valuation(N)
             inv = inverse_mod(N**times, e**i)
             shifts.append(
@@ -313,8 +313,8 @@ def small_dp_dq(N, e, lens, params, test=None):
         dp = inverse_mod(e, p - 1)
         dq = inverse_mod(e, q - 1)
         k = (e * dp - 1) // (p - 1)
-        l = (e * dq - 1) // (q - 1)
-        test = [l - 1, l, k, k - 1, p, q]
+        ell = (e * dq - 1) // (q - 1)
+        test = [ell - 1, ell, k, k - 1, p, q]
     res = solve_copper(
         shifts,
         [Y, yp],

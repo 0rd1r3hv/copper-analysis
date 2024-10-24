@@ -84,25 +84,26 @@ def tk14_msb_1(beta, gamma):
         km = k * m
         for u in range(m + 1):
             for i in range(u + 1):
-                l = l_MSBs(i, km, t)
-                s_X += u - l
-                s_Y += i - l
-                s_Z += l
+                ll = l_MSBs(i, km, t)
+                s_X += u - ll
+                s_Y += i - ll
+                s_Z += ll
                 s_e += m - i
                 n += 1
             for j in range(1, floor(k * m + t * u) + 1):
-                l = l_MSBs(u + j, km, t)
-                s_X += u - l
-                s_Y += u + j - l
-                s_Z += l
+                ll = l_MSBs(u + j, km, t)
+                s_X += u - ll
+                s_Y += u + j - ll
+                s_Z += ll
                 s_e += m - u
                 n += 1
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
-            print(f"自动使用参数：m = {m}")
-            print(f"格的维度：dim = {n}")
-            print(
-                f"格行列式中各项幂次：s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}"
-            )
+            print("自动使用攻击参数：")
+            print(f"m = {m}")
+            print("格的维度：")
+            print(f"dim = {n}")
+            print("格行列式中各项幂次：")
+            print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}")
             return m
 
 
@@ -120,12 +121,12 @@ def tk14_lsb(beta, gamma):
                 s_M += m - i
                 n += 1
             for j in range(1, floor(k * m + t * u) + 1):
-                l = l_LSBs(j, km, t)
-                s_X += u - l
-                s_Y += u + j - l
-                s_Z += l
+                ll = l_LSBs(j, km, t)
+                s_X += u - ll
+                s_Y += u + j - ll
+                s_Z += ll
                 s_e += m - u
-                s_M += m - u + l
+                s_M += m - u + ll
                 n += 1
         if s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (
             beta - gamma
@@ -230,7 +231,7 @@ def tk17_large_e(alpha, beta, delta):
 
 
 def tk17_small_e(alpha, beta, delta):
-    l = (1 - beta - delta) / beta
+    ll = (1 - beta - delta) / beta
     t = (1 - beta - delta) / (1 - beta)
     for m in range(1, MAX_M + 1):
         n = s_X = s_Yp = s_Yq = s_e = 0
@@ -238,14 +239,14 @@ def tk17_small_e(alpha, beta, delta):
             for j in range(m - i + 1):
                 n += 1
                 s_X += i + j
-                s_Yp += ceil(l * i)
-                s_Yq += floor((1 - l) * i)
+                s_Yp += ceil(ll * i)
+                s_Yq += floor((1 - ll) * i)
                 s_e += m - i
         for i in range(1, m + 1):
-            for j in range(1, ceil(t * i) - floor((1 - l) * i) + 1):
+            for j in range(1, ceil(t * i) - floor((1 - ll) * i) + 1):
                 n += 1
                 s_X += i
-                s_Yq += floor((1 - l) * i) + j
+                s_Yq += floor((1 - ll) * i) + j
                 s_e += m - i
         if (
             s_X * (alpha + beta + delta - 1)
@@ -403,8 +404,9 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
             ) + s_M * leak + s_eM * (alpha + leak) < dim * 2 * m * (alpha + leak):
                 print(f"自动使用攻击参数：m = {m}, s = {thres}")
                 print(f"格的维度：dim = {dim}")
+                print("格行列式中各项幂次：")
                 print(
-                    f"格行列式中各项幂次：s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_eM}, s_M = {s_eM+s_M}"
+                    f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_eM}, s_M = {s_eM + s_M}"
                 )
                 return m, thres
 

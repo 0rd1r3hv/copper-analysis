@@ -393,7 +393,7 @@ class MainWinIniter:
         self.rsa_text_display = QTextEdit()
         self.rsa_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.rsa_text_display.setObjectName("rsa_text_display")
-        # self.rsa_text_display.setReadOnly(True)
+        self.rsa_text_display.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.rsa_text_display.setSizePolicy(size_policy)
@@ -492,7 +492,7 @@ class MainWinIniter:
         self.crt_rsa_text_display = QTextEdit()
         self.crt_rsa_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.crt_rsa_text_display.setObjectName("crt_rsa_text_display")
-        self.crt_rsa_text_display.setReadOnly(True)
+        # self.crt_rsa_text_display.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.crt_rsa_text_display.setSizePolicy(size_policy)
@@ -581,7 +581,99 @@ class MainWinIniter:
         return icon_opt_lbl
 
     def _setup_about_page(self, cfg: Cfg):
-        pass
+        about_hlo = QHBoxLayout(self.about_page)
+        about_hlo.setSpacing(4)
+        about_hlo.setContentsMargins(12, 12, 12, 12)
+
+        # 左侧区域
+        left_vlo = QVBoxLayout()
+        left_upper = QWidget()
+        left_lower = QWidget()
+        left_lower.setMaximumHeight(288)
+        left_vlo.addWidget(left_upper)
+        left_vlo.addWidget(left_lower)
+        about_hlo.addLayout(left_vlo)
+
+        # 右侧区域
+        right_vlo = QVBoxLayout()
+        right_upper = QWidget()
+        right_lower = QWidget()
+        right_vlo.addWidget(right_upper)
+        right_vlo.addWidget(right_lower)
+        about_hlo.addLayout(right_vlo)
+
+        names = [
+            "樊宸华(0rd1r3hv)",
+            "张九洲(observer-297)",
+            "任宇涵(Kh05ifr4nD)",
+            "c1phr34k",
+        ]
+        # 在左下区域添加四个frame
+        left_lower_vlo = QVBoxLayout(left_lower)
+        left_lower_vlo.setSpacing(4)
+        left_lower_vlo.setContentsMargins(0, 0, 0, 0)
+        left_lower_vlo.setStretch(0, 1)
+        for name in names:
+            frame = QFrame()
+            frame.setMaximumWidth(288)
+            frame.setMaximumHeight(64)
+            frame.setStyleSheet("QFrame { border: 1px solid #00CA9A; }")
+            frame_hlo = QHBoxLayout(frame)
+
+            icon_label = QLabel()
+            if name == "樊宸华(0rd1r3hv)":
+                icon_label.setPixmap(
+                    QPixmap(f"{cfg.icon_dir}/fch.jpg").scaled(
+                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                    )
+                )
+            elif name == "张九洲(observer-297)":
+                icon_label.setPixmap(
+                    QPixmap(f"{cfg.icon_dir}/zjz.jpg").scaled(
+                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                    )
+                )
+            elif name == "任宇涵(Kh05ifr4nD)":
+                icon_label.setPixmap(
+                    QPixmap(f"{cfg.icon_dir}/ryh.png").scaled(
+                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                    )
+                )
+            elif name == "c1phr34k":
+                icon_label.setPixmap(
+                    QPixmap(f"{cfg.icon_dir}/密码学会.png").scaled(
+                        48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                    )
+                )
+
+            icon_label.setStyleSheet("QLabel { border: none; }")
+
+            text_label = QLabel(name)
+            text_label.setStyleSheet("QLabel { border: none; font-size: 16pt; }")
+
+            frame_hlo.addWidget(icon_label)
+            frame_hlo.addWidget(text_label)
+            frame_hlo.setAlignment(Qt.AlignLeft)
+
+            left_lower_vlo.addWidget(frame)
+
+        # 在右下角添加图标和标签
+        right_lower_hlo = QHBoxLayout(right_lower)
+        right_lower_hlo.setAlignment(Qt.AlignRight | Qt.AlignBottom)
+
+        icon_label = QLabel()
+        icon_label.setPixmap(
+            QPixmap(f"{cfg.icon_dir}/xdu.png").scaled(
+                48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
+        )
+        icon_label.setStyleSheet("QLabel { border: none; }")
+
+        text_label = QLabel("铜钥 CSyde v0.4.1")
+        text_label.setStyleSheet("QLabel { border: none; font-size: 20pt; }")
+
+        right_lower_hlo.addWidget(icon_label)
+        right_lower_hlo.addWidget(text_label)
 
     def _finalize_lo(self, main_win: QMainWindow):
         main_win.setCentralWidget(self.cent)
@@ -598,7 +690,7 @@ class MainWinIniter:
         self.auto_lbl.setText(QCoreApplication.translate("main_win", "自动化", None))
         self.usr_lbl.setText(QCoreApplication.translate("main_win", "用户", None))
         self.tit_lbl.setText(QCoreApplication.translate("main_win", "铜钥", None))
-        
+
         self.stg_lbl.setText(QCoreApplication.translate("main_win", "设置", None))
         self.home_lbl.setText(QCoreApplication.translate("main_win", "主页", None))
         self.about_lbl.setText(QCoreApplication.translate("main_win", "关于", None))

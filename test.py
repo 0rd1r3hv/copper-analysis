@@ -1,5 +1,5 @@
-from sage.all import crt, Integer, ceil, inverse_mod, gcd, randint, random_prime
-from src.tk14 import mixed, msb_1, lsb
+from sage.all import crt, Integer, ceil, inverse_mod, gcd, randint, random_prime, Rational
+from src.tk14 import mixed, msb_1, lsb, tk14_mixed
 from src.tk17 import large_e, small_e, small_dp_dq
 from src.mns21 import dp_dq_with_lsb
 from src.ernst05 import mixed_1, mixed_2
@@ -145,6 +145,8 @@ def mns21_dp_dq_with_lsb_test(delta1, delta2, leak, len_fac):
     res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
     if res == p or res == N // p:
         print(f"攻击成功！\ndp = {dp}\ndq = {dq}\np = {p}\nq = {N // p}")
+    else:
+        print(f"攻击失败！\nres = {res}")
 
 
 def tk17_large_e_test():
@@ -240,3 +242,5 @@ print(
 '''
 # tk14_mixed_test(0.29, 0.248, 0, 512, brute=True, triangluarize=False)
 # tk14_msb_1_test(0.292, 0.25, 512)
+tk14_mixed(Rational(0.29), Rational(0.248),Rational('513/1023'))
+tk14_mixed(Rational(0.29), Rational(0.248),Rational('509/1023'))
