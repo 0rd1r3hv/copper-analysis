@@ -5,7 +5,7 @@ from qt_material import list_themes
 
 
 @dataclass(frozen=True)
-class Cfg:
+class 配置:
     menu_page_items: List[Dict[str, str]]
     icon_dir: str = "./assets/"
     script_dir: str = "./scripts/"

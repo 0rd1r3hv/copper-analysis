@@ -5,8 +5,6 @@ import copy
 
 
 def automated(pols, bound_var, bounds, monomials, modulus, m, test=None):
-
-
     def optimize_shift(mono, depth):
         nonlocal max_sum
         nonlocal leadings
@@ -26,8 +24,7 @@ def automated(pols, bound_var, bounds, monomials, modulus, m, test=None):
             mono //= leadings[depth]
             optimize_shift(mono, depth + 1)
 
-
-    print("开始 Meers, Nowakowski 的自动化 Coppersmith 攻击...")
+    print("开始 Meers, Nowakowski 的自动化 Coppersmith 攻击…")
     max_depth = len(pols)
     leadings = [pol.lm() for pol in pols]
     shifts = []

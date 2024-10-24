@@ -9,19 +9,19 @@ from PySide6.QtCore import (
 from sage.all import Integer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
-from ui import MainWinIniter
+from ui import 主窗UI
 from qt_material import apply_stylesheet
-from src.cfg import Cfg
+from src.cfg import 配置
 from src.ernst05 import mixed_1, mixed_2
 from src.mns21 import dp_dq_with_lsb
 
 
-class MainWin(QMainWindow):
-    def __init__(self, cfg: Cfg):
+class 主窗(QMainWindow):
+    def __init__(self, cfg: 配置):
         super().__init__()
         self.cfg = cfg
-        self.ui = MainWinIniter()
-        self.ui.setup_ui(self)
+        self.ui = 主窗UI()
+        self.ui.初始化(self, cfg)
         self.setStyleSheet("font-size: 14pt;")
 
         self.tx_redirector = StdoutRedirector(self.ui.rsa_text_display)
@@ -245,10 +245,10 @@ class StdoutRedirector(io.StringIO):
 
 
 if __name__ == "__main__":
-    cfg = Cfg(
+    cfg = 配置(
         [{"name": "主页", "icon": "主页.png"}, {"name": "RSA", "icon": "RSA.png"}]
     )
     app = QApplication(sys.argv)
-    win = MainWin(cfg)
+    win = 主窗(cfg)
     win.show()
     sys.exit(app.exec())

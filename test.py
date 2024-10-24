@@ -242,7 +242,7 @@ def mn23(n, k, m):
     bounds = [X, Y, Z]
     solutions_verify = [A_LSB, B_LSB, C_LSB]
     with open('mn23.txt', "w", encoding="utf-8") as file:
-        file.write(f"m: {m}\nf: {str(f)}\ng: {str(g)}\nh: {str(h)}\nx: {A_LSB}\ny: {B_LSB}\nz: {C_LSB}")
+        file.write(f"p: {p}\nm: {m}\nf: {str(f)}\ng: {str(g)}\nh: {str(h)}\nx: {A_LSB}\ny: {B_LSB}\nz: {C_LSB}")
     res = automated(polys, [X, x], bounds, (prod(polys) ** i).monomials(), p, 3 * i, solutions_verify)
     if res:
         print(f"攻击成功！\nx = {A_LSB}\ny = {B_LSB}\nz = {C_LSB}")

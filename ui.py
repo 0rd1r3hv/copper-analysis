@@ -18,226 +18,270 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from src.cfg import Cfg
+from src.cfg import 配置
 
 
-class MainWinIniter:
-    def setup_ui(self, main_win: QMainWindow):
-        if not main_win.objectName():
-            main_win.setObjectName("main_win")
-        main_win.setMinimumSize(main_win.cfg.win_min_size)
-        main_win.setWindowIcon(QIcon(f"{main_win.cfg.icon_dir}/徽标.png"))
+class 主窗UI:
+    def 初始化(self, w: QMainWindow, cfg: 配置):
+        def 设置主窗():
+            if not w.objectName():
+                w.setObjectName("主窗")
+            w.setWindowIcon(QIcon("./assets/徽标.png"))
 
-        self._setup_cent(main_win)
-        self._setup_sidebar_frm(main_win.cfg)
-        self._setup_srch_hlo(main_win.cfg)
-        self._setup_page_stk(main_win.cfg)
-        self._finalize_lo(main_win)
+            self.cent = QWidget(w)
+            self.cent.setObjectName("cent")
+            w.setCentralWidget(self.cent)
 
-    def _setup_cent(self, main_win: QMainWindow):
-        self.cent = QWidget(main_win)
-        self.cent.setObjectName("cent")
-        self.cent.setMinimumSize(main_win.cfg.win_min_size)
+            self.cent_glo = QGridLayout(self.cent)
+            self.cent_glo.setObjectName("cent_glo")
+            self.cent_glo.setContentsMargins(0, 0, 0, 0)
+            self.cent_glo.setSpacing(4)
 
-        self.cent_glo = QGridLayout(self.cent)
-        self.cent_glo.setObjectName("cent_glo")
-        self.cent_glo.setSpacing(4)
-        self.cent_glo.setContentsMargins(0, 0, 0, 0)
+        def 设置侧边栏():
+            self.sidebar_frm = QFrame()
+            self.sidebar_frm.setObjectName("sidebar_frm")
+            self.sidebar_frm.setStyleSheet("""QFrame#sidebar_frm {
+                background-color: #2F4F4F;
+                border: 2px solid #00CA9A; 
+                border-radius: 12px; 
+                border-left: 0px; 
+                border-top-left-radius: 0px; 
+                border-bottom-left-radius: 0px;
+            }""")
 
-    def _setup_sidebar_frm(self, cfg: Cfg):
-        self.sidebar_frm = QFrame()
-        self.sidebar_frm.setObjectName("sidebar_frm")
-        self.sidebar_frm.setStyleSheet("""QFrame#sidebar_frm {
-            background-color: #2F4F4F;
-            border: 2px solid #00CA9A; 
-            border-radius: 12px; 
-            border-left: 0px; 
-            border-top-left-radius: 0px; 
-            border-bottom-left-radius: 0px;
-        }""")
-
-        sizePolicy = QSizePolicy(
-            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
-        )
-        sizePolicy.setHorizontalStretch(1)
-        sizePolicy.setVerticalStretch(1)
-        self.sidebar_frm.setSizePolicy(sizePolicy)
-
-        self.sidebar_glo = QGridLayout(self.sidebar_frm)
-        self.sidebar_glo.setSpacing(0)
-        self.sidebar_glo.setObjectName("sidebar_glo")
-        self.sidebar_glo.setContentsMargins(0, 0, 0, 0)
-
-        self._setup_sidebar_icon(cfg)
-        self._setup_sidebar_lbl(cfg)
-        self._setup_sidebar_spcs()
-
-        self.cent_glo.addWidget(self.sidebar_frm, 0, 0, 2, 1)
-
-    def _setup_sidebar_icon(self, cfg: Cfg):
-        buttons = [
-            ("icon_lbl", f"{cfg.icon_dir}/密码学会.png", 0, 0),
-            ("pnl_btn", f"{cfg.icon_dir}/展开面板.png", 1, 0),
-            ("home_btn", f"{cfg.icon_dir}/主页.png", 2, 0),
-            ("rsa_btn", f"{cfg.icon_dir}/RSA.png", 3, 0),
-            ("crt_rsa_btn", f"{cfg.icon_dir}/CRT-RSA.png", 4, 0),
-            ("var_btn", f"{cfg.icon_dir}/单变元.png", 5, 0),
-            ("auto_btn", f"{cfg.icon_dir}/自动.png", 6, 0),
-            ("usr_btn", f"{cfg.icon_dir}/用户.png", 8, 0),
-            ("stg_btn", f"{cfg.icon_dir}/设置.png", 9, 0),
-            ("about_btn", f"{cfg.icon_dir}/关于.png", 10, 0),
-        ]
-
-        for name, icon_path, row, col in buttons:
-            widget = self._create_icon_btn(name, icon_path, cfg)
-            widget.setFixedSize(cfg.btn_size)
-            self.sidebar_glo.addWidget(widget, row, col, 1, 1)
-
-        self.pnl_btn.setCheckable(True)
-
-    def _create_icon_btn(self, name, icon, cfg):
-        if name == "icon_lbl":
-            widget = QLabel(self.cent)
-            widget.setPixmap(
-                QPixmap(icon).scaled(
-                    cfg.icon_size,
-                    Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.SmoothTransformation,
-                )
+            sizePolicy = QSizePolicy(
+                QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
             )
-            widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        else:
-            widget = QPushButton(self.cent)
-            widget.setIcon(QIcon(icon))
-            widget.setIconSize(cfg.icon_size)
-            widget.setFlat(True)
-        widget.setObjectName(name)
-        setattr(self, name, widget)
-        return widget
+            sizePolicy.setHorizontalStretch(1)
+            sizePolicy.setVerticalStretch(1)
+            self.sidebar_frm.setSizePolicy(sizePolicy)
 
-    def _setup_sidebar_lbl(self, cfg: Cfg):
-        labels = [
-            ("tit_lbl", 0, 1),
-            ("home_lbl", 2, 1),
-            ("rsa_lbl", 3, 1),
-            ("crt_rsa_lbl", 4, 1),
-            ("var_lbl", 5, 1),
-            ("auto_lbl", 6, 1),
-            ("usr_lbl", 8, 1),
-            ("stg_lbl", 9, 1),
-            ("about_lbl", 10, 1),
-        ]
+            self.sidebar_glo = QGridLayout(self.sidebar_frm)
+            self.sidebar_glo.setSpacing(0)
+            self.sidebar_glo.setObjectName("sidebar_glo")
+            self.sidebar_glo.setContentsMargins(0, 0, 0, 0)
 
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
+            def _setup_sidebar_icon():
+                buttons = [
+                    ("icon_lbl", "./assets/密码学会.png", 0, 0),
+                    ("pnl_btn", "./assets/展开面板.png", 1, 0),
+                    ("home_btn", "./assets/主页.png", 2, 0),
+                    ("rsa_btn", "./assets/RSA.png", 3, 0),
+                    ("crt_rsa_btn", "./assets/CRT-RSA.png", 4, 0),
+                    ("var_btn", "./assets/单变元.png", 5, 0),
+                    ("auto_btn", "./assets/自动.png", 6, 0),
+                    ("usr_btn", "./assets/用户.png", 8, 0),
+                    ("stg_btn", "./assets/设置.png", 9, 0),
+                    ("about_btn", "./assets/关于.png", 10, 0),
+                ]
 
-        for name, row, col in labels:
-            label = QLabel(self.cent)
-            label.setObjectName(name)
-            sizePolicy.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
-            label.setSizePolicy(sizePolicy)
-            label.setFixedSize(cfg.lbl_size)
-            label.setStyleSheet("QLabel {font-size: 14pt;}")
+                for name, icon_path, row, col in buttons:
+                    if name == "icon_lbl":
+                        widget = QLabel(self.cent)
+                        widget.setPixmap(
+                            QPixmap(icon_path).scaled(
+                                cfg.icon_size,
+                                Qt.AspectRatioMode.KeepAspectRatio,
+                                Qt.SmoothTransformation,
+                            )
+                        )
+                        widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                    else:
+                        widget = QPushButton(self.cent)
+                        widget.setIcon(QIcon(icon_path))
+                        widget.setIconSize(cfg.icon_size)
+                        widget.setFlat(True)
+                    widget.setObjectName(name)
+                    setattr(self, name, widget)
 
-            self.sidebar_glo.addWidget(label, row, col, 1, 1)
-            setattr(self, name, label)
+                    widget.setFixedSize(cfg.btn_size)
+                    self.sidebar_glo.addWidget(widget, row, col, 1, 1)
 
-    def _setup_sidebar_spcs(self):
-        spacers = [
-            (
-                "icon_vspc",
-                7,
-                0,
-                QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Minimum,
-            ),
-            (
-                "ext_vspc",
-                7,
-                1,
-                QSizePolicy.Policy.Minimum,
-                QSizePolicy.Policy.Expanding,
-            ),
-            (
-                "pnl_btn_vspc",
-                1,
-                1,
-                QSizePolicy.Policy.Minimum,
-                QSizePolicy.Policy.Maximum,
-                48,
-            ),
-        ]
+                self.pnl_btn.setCheckable(True)
 
-        for name, row, col, h_policy, v_policy, *args in spacers:
-            spacer = QSpacerItem(0, args[0] if args else 0, h_policy, v_policy)
-            self.sidebar_glo.addItem(spacer, row, col, 1, 1)
-            setattr(self, name, spacer)
+            def _setup_sidebar_lbl():
+                labels = [
+                    ("tit_lbl", 0, 1),
+                    ("home_lbl", 2, 1),
+                    ("rsa_lbl", 3, 1),
+                    ("crt_rsa_lbl", 4, 1),
+                    ("var_lbl", 5, 1),
+                    ("auto_lbl", 6, 1),
+                    ("usr_lbl", 8, 1),
+                    ("stg_lbl", 9, 1),
+                    ("about_lbl", 10, 1),
+                ]
 
-        for row in range(self.sidebar_glo.rowCount()):
-            item = self.sidebar_glo.itemAtPosition(row, 1)
-            if w := item.widget():
-                w.hide()
+                sizePolicy = QSizePolicy(
+                    QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
+                )
+                sizePolicy.setHorizontalStretch(0)
+                sizePolicy.setVerticalStretch(0)
 
-    def _setup_srch_hlo(self, cfg: Cfg):
-        self.srch_hlo = QHBoxLayout()
-        self.srch_hlo.setSpacing(0)
-        self.srch_hlo.setContentsMargins(0, 0, 0, 0)
-        self.srch_hlo.setObjectName("srch_hlo")
+                for name, row, col in labels:
+                    label = QLabel(self.cent)
+                    label.setObjectName(name)
+                    sizePolicy.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
+                    label.setSizePolicy(sizePolicy)
+                    label.setFixedSize(cfg.lbl_size)
+                    label.setStyleSheet("QLabel {font-size: 14pt;}")
 
-        self.srch_hspc = QSpacerItem(
-            0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
-        )
-        self.srch_hlo.addItem(self.srch_hspc)
+                    self.sidebar_glo.addWidget(label, row, col, 1, 1)
+                    setattr(self, name, label)
 
-        self.srch_le = QLineEdit(self.cent)
-        self.srch_le.setObjectName("srch_le")
-        self.srch_le.setMinimumSize(cfg.srch_le_min_size)
-        self.srch_hlo.addWidget(self.srch_le)
+            def _setup_sidebar_spcs():
+                spacers = [
+                    (
+                        "icon_vspc",
+                        7,
+                        0,
+                        QSizePolicy.Policy.Expanding,
+                        QSizePolicy.Policy.Minimum,
+                    ),
+                    (
+                        "ext_vspc",
+                        7,
+                        1,
+                        QSizePolicy.Policy.Minimum,
+                        QSizePolicy.Policy.Expanding,
+                    ),
+                    (
+                        "pnl_btn_vspc",
+                        1,
+                        1,
+                        QSizePolicy.Policy.Minimum,
+                        QSizePolicy.Policy.Maximum,
+                        48,
+                    ),
+                ]
 
-        self.srch_btn = QPushButton(self.cent)
-        self.srch_btn.setObjectName("srch_btn")
-        self.srch_btn.setFixedSize(cfg.btn_size)
-        self.srch_btn.setIconSize(cfg.icon_size)
-        self.srch_btn.setFlat(False)
-        self.srch_btn.setIcon(QIcon(f"{cfg.icon_dir}/搜索.png"))
-        self.srch_hlo.addWidget(self.srch_btn)
+                for name, row, col, h_policy, v_policy, *args in spacers:
+                    spacer = QSpacerItem(0, args[0] if args else 0, h_policy, v_policy)
+                    self.sidebar_glo.addItem(spacer, row, col, 1, 1)
+                    setattr(self, name, spacer)
 
-        self.cent_glo.addLayout(self.srch_hlo, 0, 1, 1, 1)
+                for row in range(self.sidebar_glo.rowCount()):
+                    item = self.sidebar_glo.itemAtPosition(row, 1)
+                    if w := item.widget():
+                        w.hide()
 
-    def _setup_page_stk(self, cfg: Cfg):
-        self.page_stk = QStackedWidget(self.cent)
-        self.page_stk.setObjectName("page_stk")
+            _setup_sidebar_icon()
+            _setup_sidebar_lbl()
+            _setup_sidebar_spcs()
 
-        pages = [
-            "home_page",
-            "rsa_page",
-            "crt_rsa_page",
-            "var_page",
-            "auto_page",
-            "usr_page",
-            "stg_page",
-            "about_page",
-        ]
+            self.cent_glo.addWidget(self.sidebar_frm, 0, 0, 2, 1)
 
-        for page in pages:
-            widget = QWidget()
-            widget.setObjectName(page)
-            self.page_stk.addWidget(widget)
-            setattr(self, page, widget)
+        def 设置搜索行():
+            self.srch_hlo = QHBoxLayout()
+            self.srch_hlo.setSpacing(0)
+            self.srch_hlo.setContentsMargins(0, 0, 0, 0)
+            self.srch_hlo.setObjectName("srch_hlo")
 
-        self._setup_home_page(cfg)
-        self._setup_rsa_page(cfg)
-        self._setup_crt_rsa_page(cfg)
-        self._setup_var_page(cfg)
-        self._setup_auto_page(cfg)
-        self._setup_usr_page(cfg)
-        self._setup_stg_page(cfg)
-        self._setup_about_page(cfg)
+            self.srch_hspc = QSpacerItem(
+                0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+            )
+            self.srch_hlo.addItem(self.srch_hspc)
 
-        self.cent_glo.addWidget(self.page_stk, 1, 1, 1, 1)
+            self.srch_le = QLineEdit(self.cent)
+            self.srch_le.setObjectName("srch_le")
+            self.srch_le.setMinimumSize(cfg.srch_le_min_size)
+            self.srch_hlo.addWidget(self.srch_le)
 
-    def _setup_home_page(self, cfg: Cfg):
+            self.srch_btn = QPushButton(self.cent)
+            self.srch_btn.setObjectName("srch_btn")
+            self.srch_btn.setFixedSize(cfg.btn_size)
+            self.srch_btn.setIconSize(cfg.icon_size)
+            self.srch_btn.setFlat(False)
+            self.srch_btn.setIcon(QIcon("./assets/搜索.png"))
+            self.srch_hlo.addWidget(self.srch_btn)
+
+            self.cent_glo.addLayout(self.srch_hlo, 0, 1, 1, 1)
+
+        def 设置页栈():
+            self.page_stk = QStackedWidget(self.cent)
+            self.page_stk.setObjectName("page_stk")
+
+            pages = [
+                "home_page",
+                "rsa_page",
+                "crt_rsa_page",
+                "var_page",
+                "auto_page",
+                "usr_page",
+                "stg_page",
+                "about_page",
+            ]
+
+            for page in pages:
+                widget = QWidget()
+                widget.setObjectName(page)
+                self.page_stk.addWidget(widget)
+                setattr(self, page, widget)
+
+            self.设置主页(cfg)
+            self.设置rsa页(cfg)
+            self.设置crt页(cfg)
+            self.设置单变元页(cfg)
+            self.设置自动页(cfg)
+            self.设置用户页(cfg)
+            self.设置设置页(cfg)
+            self.设置关于页(cfg)
+
+            self.cent_glo.addWidget(self.page_stk, 1, 1, 1, 1)
+
+        def 收尾():
+            def 本地化():
+                w.setWindowTitle(
+                    QCoreApplication.translate("CSyde", "铜钥 CSyde", None)
+                )
+                self.rsa_lbl.setText(
+                    QCoreApplication.translate("main_win", "RSA 攻击", None)
+                )
+                self.crt_rsa_lbl.setText(
+                    QCoreApplication.translate("main_win", "CRT-RSA 攻击", None)
+                )
+                self.var_lbl.setText(
+                    QCoreApplication.translate("main_win", "单变元攻击", None)
+                )
+                self.auto_lbl.setText(
+                    QCoreApplication.translate("main_win", "自动化", None)
+                )
+                self.usr_lbl.setText(
+                    QCoreApplication.translate("main_win", "用户", None)
+                )
+                self.tit_lbl.setText(
+                    QCoreApplication.translate("main_win", "铜钥", None)
+                )
+
+                self.stg_lbl.setText(
+                    QCoreApplication.translate("main_win", "设置", None)
+                )
+                self.home_lbl.setText(
+                    QCoreApplication.translate("main_win", "主页", None)
+                )
+                self.about_lbl.setText(
+                    QCoreApplication.translate("main_win", "关于", None)
+                )
+                self.srch_le.setPlaceholderText(
+                    QCoreApplication.translate("Search…", "搜索……", None)
+                )
+                self.usr_btn.setText("")
+                self.stg_btn.setText("")
+                self.about_btn.setText("")
+                self.home_btn.setText("")
+                self.pnl_btn.setText("")
+                self.srch_btn.setText("")
+
+            本地化()
+            QMetaObject.connectSlotsByName(w)
+
+        设置主窗()
+        设置侧边栏()
+        设置搜索行()
+        设置页栈()
+        收尾()
+
+    def 设置主页(self, cfg: 配置):
         # 创建主布局
         home_vlo = QVBoxLayout(self.home_page)
         home_vlo.setSpacing(20)
@@ -250,7 +294,7 @@ class MainWinIniter:
         upper_vlo.setAlignment(Qt.AlignCenter)
 
         icon_label = QLabel()
-        icon_pixmap = QPixmap(f"{cfg.icon_dir}/徽标.png").scaled(
+        icon_pixmap = QPixmap("./assets/徽标.png").scaled(
             192, 192, Qt.KeepAspectRatio, Qt.SmoothTransformation
         )
         icon_label.setPixmap(icon_pixmap)
@@ -309,7 +353,7 @@ class MainWinIniter:
         home_vlo.addWidget(upper_widget)
         home_vlo.addWidget(lower_widget)
 
-    def _setup_rsa_page(self, cfg: Cfg):
+    def 设置rsa页(self, cfg: 配置):
         self.rsa_hlo = QHBoxLayout(self.rsa_page)
         self.rsa_hlo.setObjectName("rsa_hlo")
         self.parma_cont = QWidget()
@@ -401,7 +445,7 @@ class MainWinIniter:
 
         self.rsa_hlo.addWidget(self.rsa_text_display)
 
-    def _setup_crt_rsa_page(self, cfg: Cfg):
+    def 设置crt页(self, cfg: 配置):
         self.crt_rsa_hlo = QHBoxLayout(self.crt_rsa_page)
         self.crt_rsa_hlo.setObjectName("crt_rsa_hlo")
         self.crt_parma_cont = QWidget()
@@ -502,7 +546,7 @@ class MainWinIniter:
 
         self.crt_rsa_hlo.addWidget(self.crt_rsa_text_display)
 
-    def _setup_var_page(self, cfg: Cfg):
+    def 设置单变元页(self, cfg: 配置):
         self.var_hlo = QHBoxLayout(self.var_page)
         self.var_hlo.setObjectName("var_hlo")
         self.var_parma_cont = QWidget()
@@ -533,7 +577,7 @@ class MainWinIniter:
         var_atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
         var_atk_cb.setObjectName("var_atk_cb")
         var_atk_cb.setMinimumHeight(40)
-        var_atk_cb.addItems(["MNS22"])
+        var_atk_cb.addItems(["MNS22", "Cop", "HG"])
         setattr(self, "var_atk_cb", var_atk_cb)
         var_atk_hlo.addWidget(var_atk_lbl)
         var_atk_hlo.addWidget(var_atk_cb)
@@ -590,13 +634,110 @@ class MainWinIniter:
 
         self.var_hlo.addWidget(self.var_text_display)
 
-    def _setup_auto_page(self, cfg: Cfg):
+    def 设置自动页(self, cfg: 配置):
+        self.auto_hlo = QHBoxLayout(self.auto_page)
+        self.auto_hlo.setObjectName("auto_hlo")
+        self.auto_parma_cont = QWidget()
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        self.auto_parma_cont.setSizePolicy(sizePolicy)
+        self.auto_parma_cont.setFixedWidth(640)
+        sizePolicy = QSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
+        )
+        self.auto_parma_cont.setSizePolicy(sizePolicy)
+
+        self.auto_parma_vlo = QVBoxLayout(self.auto_parma_cont)
+        self.auto_parma_vlo.setSpacing(4)
+        self.auto_parma_vlo.setContentsMargins(0, 0, 0, 0)
+        label = QLabel("自动化 Coppersmith 攻击")
+        label.setAlignment(Qt.AlignCenter)
+        label.setStyleSheet("QLabel { font-size: 22pt; font-weight: bold; }")
+        self.auto_parma_vlo.addWidget(label, 0, Qt.AlignTop | Qt.AlignHCenter)
+
+        auto = [
+            "M",
+            "m",
+            "var",
+            "mono_set",
+            "eq",
+        ]
+        auto_params = [
+            "模数 M",
+            "参数 m",
+            "变元",
+            "单项式集合",
+            "方程",
+        ]
+        for param, name in zip(auto, auto_params):
+            param_frm = QFrame()
+            param_frm.setMinimumHeight(64)
+            param_hlo = QHBoxLayout(param_frm)
+            param_hlo.setContentsMargins(12, 0, 12, 0)
+            param_hlo.setSpacing(16)
+            param_lbl = QLabel(name)
+            param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            param_lbl.setMinimumWidth(120)
+            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_le = QLineEdit()
+            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setObjectName(f"auto_{param.lower().replace(' ', '_')}_le")
+            param_le.setMinimumHeight(40)
+            if param == "mono_set":
+                param_le.setPlaceholderText("（自动选取）")
+            setattr(self, f"auto_{param.lower().replace(' ', '_')}_le", param_le)
+            param_hlo.addWidget(param_lbl)
+            param_hlo.addWidget(param_le)
+            self.auto_parma_vlo.addWidget(param_frm)
+
+        self.auto_parma_vlo.addStretch(1)
+        self.auto_parma_vlo.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        )
+
+        self.auto_eq_add_btn = QPushButton("添加方程")
+        self.auto_eq_add_btn.setObjectName("auto_eq_add_btn")
+        self.auto_parma_vlo.addWidget(self.auto_eq_add_btn)
+
+        def add_eq_component():
+            param_frm = QFrame()
+            param_frm.setMinimumHeight(64)
+            param_hlo = QHBoxLayout(param_frm)
+            param_hlo.setContentsMargins(12, 0, 12, 0)
+            param_hlo.setSpacing(16)
+            param_lbl = QLabel("方程")
+            param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            param_lbl.setMinimumWidth(120)
+            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_le = QLineEdit()
+            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setObjectName(f"auto_eq_le_{self.auto_parma_vlo.count()}")
+            param_le.setMinimumHeight(40)
+            param_hlo.addWidget(param_lbl)
+            param_hlo.addWidget(param_le)
+            self.auto_parma_vlo.insertWidget(self.auto_parma_vlo.count() - 4, param_frm)
+
+        self.auto_eq_add_btn.clicked.connect(add_eq_component)
+
+        self.auto_atk_btn = QPushButton("开始攻击")
+        self.auto_atk_btn.setObjectName("auto_atk_btn")
+        self.auto_atk_btn.setMinimumSize(cfg.btn_size)
+        self.auto_parma_vlo.addWidget(self.auto_atk_btn)
+
+        self.auto_hlo.addWidget(self.auto_parma_cont)
+        self.auto_text_display = QTextEdit()
+        self.auto_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.auto_text_display.setObjectName("auto_text_display")
+        # self.auto_text_display.setReadOnly(True)
+
+        size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.auto_text_display.setSizePolicy(size_policy)
+
+        self.auto_hlo.addWidget(self.auto_text_display)
+
+    def 设置用户页(self, cfg: 配置):
         pass
 
-    def _setup_usr_page(self, cfg: Cfg):
-        pass
-
-    def _setup_stg_page(self, cfg: Cfg):
+    def 设置设置页(self, cfg: 配置):
         self.stg_scroll_area = QScrollArea(self.stg_page)
         self.stg_scroll_area.setWidgetResizable(True)
         self.stg_scroll_cont = QWidget()
@@ -661,7 +802,7 @@ class MainWinIniter:
         icon_opt_lbl = QLabel()
         icon_opt_lbl.setObjectName(f"icon_{opt_name}_lbl")
         icon_opt_lbl.setPixmap(
-            QPixmap(f"{cfg.icon_dir}/{opt_icon}").scaled(
+            QPixmap(f"./assets/{opt_icon}").scaled(
                 cfg.opt_icon_size,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.SmoothTransformation,
@@ -671,7 +812,7 @@ class MainWinIniter:
         setattr(self, f"icon_{opt_name}_lbl", icon_opt_lbl)
         return icon_opt_lbl
 
-    def _setup_about_page(self, cfg: Cfg):
+    def 设置关于页(self, cfg: 配置):
         about_vlo = QVBoxLayout(self.about_page)
         about_vlo.setContentsMargins(20, 20, 20, 20)
         about_upper_hlo = QHBoxLayout()
@@ -741,25 +882,25 @@ class MainWinIniter:
             icon_label = QLabel()
             if name == "樊宸华(0rd1r3hv)":
                 icon_label.setPixmap(
-                    QPixmap(f"{cfg.icon_dir}/fch.jpg").scaled(
+                    QPixmap("./assets/fch.jpg").scaled(
                         64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
             elif name == "张九洲(observer-297)":
                 icon_label.setPixmap(
-                    QPixmap(f"{cfg.icon_dir}/zjz.jpg").scaled(
+                    QPixmap("./assets/zjz.jpg").scaled(
                         64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
             elif name == "任宇涵(Kh05ifr4nD)":
                 icon_label.setPixmap(
-                    QPixmap(f"{cfg.icon_dir}/ryh.png").scaled(
+                    QPixmap("./assets/ryh.png").scaled(
                         64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
             elif name == "C1phr34k from XDU":
                 icon_label.setPixmap(
-                    QPixmap(f"{cfg.icon_dir}/xdu.png").scaled(
+                    QPixmap("./assets/xdu.png").scaled(
                         64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
                     )
                 )
@@ -781,7 +922,7 @@ class MainWinIniter:
 
         icon_label = QLabel()
         icon_label.setPixmap(
-            QPixmap(f"{cfg.icon_dir}/密码学会.png").scaled(
+            QPixmap("./assets/密码学会.png").scaled(
                 64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
             )
         )
@@ -792,32 +933,3 @@ class MainWinIniter:
 
         right_hlo.addWidget(icon_label)
         right_hlo.addWidget(text_label)
-
-    def _finalize_lo(self, main_win: QMainWindow):
-        main_win.setCentralWidget(self.cent)
-        self.retranslateUi(main_win)
-        QMetaObject.connectSlotsByName(main_win)
-
-    def retranslateUi(self, main_win: QMainWindow):
-        main_win.setWindowTitle(QCoreApplication.translate("CSyde", "铜钥 CSyde", None))
-        self.rsa_lbl.setText(QCoreApplication.translate("main_win", "RSA 攻击", None))
-        self.crt_rsa_lbl.setText(
-            QCoreApplication.translate("main_win", "CRT-RSA 攻击", None)
-        )
-        self.var_lbl.setText(QCoreApplication.translate("main_win", "单变元攻击", None))
-        self.auto_lbl.setText(QCoreApplication.translate("main_win", "自动化", None))
-        self.usr_lbl.setText(QCoreApplication.translate("main_win", "用户", None))
-        self.tit_lbl.setText(QCoreApplication.translate("main_win", "铜钥", None))
-
-        self.stg_lbl.setText(QCoreApplication.translate("main_win", "设置", None))
-        self.home_lbl.setText(QCoreApplication.translate("main_win", "主页", None))
-        self.about_lbl.setText(QCoreApplication.translate("main_win", "关于", None))
-        self.srch_le.setPlaceholderText(
-            QCoreApplication.translate("Search…", "搜索……", None)
-        )
-        self.usr_btn.setText("")
-        self.stg_btn.setText("")
-        self.about_btn.setText("")
-        self.home_btn.setText("")
-        self.pnl_btn.setText("")
-        self.srch_btn.setText("")
