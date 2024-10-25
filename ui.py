@@ -1,4 +1,4 @@
-from PySide6.QtCore import QCoreApplication, QMetaObject
+from PySide6.QtCore import QCoreApplication, QMetaObject, QSize
 from PySide6.QtGui import QIcon, QPixmap, Qt
 from PySide6.QtWidgets import (
     QComboBox,
@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 from src.cfg import 配置
 
 
+
 class 主窗UI:
     def 初始化(self, w: QMainWindow, cfg: 配置):
         def 设置主窗():
@@ -30,6 +31,7 @@ class 主窗UI:
 
             self.cent = QWidget(w)
             self.cent.setObjectName("cent")
+            self.cent.setMinimumSize(QSize(1280, 800))
             w.setCentralWidget(self.cent)
 
             self.cent_glo = QGridLayout(self.cent)
@@ -37,7 +39,7 @@ class 主窗UI:
             self.cent_glo.setContentsMargins(0, 0, 0, 0)
             self.cent_glo.setSpacing(4)
 
-        def 设置侧边栏():
+        def 设置侧栏():
             self.sidebar_frm = QFrame()
             self.sidebar_frm.setObjectName("sidebar_frm")
             self.sidebar_frm.setStyleSheet("""QFrame#sidebar_frm {
@@ -75,7 +77,7 @@ class 主窗UI:
                     ("about_btn", "./assets/关于.png", 10, 0),
                 ]
 
-                for name, icon_path, row, col in buttons:
+                for name, icon_path, r, c in buttons:
                     if name == "icon_lbl":
                         widget = QLabel(self.cent)
                         widget.setPixmap(
@@ -95,7 +97,7 @@ class 主窗UI:
                     setattr(self, name, widget)
 
                     widget.setFixedSize(cfg.btn_size)
-                    self.sidebar_glo.addWidget(widget, row, col, 1, 1)
+                    self.sidebar_glo.addWidget(widget, r, c, 1, 1)
 
                 self.pnl_btn.setCheckable(True)
 
@@ -118,19 +120,19 @@ class 主窗UI:
                 sizePolicy.setHorizontalStretch(0)
                 sizePolicy.setVerticalStretch(0)
 
-                for name, row, col in labels:
-                    label = QLabel(self.cent)
-                    label.setObjectName(name)
-                    sizePolicy.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
-                    label.setSizePolicy(sizePolicy)
-                    label.setFixedSize(cfg.lbl_size)
-                    label.setStyleSheet("QLabel {font-size: 14pt;}")
+                for n, r, c in labels:
+                    lbl = QLabel(self.cent)
+                    lbl.setObjectName(n)
+                    sizePolicy.setHeightForWidth(lbl.sizePolicy().hasHeightForWidth())
+                    lbl.setSizePolicy(sizePolicy)
+                    lbl.setFixedSize(cfg.lbl_size)
+                    lbl.setStyleSheet("QLabel {font-size: 14pt;}")
 
-                    self.sidebar_glo.addWidget(label, row, col, 1, 1)
-                    setattr(self, name, label)
+                    self.sidebar_glo.addWidget(lbl, r, c, 1, 1)
+                    setattr(self, n, lbl)
 
             def _setup_sidebar_spcs():
-                spacers = [
+                间隔 = [
                     (
                         "icon_vspc",
                         7,
@@ -155,13 +157,13 @@ class 主窗UI:
                     ),
                 ]
 
-                for name, row, col, h_policy, v_policy, *args in spacers:
+                for n, r, c, h_policy, v_policy, *args in 间隔:
                     spacer = QSpacerItem(0, args[0] if args else 0, h_policy, v_policy)
-                    self.sidebar_glo.addItem(spacer, row, col, 1, 1)
-                    setattr(self, name, spacer)
+                    self.sidebar_glo.addItem(spacer, r, c, 1, 1)
+                    setattr(self, n, spacer)
 
-                for row in range(self.sidebar_glo.rowCount()):
-                    item = self.sidebar_glo.itemAtPosition(row, 1)
+                for r in range(self.sidebar_glo.rowCount()):
+                    item = self.sidebar_glo.itemAtPosition(r, 1)
                     if w := item.widget():
                         w.hide()
 
@@ -201,10 +203,10 @@ class 主窗UI:
             self.page_stk = QStackedWidget(self.cent)
             self.page_stk.setObjectName("page_stk")
 
-            pages = [
+            页名 = [
                 "home_page",
                 "rsa_page",
-                "crt_rsa_page",
+                "crt_page",
                 "var_page",
                 "auto_page",
                 "usr_page",
@@ -212,13 +214,85 @@ class 主窗UI:
                 "about_page",
             ]
 
-            for page in pages:
-                widget = QWidget()
-                widget.setObjectName(page)
-                self.page_stk.addWidget(widget)
-                setattr(self, page, widget)
+            for n in 页名:
+                页 = QWidget()
+                页.setObjectName(n)
+                self.page_stk.addWidget(页)
+                setattr(self, n, 页)
 
-            self.设置主页(cfg)
+            def 设置主页():
+                home_vlo = QVBoxLayout(self.home_page)
+                home_vlo.setSpacing(20)
+                home_vlo.setContentsMargins(20, 20, 20, 20)
+
+                # 上半部分：图标和标题
+                upper_widget = QWidget()
+                upper_widget.setMaximumHeight(self.home_page.height() // 2)
+                upper_vlo = QVBoxLayout(upper_widget)
+                upper_vlo.setAlignment(Qt.AlignCenter)
+
+                icon_label = QLabel()
+                icon_pixmap = QPixmap("./assets/徽标.png").scaled(
+                    192, 192, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                )
+                icon_label.setPixmap(icon_pixmap)
+                icon_label.setAlignment(Qt.AlignCenter)
+
+                title_label = QLabel("自动化公钥密码系统 Coppersmith 格攻击工具")
+                title_label.setAlignment(Qt.AlignCenter)
+                title_label.setStyleSheet("font-size: 24pt; font-weight: bold;")
+
+                upper_vlo.addWidget(icon_label)
+                upper_vlo.addWidget(title_label)
+
+                # 下半部分：三个框架
+                lower_widget = QWidget()
+                lower_hlo = QHBoxLayout(lower_widget)
+                lower_hlo.setSpacing(20)
+
+                框名 = [
+                    "针对 RSA 的攻击",
+                    "针对 CRT-RSA 的攻击",
+                    "单变元模方程攻击",
+                    "自动化通用攻击",
+                ]
+                for tit in 框名:
+                    框 = QGroupBox(tit)
+                    框.setStyleSheet(
+                        "QGroupBox { border-color: #00CA9A; font-size: 14pt; }"
+                    )
+                    frame_vlo = QVBoxLayout(框)
+                    if tit == "针对 RSA 的攻击":
+                        text = """<p>已实现多种特定情形下已知上界最好的 d 泄露攻击。本工具提供五种攻击类型：</p>
+<p>Takayasu, Kunihiro 对高位和低位泄露攻击的改进方案（无泄露等价 Boneh-Durfee 最优方案）；</p>
+<p>Ernst 等人对高低位混合泄露的两种攻击方案；</p>
+<p>Takayasu, Kunihiro 对 Ernst 等人混合泄露方案的等价替代。</p>
+"""
+                    elif tit == "针对 CRT-RSA 的攻击":
+                        text = """<p>已实现多种特定情形下已知上界最优的 CRT-RSA d<sub>p</sub>, d<sub>q</sub> 部分泄露攻击方案。本工具所提供的六大功能包括：</p>
+                        <p>Takayasu 等人提出的针对小 d<sub>p</sub>和小 d<sub>p</sub>,d<sub>q</sub> 的三种攻击方案；</p>
+                        <p>May 等人针对 d<sub>p</sub>,d<sub>q</sub> 的纯低位泄露攻击；</p>
+                        <p>May 等人针对小 e 情况下 d<sub>p</sub>,d<sub>q</sub> 的纯高位和纯低位泄露攻击。</p>"""
+                    elif tit == "单变元模方程攻击":
+                        text = """<p>本工具实现了以下单变元模多项式方程攻击类型：</p>
+                        <p>Coppersmith 格基模 N 单变元方程的攻击方法；</p>
+<p>Howgrave-Graham 对模 N 的未知因数的单变元方程的攻击；</p>
+                        <p>May 等人对模未知因数的已知倍数的单变元线性方程的攻击。</p>"""
+                    else:
+                        text = """<p>本工具实现了 Meers, Nowakowski 提出的 Coppersmith 攻击的自动化构造算法。该种新型方法针对所给的一系列模方程和指定的单项式集合，自动分析并选择该单项式集合下的最优移位多项式供后续求解使用；对于形式较为复杂的多项式，该自动化方法的应用将使求解的进行变得极其便捷。</p>"""
+                    内容 = QLabel(text)
+                    内容.setOpenExternalLinks(True)
+                    内容.setMinimumWidth(192)
+                    内容.setWordWrap(True)
+                    内容.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+                    内容.setStyleSheet("QLabel { font-size: 14pt; }")
+                    frame_vlo.addWidget(内容)
+                    lower_hlo.addWidget(框)
+
+                home_vlo.addWidget(upper_widget)
+                home_vlo.addWidget(lower_widget)
+
+            设置主页()
             self.设置rsa页(cfg)
             self.设置crt页(cfg)
             self.设置单变元页(cfg)
@@ -276,82 +350,10 @@ class 主窗UI:
             QMetaObject.connectSlotsByName(w)
 
         设置主窗()
-        设置侧边栏()
+        设置侧栏()
         设置搜索行()
         设置页栈()
         收尾()
-
-    def 设置主页(self, cfg: 配置):
-        # 创建主布局
-        home_vlo = QVBoxLayout(self.home_page)
-        home_vlo.setSpacing(20)
-        home_vlo.setContentsMargins(20, 20, 20, 20)
-
-        # 上半部分：图标和标题
-        upper_widget = QWidget()
-        upper_widget.setMaximumHeight(self.home_page.height() // 2)
-        upper_vlo = QVBoxLayout(upper_widget)
-        upper_vlo.setAlignment(Qt.AlignCenter)
-
-        icon_label = QLabel()
-        icon_pixmap = QPixmap("./assets/徽标.png").scaled(
-            192, 192, Qt.KeepAspectRatio, Qt.SmoothTransformation
-        )
-        icon_label.setPixmap(icon_pixmap)
-        icon_label.setAlignment(Qt.AlignCenter)
-
-        title_label = QLabel("自动化公钥密码系统 Coppersmith 格攻击工具")
-        title_label.setAlignment(Qt.AlignCenter)
-        title_label.setStyleSheet("font-size: 24pt; font-weight: bold;")
-
-        upper_vlo.addWidget(icon_label)
-        upper_vlo.addWidget(title_label)
-
-        # 下半部分：三个框架
-        lower_widget = QWidget()
-        lower_hlo = QHBoxLayout(lower_widget)
-        lower_hlo.setSpacing(20)
-
-        frames = [
-            "针对 RSA 的攻击",
-            "针对 CRT-RSA 的攻击",
-            "单变元模方程攻击",
-            "自动化通用攻击",
-        ]
-        for frame_title in frames:
-            frame = QGroupBox(frame_title)
-            frame.setStyleSheet("QGroupBox { border-color: #00CA9A; font-size: 14pt; }")
-            frame_vlo = QVBoxLayout(frame)
-            if frame_title == "针对 RSA 的攻击":
-                text = """<p>已实现多种特定情形下已知上界最好的 d 泄露攻击。本工具提供五种攻击类型：</p>
-<p>Takayasu, Kunihiro 对高位和低位泄露攻击的改进方案（无泄露等价 Boneh-Durfee 最优方案）；</p>
-<p>Ernst 等人对高低位混合泄露的两种攻击方案；</p>
-<p>Takayasu, Kunihiro 对 Ernst 等人混合泄露方案的等价替代。</p>
-"""
-            elif frame_title == "针对 CRT-RSA 的攻击":
-                text = """<p>已实现多种特定情形下已知上界最优的 CRT-RSA d<sub>p</sub>, d<sub>q</sub> 部分泄露攻击方案。本工具所提供的六大功能包括：</p>
-<p>Takayasu 等人提出的针对小 d<sub>p</sub>和小 d<sub>p</sub>,d<sub>q</sub> 的三种攻击方案；</p>
-<p>May 等人针对 d<sub>p</sub>,d<sub>q</sub> 的纯低位泄露攻击；</p>
-<p>May 等人针对小 e 情况下 d<sub>p</sub>,d<sub>q</sub> 的纯高位和纯低位泄露攻击。</p>"""
-            elif frame_title == "单变元模方程攻击":
-                text = """<p>本工具实现了以下单变元模多项式方程攻击类型：</p>
-<p>Coppersmith 格基模 N 单变元方程的攻击方法；</p>
-<p>Howgrave-Graham 对模 N 的未知因数的单变元方程的攻击；</p>
-<p>May 等人对模未知因数的已知倍数的单变元线性方程的攻击。</p>"""
-            else:
-                text = """<p>本工具实现了 Meers, Nowakowski 提出的 Coppersmith 攻击的自动化构造算法。该种新型方法针对所给的一系列模方程和指定的单项式集合，自动分析并选择该单项式集合下的最优移位多项式供后续求解使用；对于形式较为复杂的多项式，该自动化方法的应用将使求解的进行变得极其便捷。</p>"""
-            text_label = QLabel(text)
-            text_label.setOpenExternalLinks(True)
-            text_label.setMinimumWidth(192)
-            text_label.setWordWrap(True)
-            text_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-            text_label.setStyleSheet("QLabel { font-size: 14pt; }")
-            frame_vlo.addWidget(text_label)
-            lower_hlo.addWidget(frame)
-
-        # 将上下两部分添加到主布局
-        home_vlo.addWidget(upper_widget)
-        home_vlo.addWidget(lower_widget)
 
     def 设置rsa页(self, cfg: 配置):
         self.rsa_hlo = QHBoxLayout(self.rsa_page)
@@ -430,24 +432,24 @@ class 主窗UI:
         self.parma_vlo.addItem(
             QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         )
-        self.atk_btn = QPushButton("开始攻击")
-        self.atk_btn.setObjectName("atk_btn")
-        self.atk_btn.setMinimumSize(cfg.btn_size)
-        self.parma_vlo.addWidget(self.atk_btn)
+        self.rsa_atk_btn = QPushButton("开始攻击")
+        self.rsa_atk_btn.setObjectName("atk_btn")
+        self.rsa_atk_btn.setMinimumSize(cfg.btn_size)
+        self.parma_vlo.addWidget(self.rsa_atk_btn)
         self.rsa_hlo.addWidget(self.parma_cont)
-        self.rsa_text_display = QTextEdit()
-        self.rsa_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
-        self.rsa_text_display.setObjectName("rsa_text_display")
-        self.rsa_text_display.setReadOnly(True)
+        self.rsa_te = QTextEdit()
+        self.rsa_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.rsa_te.setObjectName("rsa_text_display")
+        self.rsa_te.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.rsa_text_display.setSizePolicy(size_policy)
+        self.rsa_te.setSizePolicy(size_policy)
 
-        self.rsa_hlo.addWidget(self.rsa_text_display)
+        self.rsa_hlo.addWidget(self.rsa_te)
 
     def 设置crt页(self, cfg: 配置):
-        self.crt_rsa_hlo = QHBoxLayout(self.crt_rsa_page)
-        self.crt_rsa_hlo.setObjectName("crt_rsa_hlo")
+        self.crt_hlo = QHBoxLayout(self.crt_page)
+        self.crt_hlo.setObjectName("crt_hlo")
         self.crt_parma_cont = QWidget()
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         self.crt_parma_cont.setSizePolicy(sizePolicy)
@@ -477,7 +479,16 @@ class 主窗UI:
         crt_atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
         crt_atk_cb.setObjectName("crt_atk_cb")
         crt_atk_cb.setMinimumHeight(40)
-        crt_atk_cb.addItems(["MNS21"])
+        crt_atk_cb.addItems(
+            [
+                "MNS21 LSB",
+                "MNS22 MSB",
+                "MNS22 LSB",
+                "TLP17 小e 小dq",
+                "TLP17 大e 小dq",
+                "TLP17 小dp,dq",
+            ]
+        )
         setattr(self, "crt_atk_cb", crt_atk_cb)
         crt_atk_hlo.addWidget(crt_atk_lbl)
         crt_atk_hlo.addWidget(crt_atk_cb)
@@ -486,6 +497,7 @@ class 主窗UI:
         crt_params = [
             "N",
             "e",
+            "p_len",
             "dp_len",
             "dq_len",
             "msb_len",
@@ -494,10 +506,13 @@ class 主窗UI:
             "dq_msb",
             "dp_lsb",
             "dq_lsb",
+            "m",
+            "s",
         ]
         crt_params_name = [
             "模数 N",
             "公钥 e",
+            "因数 p 长度",
             "d<sub>p</sub> 长度",
             "d<sub>q</sub> 长度",
             "MSB 长度",
@@ -506,6 +521,8 @@ class 主窗UI:
             "d<sub>q</sub> MSB",
             "d<sub>p</sub> LSB",
             "d<sub>q</sub> LSB",
+            "m（可选）",
+            "s（可选）",
         ]
         for param, name in zip(crt_params, crt_params_name):
             param_frm = QFrame()
@@ -519,12 +536,15 @@ class 主窗UI:
             param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
             param_le = QLineEdit()
             param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
-            param_le.setObjectName(f"crt_rsa_{param}_le")
+            param_le.setObjectName(f"crt_{param}_le")
             param_le.setMinimumHeight(40)
-            setattr(self, f"crt_rsa_{param}_le", param_le)
+            setattr(self, f"crt_{param}_le", param_le)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
             self.crt_parma_vlo.addWidget(param_frm)
+
+        self.crt_m_le.setPlaceholderText("（自动选取）")
+        self.crt_s_le.setPlaceholderText("（自动选取）")
 
         self.crt_parma_vlo.addStretch(1)
         self.crt_parma_vlo.addItem(
@@ -535,16 +555,16 @@ class 主窗UI:
         self.crt_atk_btn.setMinimumSize(cfg.btn_size)
         self.crt_parma_vlo.addWidget(self.crt_atk_btn)
 
-        self.crt_rsa_hlo.addWidget(self.crt_parma_cont)
-        self.crt_rsa_text_display = QTextEdit()
-        self.crt_rsa_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
-        self.crt_rsa_text_display.setObjectName("crt_rsa_text_display")
-        # self.crt_rsa_text_display.setReadOnly(True)
+        self.crt_hlo.addWidget(self.crt_parma_cont)
+        self.crt_te = QTextEdit()
+        self.crt_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.crt_te.setObjectName("crt_rsa_text_display")
+        # self.crt_te.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.crt_rsa_text_display.setSizePolicy(size_policy)
+        self.crt_te.setSizePolicy(size_policy)
 
-        self.crt_rsa_hlo.addWidget(self.crt_rsa_text_display)
+        self.crt_hlo.addWidget(self.crt_te)
 
     def 设置单变元页(self, cfg: 配置):
         self.var_hlo = QHBoxLayout(self.var_page)

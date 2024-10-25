@@ -7,13 +7,14 @@ from PySide6.QtCore import (
     QTimer,
 )
 from sage.all import Integer
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QTextCursor
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
 from ui import 主窗UI
 from qt_material import apply_stylesheet
 from src.cfg import 配置
 from src.ernst05 import mixed_1, mixed_2
 from src.mns21 import dp_dq_with_lsb
+from src.tk14 import msb_1
 
 
 class 主窗(QMainWindow):
@@ -24,11 +25,11 @@ class 主窗(QMainWindow):
         self.ui.初始化(self, cfg)
         self.setStyleSheet("font-size: 14pt;")
 
-        self.tx_redirector = StdoutRedirector(self.ui.rsa_text_display)
-        self.crt_tx_redirector = StdoutRedirector(self.ui.crt_rsa_text_display)
+        self.tx_redirector = te_stdout重定向(self.ui.rsa_te)
+        self.crt_tx_redirector = te_stdout重定向(self.ui.crt_te)
 
         self._init_ui()
-        self.cnct_sgl()
+        self.连信()
 
     def _init_ui(self):
         self.setup_anime()
@@ -50,26 +51,26 @@ class 主窗(QMainWindow):
         anime.setDuration(self.cfg.anime_dur)
         return anime
 
-    def cnct_sgl(self):
+    def 连信(self):
         self.ui.pnl_btn.toggled["bool"].connect(self.tgl_pnl)
-        self._cnct_rsa_btn()
-        self._cnct_crt_btn()
+        self.连rsa_btn()
+        self.连crt_btn()
         self._cnct_page_btn()
-        self._cnct_atk_btn()
-        self._cnct_crt_atk_btn()
+        self.连rsa_atk_btn()
+        self.连crt_atk_btn()
         self.ui.主题_cb.currentTextChanged.connect(self.chg_th)
 
-    def _cnct_rsa_btn(self):
+    def 连rsa_btn(self):
         self.ui.rsa_btn.clicked.connect(self.tx_redirector.redirect_stdout)
 
-    def _cnct_crt_btn(self):
+    def 连crt_btn(self):
         self.ui.crt_rsa_btn.clicked.connect(self.crt_tx_redirector.redirect_stdout)
 
-    def _cnct_atk_btn(self):
-        self.ui.atk_btn.clicked.connect(self._exec_atk)
+    def 连rsa_atk_btn(self):
+        self.ui.rsa_atk_btn.clicked.connect(self.rsa攻击)
 
-    def _exec_atk(self):
-        攻击方法序列 = self.ui.atk_cb.currentIndex()
+    def rsa攻击(self):
+        方法 = self.ui.atk_cb.currentIndex()
         攻击函数 = [
             self.tk14msb,
             self.tk14lsb,
@@ -78,28 +79,20 @@ class 主窗(QMainWindow):
             self.ernstmixed2,
         ]
 
-        if 0 <= 攻击方法序列 < len(攻击函数):
-            攻击函数[攻击方法序列]()
-        else:
-            print("无效的攻击选项")
+        攻击函数[方法]()
 
     def tk14msb(self):
-        pass
-        # tk14_msb_1_test(0.37, 0.216, 512)
-        # try:
-        #     rst = msb_1(
-        #         Integer(self.ui.N_le.text()),
-        #         Integer(self.ui.e_le.text()),
-        #         (Integer(self.ui.d_msb_le.text()),),
-        #         (
-        #             Integer(self.ui.d_len_le.text()),
-        #             Integer(self.ui.msb_len_le.text()),
-        #         ),
-        #         (None,),
-        #     )
-        #     self.显示结果(f"攻击成功！私钥 d = {rst}")
-        # except Exception as e:
-        #     self.显示结果(f"攻击失败：{str(e)}")
+        rst = msb_1(
+            Integer(self.ui.N_le.text()),
+            Integer(self.ui.e_le.text()),
+            (Integer(self.ui.d_msb_le.text()),),
+            (
+                Integer(self.ui.d_len_le.text()),
+                Integer(self.ui.msb_len_le.text()),
+            ),
+            (None,),
+        )
+        self.显示结果(f"攻击成功！私钥 d = {rst}")
 
     def tk14lsb(self):
         print("Tk14 LSB")
@@ -108,7 +101,6 @@ class 主窗(QMainWindow):
         print("Tk14 Mixed")
 
     def ernstmixed1(self):
-        print("Ernst Mixed 1")
         rst = mixed_1(
             Integer(self.ui.N_le.text()),
             Integer(self.ui.e_le.text()),
@@ -123,7 +115,6 @@ class 主窗(QMainWindow):
         print(f"攻击成功！私钥 d = {rst}")
 
     def ernstmixed2(self):
-        print("Ernst Mixed 2")
         rst = mixed_2(
             Integer(self.ui.N_le.text()),
             Integer(self.ui.e_le.text()),
@@ -140,7 +131,7 @@ class 主窗(QMainWindow):
         )
         print(f"攻击成功！私钥 d = {rst}")
 
-    def _cnct_crt_atk_btn(self):
+    def 连crt_atk_btn(self):
         self.ui.crt_atk_btn.clicked.connect(self._exec_crt_atk)
 
     def _exec_crt_atk(self):
@@ -155,7 +146,6 @@ class 主窗(QMainWindow):
             print("无效的攻击选项")
 
     def mns21(self):
-        print("Mns21")
         try:
             rst = dp_dq_with_lsb(
                 Integer(self.ui.crt_rsa_N_le.text()),
@@ -226,18 +216,20 @@ class 主窗(QMainWindow):
                 item.widget().setVisible(ext)
 
 
-class StdoutRedirector(io.StringIO):
-    def __init__(self, text_widget):
+class te_stdout重定向(io.StringIO):
+    def __init__(self, te):
         super().__init__()
-        self.text_widget = text_widget
+        self.te = te
 
     def write(self, string):
-        self.text_widget.append(string)
-        # self.text_widget.moveCursor(QTextCursor.End)
-        QApplication.processEvents()
+        cursor = self.te.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        cursor.insertText(string)
+        # self.text_widget.moveCursor()
+        # QApplication.processEvents()
 
     def redirect_stdout(self):
-        self.stdout_redirector = StdoutRedirector(self.text_widget)
+        self.stdout_redirector = te_stdout重定向(self.te)
         sys.stdout = self.stdout_redirector
 
     def restore_stdout(self):
