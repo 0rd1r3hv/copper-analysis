@@ -21,7 +21,6 @@ from PySide6.QtWidgets import (
 from src.cfg import 配置
 
 
-
 class 主窗UI:
     def 初始化(self, w: QMainWindow, cfg: 配置):
         def 设置主窗():
@@ -69,7 +68,7 @@ class 主窗UI:
                     ("pnl_btn", "./assets/展开面板.png", 1, 0),
                     ("home_btn", "./assets/主页.png", 2, 0),
                     ("rsa_btn", "./assets/RSA.png", 3, 0),
-                    ("crt_rsa_btn", "./assets/CRT-RSA.png", 4, 0),
+                    ("crt_btn", "./assets/CRT-RSA.png", 4, 0),
                     ("var_btn", "./assets/单变元.png", 5, 0),
                     ("auto_btn", "./assets/自动.png", 6, 0),
                     ("usr_btn", "./assets/用户.png", 8, 0),
@@ -106,7 +105,7 @@ class 主窗UI:
                     ("tit_lbl", 0, 1),
                     ("home_lbl", 2, 1),
                     ("rsa_lbl", 3, 1),
-                    ("crt_rsa_lbl", 4, 1),
+                    ("crt_lbl", 4, 1),
                     ("var_lbl", 5, 1),
                     ("auto_lbl", 6, 1),
                     ("usr_lbl", 8, 1),
@@ -311,7 +310,7 @@ class 主窗UI:
                 self.rsa_lbl.setText(
                     QCoreApplication.translate("main_win", "RSA 攻击", None)
                 )
-                self.crt_rsa_lbl.setText(
+                self.crt_lbl.setText(
                     QCoreApplication.translate("main_win", "CRT-RSA 攻击", None)
                 )
                 self.var_lbl.setText(
@@ -644,15 +643,15 @@ class 主窗UI:
         self.var_parma_vlo.addWidget(self.var_atk_btn)
 
         self.var_hlo.addWidget(self.var_parma_cont)
-        self.var_text_display = QTextEdit()
-        self.var_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
-        self.var_text_display.setObjectName("var_text_display")
+        self.var_te = QTextEdit()
+        self.var_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.var_te.setObjectName("var_te")
         # self.var_text_display.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.var_text_display.setSizePolicy(size_policy)
+        self.var_te.setSizePolicy(size_policy)
 
-        self.var_hlo.addWidget(self.var_text_display)
+        self.var_hlo.addWidget(self.var_te)
 
     def 设置自动页(self, cfg: 配置):
         self.auto_hlo = QHBoxLayout(self.auto_page)
@@ -744,15 +743,15 @@ class 主窗UI:
         self.auto_parma_vlo.addWidget(self.auto_atk_btn)
 
         self.auto_hlo.addWidget(self.auto_parma_cont)
-        self.auto_text_display = QTextEdit()
-        self.auto_text_display.setStyleSheet("QTextEdit { font-size: 12pt; }")
-        self.auto_text_display.setObjectName("auto_text_display")
+        self.auto_te = QTextEdit()
+        self.auto_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.auto_te.setObjectName("auto_te")
         # self.auto_text_display.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.auto_text_display.setSizePolicy(size_policy)
+        self.auto_te.setSizePolicy(size_policy)
 
-        self.auto_hlo.addWidget(self.auto_text_display)
+        self.auto_hlo.addWidget(self.auto_te)
 
     def 设置用户页(self, cfg: 配置):
         pass
@@ -882,59 +881,9 @@ class 主窗UI:
         right_vlo.addWidget(right_lower)
         about_lower_hlo.addLayout(right_vlo)
 
-        names = [
-            "樊宸华(0rd1r3hv)",
-            "张九洲(observer-297)",
-            "任宇涵(Kh05ifr4nD)",
-            "C1phr34k from XDU",
-        ]
-
         left_vlo.setSpacing(4)
         left_vlo.setContentsMargins(20, 20, 20, 20)
         left_vlo.setStretch(0, 1)
-        for name in names:
-            frame = QFrame()
-            frame.setMaximumWidth(384)
-            frame.setMaximumHeight(96)
-            frame.setStyleSheet("QFrame { border: 1px solid #00CA9A; }")
-            frame_hlo = QHBoxLayout(frame)
-
-            icon_label = QLabel()
-            if name == "樊宸华(0rd1r3hv)":
-                icon_label.setPixmap(
-                    QPixmap("./assets/fch.jpg").scaled(
-                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
-                    )
-                )
-            elif name == "张九洲(observer-297)":
-                icon_label.setPixmap(
-                    QPixmap("./assets/zjz.jpg").scaled(
-                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
-                    )
-                )
-            elif name == "任宇涵(Kh05ifr4nD)":
-                icon_label.setPixmap(
-                    QPixmap("./assets/ryh.png").scaled(
-                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
-                    )
-                )
-            elif name == "C1phr34k from XDU":
-                icon_label.setPixmap(
-                    QPixmap("./assets/xdu.png").scaled(
-                        64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation
-                    )
-                )
-
-            icon_label.setStyleSheet("QLabel { border: none; }")
-
-            text_label = QLabel(name)
-            text_label.setStyleSheet("QLabel { border: none; font-size: 20pt; }")
-
-            frame_hlo.addWidget(icon_label)
-            frame_hlo.addWidget(text_label)
-            frame_hlo.setAlignment(Qt.AlignLeft | Qt.AlignBottom)
-
-            left_vlo.addWidget(frame)
 
         # 在右下角添加图标和标签
         right_hlo = QHBoxLayout(right_lower)

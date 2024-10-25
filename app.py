@@ -4,6 +4,7 @@ from PySide6.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
     QParallelAnimationGroup,
+    QProcess,
     QTimer,
 )
 from sage.all import Integer
@@ -27,6 +28,8 @@ class 主窗(QMainWindow):
 
         self.tx_redirector = te_stdout重定向(self.ui.rsa_te)
         self.crt_tx_redirector = te_stdout重定向(self.ui.crt_te)
+        self.var_tx_redirector = te_stdout重定向(self.ui.var_te)
+        self.auto_tx_redirector = te_stdout重定向(self.ui.auto_te)
 
         self._init_ui()
         self.连信()
@@ -55,7 +58,7 @@ class 主窗(QMainWindow):
         self.ui.pnl_btn.toggled["bool"].connect(self.tgl_pnl)
         self.连rsa_btn()
         self.连crt_btn()
-        self._cnct_page_btn()
+        self.换页()
         self.连rsa_atk_btn()
         self.连crt_atk_btn()
         self.ui.主题_cb.currentTextChanged.connect(self.chg_th)
@@ -64,125 +67,169 @@ class 主窗(QMainWindow):
         self.ui.rsa_btn.clicked.connect(self.tx_redirector.redirect_stdout)
 
     def 连crt_btn(self):
-        self.ui.crt_rsa_btn.clicked.connect(self.crt_tx_redirector.redirect_stdout)
+        self.ui.crt_btn.clicked.connect(self.crt_tx_redirector.redirect_stdout)
+
+    def 连var_btn(self):
+        self.ui.var_btn.clicked.connect(self.var_tx_redirector.redirect_stdout)
+
+    def 连auto_btn(self):
+        self.ui.auto_btn.clicked.connect(self.auto_tx_redirector.redirect_stdout)
 
     def 连rsa_atk_btn(self):
-        self.ui.rsa_atk_btn.clicked.connect(self.rsa攻击)
+        def rsa攻击():
+            def tk14msb():
+                print(
+                    f"""攻击成功！私钥 d = 
+                    {msb_1(
+                        Integer(self.ui.N_le.text()),
+                        Integer(self.ui.e_le.text()),
+                        (Integer(self.ui.d_msb_le.text()),),
+                        (
+                            Integer(self.ui.d_len_le.text()),
+                            Integer(self.ui.msb_len_le.text()),
+                        ),
+                        (None,),
+                    )}"""
+                )
 
-    def rsa攻击(self):
-        方法 = self.ui.atk_cb.currentIndex()
-        攻击函数 = [
-            self.tk14msb,
-            self.tk14lsb,
-            self.tk14mixed,
-            self.ernstmixed1,
-            self.ernstmixed2,
-        ]
+            def tk14lsb():
+                pass
 
-        攻击函数[方法]()
+            def tk14mixed():
+                pass
 
-    def tk14msb(self):
-        rst = msb_1(
-            Integer(self.ui.N_le.text()),
-            Integer(self.ui.e_le.text()),
-            (Integer(self.ui.d_msb_le.text()),),
-            (
-                Integer(self.ui.d_len_le.text()),
-                Integer(self.ui.msb_len_le.text()),
-            ),
-            (None,),
-        )
-        self.显示结果(f"攻击成功！私钥 d = {rst}")
+            def ernstmixed1():
+                rst = mixed_1(
+                    Integer(self.ui.N_le.text()),
+                    Integer(self.ui.e_le.text()),
+                    (
+                        Integer(self.ui.d_msb_le.text()),
+                        Integer(self.ui.d_lsb_le.text()),
+                    ),
+                    (
+                        Integer(self.ui.d_len_le.text()),
+                        Integer(self.ui.msb_len_le.text()),
+                        Integer(self.ui.lsb_len_le.text()),
+                    ),
+                    (None, None),
+                )
+                print(f"攻击成功！私钥 d = {rst}")
 
-    def tk14lsb(self):
-        print("Tk14 LSB")
+            def ernstmixed2():
+                rst = mixed_2(
+                    Integer(self.ui.N_le.text()),
+                    Integer(self.ui.e_le.text()),
+                    (
+                        Integer(self.ui.d_msb_le.text()),
+                        Integer(self.ui.d_lsb_le.text()),
+                    ),
+                    (
+                        Integer(self.ui.d_len_le.text()),
+                        Integer(self.ui.msb_len_le.text()),
+                        Integer(self.ui.lsb_len_le.text()),
+                    ),
+                    (None, None),
+                )
+                print(f"攻击成功！私钥 d = {rst}")
 
-    def tk14mixed(self):
-        print("Tk14 Mixed")
+            方法 = self.ui.atk_cb.currentIndex()
+            攻击函数 = [
+                tk14msb,
+                tk14lsb,
+                tk14mixed,
+                ernstmixed1,
+                ernstmixed2,
+            ]
 
-    def ernstmixed1(self):
-        rst = mixed_1(
-            Integer(self.ui.N_le.text()),
-            Integer(self.ui.e_le.text()),
-            (Integer(self.ui.d_msb_le.text()), Integer(self.ui.d_lsb_le.text())),
-            (
-                Integer(self.ui.d_len_le.text()),
-                Integer(self.ui.msb_len_le.text()),
-                Integer(self.ui.lsb_len_le.text()),
-            ),
-            (None, None),
-        )
-        print(f"攻击成功！私钥 d = {rst}")
+            攻击函数[方法]()
 
-    def ernstmixed2(self):
-        rst = mixed_2(
-            Integer(self.ui.N_le.text()),
-            Integer(self.ui.e_le.text()),
-            (
-                Integer(self.ui.d_msb_le.text()),
-                Integer(self.ui.d_lsb_le.text()),
-            ),
-            (
-                Integer(self.ui.d_len_le.text()),
-                Integer(self.ui.msb_len_le.text()),
-                Integer(self.ui.lsb_len_le.text()),
-            ),
-            (None, None),
-        )
-        print(f"攻击成功！私钥 d = {rst}")
+        self.ui.rsa_atk_btn.clicked.connect(rsa攻击)
 
     def 连crt_atk_btn(self):
-        self.ui.crt_atk_btn.clicked.connect(self._exec_crt_atk)
+        def crt攻击():
+            def mns21lsb():
+                rst = dp_dq_with_lsb(
+                    Integer(self.ui.crt_N_le.text()),
+                    Integer(self.ui.crt_e_le.text()),
+                    (
+                        Integer(self.ui.crt_dp_lsb_le.text()),
+                        Integer(self.ui.crt_dq_lsb_le.text()),
+                    ),
+                    (
+                        Integer(self.ui.crt_dp_len_le.text()),
+                        Integer(self.ui.crt_dq_len_le.text()),
+                        Integer(self.ui.crt_lsb_len_le.text()),
+                    ),
+                    (None, None),
+                )
+                print(f"攻击成功！私钥 d = {rst}")
 
-    def _exec_crt_atk(self):
-        攻击方法序列 = self.ui.crt_atk_cb.currentIndex()
-        攻击函数 = [
-            self.mns21,
-        ]
+            def mns22msb():
+                pass
 
-        if 0 <= 攻击方法序列 < len(攻击函数):
-            攻击函数[攻击方法序列]()
-        else:
-            print("无效的攻击选项")
+            def mns22lsb():
+                pass
 
-    def mns21(self):
-        try:
-            rst = dp_dq_with_lsb(
-                Integer(self.ui.crt_rsa_N_le.text()),
-                Integer(self.ui.crt_rsa_e_le.text()),
-                (
-                    Integer(self.ui.crt_rsa_dp_lsb_le.text()),
-                    Integer(self.ui.crt_rsa_dq_lsb_le.text()),
-                ),
-                (
-                    Integer(self.ui.crt_rsa_dp_len_le.text()),
-                    Integer(self.ui.crt_rsa_dq_len_le.text()),
-                    Integer(self.ui.crt_rsa_lsb_len_le.text()),
-                ),
-                (None, None),
-            )
-            self.显示结果(f"攻击成功！私钥 d = {rst}")
-        except Exception as e:
-            self.显示结果(f"攻击失败：{str(e)}")
+            def tlp17sesdp():
+                pass
 
-    def 显示结果(self, 结果):
-        print(结果)
+            def tlp17lesdp():
+                pass
 
-    def _cnct_page_btn(self):
+            def tlp17sdpdq():
+                pass
+
+            方法 = self.ui.crt_atk_cb.currentIndex()
+            攻击函数 = [
+                mns21lsb,
+                mns22msb,
+                mns22lsb,
+                tlp17sesdp,
+                tlp17lesdp,
+                tlp17sdpdq,
+            ]
+
+            攻击函数[方法]()
+
+        self.ui.crt_atk_btn.clicked.connect(crt攻击)
+
+    def 连var_atk_btn(self):
+        def var攻击():
+            def mns22():
+                pass
+
+            def cop():
+                pass
+
+            def hg():
+                pass
+
+            方法 = self.ui.var_atk_cb.currentIndex()
+            攻击函数 = [mns22, cop, hg]
+
+            攻击函数[方法]()
+
+        self.ui.var_atk_btn.clicked.connect(var攻击)
+
+    def 连auto_atk_btn(self):
+        def auto攻击():
+            pass
+
+        self.ui.auto_btn.clicked.connect(auto攻击)
+
+    def 换页(self):
         btn_list = [
             (self.ui.home_btn, 0),
             (self.ui.rsa_btn, 1),
-            (self.ui.crt_rsa_btn, 2),
+            (self.ui.crt_btn, 2),
             (self.ui.var_btn, 3),
             (self.ui.auto_btn, 4),
             (self.ui.usr_btn, 5),
             (self.ui.stg_btn, 6),
             (self.ui.about_btn, 7),
         ]
-        for btn, idx in btn_list:
-            btn.clicked.connect(
-                lambda _, idx=idx: self.ui.page_stk.setCurrentIndex(idx)
-            )
+        for btn, i in btn_list:
+            btn.clicked.connect(lambda _, idx=i: self.ui.page_stk.setCurrentIndex(idx))
 
     def chg_th(self, th):
         apply_stylesheet(self, theme=th)
@@ -225,8 +272,7 @@ class te_stdout重定向(io.StringIO):
         cursor = self.te.textCursor()
         cursor.movePosition(QTextCursor.End)
         cursor.insertText(string)
-        # self.text_widget.moveCursor()
-        # QApplication.processEvents()
+
 
     def redirect_stdout(self):
         self.stdout_redirector = te_stdout重定向(self.te)

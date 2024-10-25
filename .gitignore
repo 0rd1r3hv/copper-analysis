@@ -1,3 +1,4 @@
+*.pri
 *.txt
 __pycache__
 .direnv
