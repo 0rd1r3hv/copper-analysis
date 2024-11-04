@@ -193,42 +193,43 @@ def tk14_low_2(kbeta, gamma):
 
 
 def tk17_large_e(alpha, beta, delta):
-    tp = (1 - 2 * beta - delta) / (2 * beta)
     tq = (1 - beta - delta) / (1 - beta)
     for m in range(1, MAX_M + 1):
-        n = s_X = s_Yp = s_Yq = s_e = 0
-        for i in range(m + 1):
-            for j in range(m - i + 1):
-                n += 1
-                s_X += i + j
-                s_Yp += i
-                s_e += m - i
-            for j in range(1, ceil(tp * m)):
-                n += 1
-                s_X += i
-                s_Yp += i + j
-                s_e += m - i
-        for i in range(1, m + 1):
-            for j in range(1, ceil(tq * i)):
-                n += 1
-                s_X += i
-                s_Yq += j
-                s_e += m - i
-        if (
-            s_X * (alpha + beta + delta - 1)
-            + s_Yp * beta
-            + s_Yq * (1 - beta)
-            + s_e * alpha
-            < n * m * alpha
-        ):
-            print(f"s_X: {s_X} s_Yp: {s_Yp} s_Yq: {s_Yq} s_e: {s_e} n: {n} m: {m}")
-            print(
-                f"s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha: {(s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha) / n}"
-            )
-            print(
-                f"alpha + beta + delta - 1: {alpha + beta + delta - 1} beta: {beta} 1 - beta: {1 - beta} alpha: {alpha}"
-            )
-            return m
+        max_t = floor(((1 - 2 * beta - delta) / beta) * m)
+        for t in range(max_t + 1):
+            n = s_X = s_Yp = s_Yq = s_e = 0
+            for i in range(m + 1):
+                for j in range(m - i + 1):
+                    n += 1
+                    s_X += i + j
+                    s_Yp += i
+                    s_e += m - i
+                for j in range(1, t + 1):
+                    n += 1
+                    s_X += i
+                    s_Yp += i + j
+                    s_e += m - i
+            for i in range(1, m + 1):
+                for j in range(1, floor(tq * i) + 1):
+                    n += 1
+                    s_X += i
+                    s_Yq += j
+                    s_e += m - i
+            if (
+                s_X * (alpha + beta + delta - 1)
+                + s_Yp * beta
+                + s_Yq * (1 - beta)
+                + s_e * alpha
+                < n * m * alpha
+            ):
+                print(f"s_X: {s_X} s_Yp: {s_Yp} s_Yq: {s_Yq} s_e: {s_e} n: {n} m: {m}")
+                print(
+                    f"s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha: {(s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha) / n}"
+                )
+                print(
+                    f"alpha + beta + delta - 1: {alpha + beta + delta - 1} beta: {beta} 1 - beta: {1 - beta} alpha: {alpha}"
+                )
+                return m, t
 
 
 def tk17_small_e(alpha, beta, delta):
