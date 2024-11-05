@@ -1,6 +1,6 @@
 from sage.all import Matrix, ZZ, inverse_mod, gcd, ceil, floor
 from src.mp import groebner
-from src.practical_bounds import tk17_large_e, tk17_small_dp_dq
+from src.practical_bounds import tk17_large_e, tk17_small_e, tk17_small_dp_dq
 from src.misc import solve_copper
 
 # from src.root_methods import groebner
@@ -60,15 +60,26 @@ def large_e(N, e, lens, params, test=None):
     return res
 
 
-def small_e(N, e, m, beta, delta):
+# lens = [len_p, len_dq], params = [m], test = [p]
+def small_e(N, e, lens, params, test=None):
+    len_p, len_dq = lens
+    len_N = N.nbits()
+    len_e = e.nbits()
+    alpha = len_e / len_N
+    beta = len_p / len_N
+    delta = len_dq / len_N
+    if None in params:
+        m = tk17_small_e(alpha, beta, delta)
+    else:
+        m = params
     PR = ZZ["xp, xq, yp, yq"]
     xp, xq, yp, yq = PR.gens()
     Q = PR.quotient(N - yp * yq)
     ll = (1 - beta - delta) / beta
     t = (1 - beta - delta) / (1 - beta)
-    X = 1 << (e.nbits() + floor(N.nbits() * (delta + beta - 1)))
-    Yp = 1 << (floor(N.nbits() * beta))
-    Yq = 1 << (floor(N.nbits() * (1 - beta)))
+    X = 1 << (len_e + len_dq + len_p - len_N)
+    Yp = 1 << len_p
+    Yq = 1 << (len_N - len_p)
     shifts = []
     monomials = []
     for i in range(m + 1):
@@ -88,12 +99,9 @@ def small_e(N, e, m, beta, delta):
                 trans = pt1.subs(xq=xp + 1) + pt2.subs(xp=xq - 1)
                 times = trans.monomial_coefficient(monomials[-1]).valuation(N)
                 inv = inverse_mod(N**times, e**i)
-                shifts.append(
-                    ((trans * inv) % (e**i))(X * xp, X * xq, Yp * yp, Yq * yq)
-                    * e ** (m - i)
-                )
+                shifts.append(((trans * inv) % (e**i))* e ** (m - i))
             else:
-                shifts.append((X * xp) ** j * e**m)
+                shifts.append(xp ** j * e**m)
     for i in range(1, m + 1):
         for j in range(1, ceil(t * i) - floor((1 - ll) * i) + 1):
             orig = Q(
@@ -108,50 +116,15 @@ def small_e(N, e, m, beta, delta):
             times = trans.monomial_coefficient(monomials[-1]).valuation(N)
             inv = inverse_mod(N**times, e**i)
             shifts.append(
-                ((trans * inv) % (e**i))(X * xp, X * xq, Yp * yp, Yq * yq)
-                * e ** (m - i)
-            )
-    n = len(shifts)
-    print(n)
-    scales = [mono(X, X, Yp, Yq) for mono in monomials]
-    L = Matrix(ZZ, n)
-    for i in range(n):
-        for j in range(i + 1):
-            L[i, j] = shifts[i].monomial_coefficient(monomials[j])
-    start = time()
-    # L = L.LLL(delta=0.75)
-
-    s = fplll_fmt(L)
-    file_name = "tk17_output.txt"
-
-    # 写入文件，覆盖之前的内容
-    with open(file_name, "w", encoding="utf-8") as file:
-        file.write(s)
-
-    try:
-        rst = subprocess.Popen(
-            "./scripts/tk17_flatter.nu",
-            text=True,
-            stdout=subprocess.PIPE,
-            shell=True,
-        )
-        L = fplll_read(rst.stdout)
-    except subprocess.CalledProcessError as e:
-        print(e)
-        return
-
-    k, p, q = ZZ["k, p, q"].gens()
-    pols = [N - p * q]
-    # pols = [N - yp * yq, xq - xp - 1]
-    for i in range(n // 2):
-        pol = 0
-        for j in range(n):
-            pol += L[i, j] * monomials[j] // scales[j]
-        pols.append(pol(k - 1, k, p, q))
-    print(f"small_e flatter: {time() - start}s")
-    # p0 = groebner(pols, yp, Yp)
-    p0 = groebner(pols, p, Yp)
-    return p0
+                ((trans * inv) % (e**i)) * e ** (m - i))
+    if test:
+        (p,) = test
+        q = N // p
+        dq = inverse_mod(e, q - 1)
+        ell = (e * dq - 1) // (q - 1)
+        test = [ell - 1, ell, p, q]
+    res = solve_copper(shifts, [Yp, yp], [X, X, Yp, Yq], test, ex_pols=[N - yp * yq, xp - xq + 1], monomials=monomials, N=N)
+    return res
 
 
 # lens = [len_dp, len_dq], params = [m], test = [p]

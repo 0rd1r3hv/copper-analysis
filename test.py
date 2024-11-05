@@ -188,6 +188,16 @@ def tk17_large_e_test(alpha, beta, delta, len_N):
     return res == p
 
 
+def tk17_small_e_test(alpha, beta, delta, len_N):
+    print(f"tk17_small_e_test alpha: {alpha}, beta: {beta}, delta: {delta}")
+    len_dq = ceil(len_N * delta)
+    len_p = ceil(len_N * beta)
+    len_e = ceil(len_N * alpha)
+    p, N, e, dq = get_crt_1_test(len_N, len_e, len_dq, len_p)
+    res = small_e(N, e, [len_p, len_dq], [None], test=[p])
+    return res == p
+
+
 def tk17_small_dp_dq_test(delta1, delta2, len_fac):
     print(
         f"tk17_small_dp_dq_test delta1: {delta1}, delta2: {delta2}, len_fac: {len_fac}"
@@ -277,26 +287,6 @@ def mn23(n, k, m):
         print(f"攻击成功！\nx = {A_LSB}\ny = {B_LSB}\nz = {C_LSB}")
 
 
-def tk17_small_e_test():
-    ln = 2000
-    alpha = 0.6
-    beta = 0.5
-    delta = 0.065
-    le = ceil(alpha * ln)
-    lp = ceil(beta * ln)
-    ldq = ceil(delta * ln)
-    p = get_prime(lp)
-    q = get_prime(ln - lp)
-    N = p * q
-    phi = (p - 1) * (q - 1)
-    while True:
-        dq = get_rand(ldq)
-        if gcd(dq, q - 1) == 1:
-            e = inverse_mod(dq, q - 1) + get_rand(le - (ln - lp)) * (q - 1)
-            if gcd(e, phi) == 1:
-                break
-    assert small_e(N, e, tk17_small_e(alpha, beta, delta), lp / ln, ldq / ln) == p
-
 '''
 # ernst05_mixed_1_test()
 # ernst05_mixed_2_test()
@@ -356,4 +346,5 @@ print(
 # mns22_mixed_kp_test(0.5, 0.1, 0.347, 0.1, 1024)
 # mn23(512, 300, 6)
 '''
-print(tk17_large_e_test(1, 0.29, 0.11, 1024))
+# print(tk17_large_e_test(1, 0.29, 0.11, 1024))
+print(tk17_small_e_test(0.6, 0.5, 0.05, 1024))
