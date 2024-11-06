@@ -11,7 +11,7 @@ from sage.all import (
 from src.tk14 import mixed, msb_1, lsb
 from src.tk17 import large_e, small_e, small_dp_dq
 from src.mns21 import dp_dq_with_lsb
-from src.mns22 import mixed_kp, small_e_dp_dq_with_lsb
+from src.mns22 import mixed_kp, small_e_dp_dq_with_msb, small_e_dp_dq_with_lsb
 from src.ernst05 import mixed_1, mixed_2
 from src.practical_bounds import *
 from src.mn23 import *
@@ -123,7 +123,7 @@ def get_crt_partial_control_e_test(len_fac, len_e, len_dp_m, len_dq_m, len_l):
             d = inverse_mod(e, phi)
             dp = d % (p - 1)
             dq = d % (q - 1)
-            if ((e * dp - 1) // (p - 1)) % 2 == 1:
+            if ((e * dp - 1) // (p - 1)) % 2 == 1 and ((e * dq - 1) // (q - 1)) % 2 == 1:
                 break
     dp_m = get_leak(dp, "high", len_dp_m)
     dq_m = get_leak(dq, "high", len_dq_m)
@@ -267,6 +267,17 @@ def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
         print(f"攻击失败！\nres = {res}")
 
 
+def mns22_small_e_dp_dq_with_msb(alpha, delta, len_fac):
+    len_e = ceil(2 * len_fac * alpha)
+    len_dp_m = len_dq_m = ceil(2 * len_fac * (1 / 2 - delta))
+    len_l = 0
+    p, N, e, dp, dq, dp_m, dq_m, dp_l, dq_l = get_crt_partial_control_e_test(len_fac, len_e, len_dp_m, len_dq_m, len_l)
+    len_dp = dp.nbits()
+    len_dq = dq.nbits()
+    res = small_e_dp_dq_with_msb(N, e, [dp_m, dq_m], [len_dp, len_dq, len_dp_m, len_dq_m])
+    return res == p
+
+
 def mns22_small_e_dp_dq_with_lsb(alpha, delta, len_fac):
     len_e = ceil(2 * len_fac * alpha)
     len_dp_m = len_dq_m = 0
@@ -383,3 +394,4 @@ print(
 # print(tk17_large_e_test(1, 0.29, 0.11, 1024))
 # print(tk17_small_e_test(0.6, 0.5, 0.05, 1024))
 # print(mns22_small_e_dp_dq_with_lsb(1 / 12, 0.32, 512))
+print(mns22_small_e_dp_dq_with_msb(1 / 12, 0.32, 512))

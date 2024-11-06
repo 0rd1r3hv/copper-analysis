@@ -4,13 +4,14 @@ from src.misc import solve_copper
 
 
 # leaks = [kp msb, kp lsb], lens = [len kp, len msb, len lsb]
-def mixed_kp(N, k, leaks, lens, params, len_e=0):
+def mixed_kp(N, k, leaks, lens, params, len_e=0, raw=False):
     print("开始 May, Nowakowski, Sarkar 的 kp 混合泄露攻击…")
     kp_m, kp_l = leaks
     len_kp, len_m, len_l = lens
     len_N = N.nbits()
     len_k = k.nbits()
-    kp_m <<= len_kp - len_m
+    if raw == False:
+        kp_m <<= len_kp - len_m
     beta = (len_kp - len_k) / len_N
     mu = len_k / len_N
     delta = (len_kp - len_m - len_l - len_e) / len_N
@@ -38,14 +39,32 @@ def mixed_kp(N, k, leaks, lens, params, len_e=0):
 
 
 # leaks = [dp msb, dq msb], lens = [len dp, len dq, len dp msb, len dq msb]
-def small_e_dp_dq_with_msb(N, e, leaks):
+def small_e_dp_dq_with_msb(N, e, leaks, lens):
     dp_m, dq_m = leaks
     len_dp, len_dq, len_dp_m, len_dq_m = lens
     len_dp_l = len_dp - len_dp_m
     len_dq_l = len_dq - len_dq_m
-    kl = ((dp_m * dq_m) << (len_dq_l + len_dq_l)) // N
+    len_N = N.nbits()
+    len_e = e.nbits()
+    dp_m <<= len_dp_l
+    dq_m <<= len_dq_l
+    kl = ((e ** 2 * dp_m * dq_m) // N) + 1
     s = (1 - kl * (N - 1)) % e
-
+    delt = sqrt(s ** 2 - 4 * kl)
+    if delt.is_integer() == False:
+        s += e
+        delt = sqrt(s ** 2 - 4 * kl)
+    k = (s + delt) >> 1
+    len_k = k.nbits()
+    dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], [None], len_e=len_e, raw=True)
+    if dp_l is None:
+        k = (s - delt) >> 1
+        len_k = k.nbits()
+        dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], [None], len_e=len_e, raw=True)
+    if dp_l:
+        dp = dp_m + dp_l
+        p = (e * dp - 1) // k + 1
+        return p
 
 # leaks = [dp lsb, dq lsb], lens = [len dp, len dq, len low], params = [m], test = [p]
 def small_e_dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
