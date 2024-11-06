@@ -435,11 +435,26 @@ def mns22_mixed_kp(beta, mu, delta):
                 return m, t
 
 
-# mns21_dp_dq_with_lsb(1, 0.07, 0.07, 0.03)
-# tk17_small_dp_dq(1, 0.05)
-# tk14_high(0.3, 0.27)
-# tk14_low_1(0.3, 0.27)
-# tk14_low_2(0.4, 0.17)
-# ernst05_eq1(props=[0.07, 0.7, 0.5, 1 + 0.7])
-# beta = 0.7
-# ernst05_eq2(props=[0.074, 0.2, 0.5, 1 + 0.2])
+def cop96_univariate(beta, delta, deg):
+    for m in range(1, MAX_M + 1):
+        s_X = s_N = dim = 0
+        for i in range(m):
+            for j in range(deg):
+                s_X += i * deg + j
+                s_N += m - i
+                dim += 1
+        if m > 1:
+            min_t = 0
+        else:
+            min_t = 1
+        max_t = max(floor((beta / delta - deg) * m), min_t)
+        for i in range(min_t, max_t + 1):
+            s_X += m * deg + i
+            dim += 1
+            if s_X * delta + s_N < dim * m * beta:
+                print(f"自动使用攻击参数：m = {m}, t = {i}")
+                print(f"格的维度：dim = {dim}")
+                print("格行列式中各项幂次：")
+                print(f"s_X = {s_X}, s_N = {s_N}")
+                return m, i
+

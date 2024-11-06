@@ -8,6 +8,7 @@ from sage.all import (
     random_prime,
     Rational,
 )
+from src.cop96 import cop, hg
 from src.tk14 import mixed, msb_1, lsb
 from src.tk17 import large_e, small_e, small_dp_dq
 from src.mns21 import dp_dq_with_lsb
@@ -267,7 +268,7 @@ def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
         print(f"攻击失败！\nres = {res}")
 
 
-def mns22_small_e_dp_dq_with_msb(alpha, delta, len_fac):
+def mns22_small_e_dp_dq_with_msb_test(alpha, delta, len_fac):
     len_e = ceil(2 * len_fac * alpha)
     len_dp_m = len_dq_m = ceil(2 * len_fac * (1 / 2 - delta))
     len_l = 0
@@ -278,7 +279,7 @@ def mns22_small_e_dp_dq_with_msb(alpha, delta, len_fac):
     return res == p
 
 
-def mns22_small_e_dp_dq_with_lsb(alpha, delta, len_fac):
+def mns22_small_e_dp_dq_with_lsb_test(alpha, delta, len_fac):
     len_e = ceil(2 * len_fac * alpha)
     len_dp_m = len_dq_m = 0
     len_l = ceil(2 * len_fac * (1 / 2 - delta))
@@ -287,6 +288,27 @@ def mns22_small_e_dp_dq_with_lsb(alpha, delta, len_fac):
     len_dq = dq.nbits()
     res = small_e_dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
     return res == p
+
+
+def hg_cop_test(beta, delta, len_N, deg, mode):
+    len_p = ceil(len_N * beta)
+    len_q = ceil(len_N * (1 - beta))
+    len_X = ceil(len_N * delta)
+    p = get_prime(len_p)
+    q = get_prime(len_q)
+    N = p * q
+    x0 = get_rand(len_X)
+    PR = ZZ['x']
+    x = PR.gen()
+    a = get_rand(len_N)
+    g = PR.random_element(degree=deg)
+    f = (x + a) ** deg + 2 * g
+    strf = f'(x + {a}) ** {deg} + {2 * g}'
+    if mode == 'cop':
+        res = cop(strf + f' - {f(x0) % N}', N, [len_X], [None])
+    elif mode == 'hg':
+        res = hg(strf + f' - {f(x0) % p}', N, [len_X, len_p], [None])
+    return res == x0
 
 
 def mn23(n, k, m):
@@ -393,5 +415,7 @@ print(
 '''
 # print(tk17_large_e_test(1, 0.29, 0.11, 1024))
 # print(tk17_small_e_test(0.6, 0.5, 0.05, 1024))
-# print(mns22_small_e_dp_dq_with_lsb(1 / 12, 0.32, 512))
-print(mns22_small_e_dp_dq_with_msb(1 / 12, 0.32, 512))
+# print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.32, 512))
+# print(mns22_small_e_dp_dq_with_msb_test(1 / 12, 0.32, 512))
+# print(hg_cop_test(1 / 2, 0.18, 1024, 5, 'cop'))
+# print(hg_cop_test(1 / 2, 0.115, 1024, 2, 'hg'))

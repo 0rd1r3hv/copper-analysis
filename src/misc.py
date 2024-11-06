@@ -42,7 +42,7 @@ def reduce_varsize(N):
 
 
 def solve_copper(
-    shifts, bound_var, bounds, test, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False
+    shifts, bound_var, bounds, test=None, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False
 ):
     if select_num is None:
         select_num = len(shifts)
