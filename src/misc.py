@@ -120,7 +120,7 @@ def solve_copper(
     if len(bounds) > 1:
         return groebner(ex_pols + selected, bound_var, N=N)
     else:
-        print(f"开始求解单变元方程...")
+        print(f"开始求解单变元方程…")
         start = time()
         for pol in selected:
             roots = pol.roots(multiplicities=False)

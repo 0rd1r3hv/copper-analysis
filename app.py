@@ -16,7 +16,7 @@ from src.ernst05 import mixed_1, mixed_2
 from src.mns21 import dp_dq_with_lsb
 from src.tk14 import msb_1, lsb, mixed
 from src.mns22 import mixed_kp
-from src.mn23 import mn23
+from src.mn23 import automated
 
 
 class 主窗(QMainWindow):
@@ -242,7 +242,13 @@ class 主窗(QMainWindow):
 
     def 连auto_atk_btn(self):
         def auto攻击():
-            mn23(512, 300, 6)
+            automated(
+                Integer(self.ui.auto_M_le.text()),
+                Integer(self.ui.auto_m_le.text()),
+                Integer(self.ui.auto_var_le.text()),
+                Integer(self.ui.auto_mono_set_le.text()),
+                Integer(self.ui.auto_eq_le.text()),
+            )
 
         self.ui.auto_atk_btn.clicked.connect(auto攻击)
 

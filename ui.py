@@ -113,9 +113,6 @@ class 主窗UI:
                     ("about_lbl", 10, 1),
                 ]
 
-                sizePolicy = QSizePolicy(
-                    QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
-                )
                 sizePolicy.setHorizontalStretch(0)
                 sizePolicy.setVerticalStretch(0)
 
@@ -335,7 +332,7 @@ class 主窗UI:
                 self.about_lbl.setText(
                     QCoreApplication.translate("main_win", "关于", None)
                 )
-                self.srch_le.setPlaceholderText(
+                self.srch_lbl.setPlaceholderText(
                     QCoreApplication.translate("Search…", "搜索……", None)
                 )
                 self.usr_btn.setText("")
@@ -713,7 +710,7 @@ class 主窗UI:
             param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
             param_le = QLineEdit()
             param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
-            param_le.setObjectName(f"auto_{param.lower().replace(' ', '_')}_le")
+            param_le.setObjectName(f"auto_{param}_le")
             param_le.setMinimumHeight(40)
             if param == "mono_set":
                 param_le.setPlaceholderText("（自动选取）")
