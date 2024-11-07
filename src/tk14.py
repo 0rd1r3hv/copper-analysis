@@ -148,6 +148,7 @@ def lsb(N, e, leaks, lens, params, test=None):
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
     if None in params:
+        print("未指定参数，自动选择参数'm'…")
         m = tk14_lsb(beta, gamma)
     else:
         (m,) = params

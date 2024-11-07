@@ -192,7 +192,7 @@ def tk14_low_2(kbeta, gamma):
                 return m, t
 
 
-def tk17_large_e(alpha, beta, delta):
+def tlp17_large_e(alpha, beta, delta):
     tq = (1 - beta - delta) / (1 - beta)
     for m in range(1, MAX_M + 1):
         max_t = floor(((1 - 2 * beta - delta) / beta) * m)

@@ -332,7 +332,7 @@ class 主窗UI:
                 self.about_lbl.setText(
                     QCoreApplication.translate("main_win", "关于", None)
                 )
-                self.srch_lbl.setPlaceholderText(
+                self.srch_le.setPlaceholderText(
                     QCoreApplication.translate("Search…", "搜索……", None)
                 )
                 self.usr_btn.setText("")

@@ -12,10 +12,10 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
 from ui import 主窗UI
 from qt_material import apply_stylesheet
 from src.cfg import 配置
-from src.ernst05 import mixed_1, mixed_2
-from src.mns21 import dp_dq_with_lsb
-from src.tk14 import msb_1, lsb, mixed
-from src.mns22 import mixed_kp
+from src import ernst05
+from src import mns21
+from src import tk14
+import src.mns22
 from src.mn23 import automated
 
 
@@ -83,50 +83,66 @@ class 主窗(QMainWindow):
     def 连rsa_atk_btn(self):
         def rsa攻击():
             def tk14msb():
+                rst = tk14.msb_1(
+                    Integer(self.ui.N_le.text()),
+                    Integer(self.ui.e_le.text()),
+                    (Integer(self.ui.d_msb_le.text()),),
+                    (
+                        Integer(self.ui.d_len_le.text()),
+                        Integer(self.ui.msb_len_le.text()),
+                    ),
+                    (None,),
+                )
+
                 print(
-                    f"""攻击成功！私钥 d = 
-                    {msb_1(
-                        Integer(self.ui.N_le.text()),
-                        Integer(self.ui.e_le.text()),
-                        (Integer(self.ui.d_msb_le.text()),),
-                        (
-                            Integer(self.ui.d_len_le.text()),
-                            Integer(self.ui.msb_len_le.text()),
-                        ),
-                        (None,),
-                    )}"""
+                    f"""攻击成功！私钥 d =
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
                 )
 
             def tk14lsb():
-                print(f"""攻击成功！私钥 d = {lsb(Integer(self.ui.N_le.text()),
-                        Integer(self.ui.e_le.text()),
-                        (Integer(self.ui.d_lsb_le.text()),),
-                        (
-                            Integer(self.ui.d_len_le.text()),
-                            Integer(self.ui.lsb_len_le.text()),
-                        ),
-                        (None,),
-                    )}""")
+                rst = tk14.lsb(
+                    Integer(self.ui.N_le.text()),
+                    Integer(self.ui.e_le.text()),
+                    (Integer(self.ui.d_lsb_le.text()),),
+                    (
+                        Integer(self.ui.d_len_le.text()),
+                        Integer(self.ui.lsb_len_le.text()),
+                    ),
+                    (None,),
+                )
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
 
             def tk14mixed():
+                rst = tk14.mixed(
+                    Integer(self.ui.N_le.text()),
+                    Integer(self.ui.e_le.text()),
+                    (
+                        Integer(self.ui.d_msb_le.text()),
+                        Integer(self.ui.d_lsb_le.text()),
+                    ),
+                    (
+                        Integer(self.ui.d_len_le.text()),
+                        Integer(self.ui.msb_len_le.text()),
+                        Integer(self.ui.lsb_len_le.text()),
+                    ),
+                    (None, None),
+                )
                 print(
-                    f"""攻击成功！私钥 d = {mixed(Integer(self.ui.N_le.text()),
-                        Integer(self.ui.e_le.text()),
-                        (
-                            Integer(self.ui.d_msb_le.text()),
-                            Integer(self.ui.d_lsb_le.text()),
-                        ),
-                        (
-                            Integer(self.ui.d_len_le.text()),
-                            Integer(self.ui.msb_len_le.text()),
-                            Integer(self.ui.lsb_len_le.text()),
-                        ),
-                        (None, None),
-                    )}"""
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
                 )
 
             def ernstmixed1():
-                rst = mixed_1(
+                rst = ernst05.mixed_1(
                     Integer(self.ui.N_le.text()),
                     Integer(self.ui.e_le.text()),
                     (
@@ -140,10 +156,15 @@ class 主窗(QMainWindow):
                     ),
                     (None, None),
                 )
-                print(f"攻击成功！私钥 d = {rst}")
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
 
             def ernstmixed2():
-                rst = mixed_2(
+                rst = ernst05.mixed_2(
                     Integer(self.ui.N_le.text()),
                     Integer(self.ui.e_le.text()),
                     (
@@ -157,7 +178,12 @@ class 主窗(QMainWindow):
                     ),
                     (None, None),
                 )
-                print(f"攻击成功！私钥 d = {rst}")
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
 
             方法 = self.ui.atk_cb.currentIndex()
             攻击函数 = [
@@ -175,7 +201,7 @@ class 主窗(QMainWindow):
     def 连crt_atk_btn(self):
         def crt攻击():
             def mns21lsb():
-                rst = dp_dq_with_lsb(
+                rst = mns21.dp_dq_with_lsb(
                     Integer(self.ui.crt_N_le.text()),
                     Integer(self.ui.crt_e_le.text()),
                     (
@@ -192,7 +218,7 @@ class 主窗(QMainWindow):
                 print(f"攻击成功！私钥 d = {rst}")
 
             def mns22msb():
-                rst = msb_1(
+                rst = src.mns22.small_e_dp_dq_with_msb(
                     Integer(self.ui.crt_N_le.text()),
                     Integer(self.ui.crt_e_le.text()),
                     (Integer(self.ui.crt_kp_msb_le.text()),),
@@ -204,11 +230,11 @@ class 主窗(QMainWindow):
                 )
                 print(f"攻击成功！私钥 d = {rst}")
 
+            def mns22lsb():
+                pass
+
             方法 = self.ui.crt_atk_cb.currentIndex()
-            攻击函数 = [
-                mns21lsb,
-                mns22msb,
-            ]
+            攻击函数 = [mns21lsb, mns22msb, mns22lsb]
 
             攻击函数[方法]()
 
@@ -217,7 +243,7 @@ class 主窗(QMainWindow):
     def 连var_atk_btn(self):
         def var攻击():
             def mns22():
-                rst = mixed_kp(
+                rst = src.mns22.mixed_kp(
                     Integer(self.ui.var_N_le.text()),
                     Integer(self.ui.var_e_le.text()),
                     (
