@@ -5,7 +5,7 @@ from src.misc import solve_copper
 
 # leaks = [kp msb, kp lsb], lens = [len kp, len msb, len lsb]
 def mixed_kp(N, k, leaks, lens, params, len_e=0, raw=False):
-    print("开始 May, Nowakowski, Sarkar 的 kp 混合泄露攻击…")
+    print("开始执行 May, Nowakowski, Sarkar 的 kp 混合泄露攻击…")
     kp_m, kp_l = leaks
     len_kp, len_m, len_l = lens
     len_N = N.nbits()

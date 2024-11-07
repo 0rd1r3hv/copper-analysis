@@ -438,7 +438,7 @@ class 主窗UI:
         self.rsa_hlo.addWidget(self.parma_cont)
         self.rsa_te = QTextEdit()
         self.rsa_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
-        self.rsa_te.setObjectName("rsa_text_display")
+        self.rsa_te.setObjectName("rsa_te")
         self.rsa_te.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -557,8 +557,8 @@ class 主窗UI:
         self.crt_hlo.addWidget(self.crt_parma_cont)
         self.crt_te = QTextEdit()
         self.crt_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
-        self.crt_te.setObjectName("crt_rsa_text_display")
-        # self.crt_te.setReadOnly(True)
+        self.crt_te.setObjectName("crt_te")
+        self.crt_te.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.crt_te.setSizePolicy(size_policy)
@@ -602,14 +602,26 @@ class 主窗UI:
         var_atk_hlo.addWidget(var_atk_cb)
         self.var_parma_vlo.addWidget(var_atk_frm)
 
-        # 添加参数输入框
-        var = ["N", "k", "p_len", "msb_len", "lsb_len", "kp_msb", "kp_lsb", "mod_eq"]
+        var = [
+            "N",
+            "k",
+            "p_len",
+            "msb_len",
+            "lsb_len",
+            "m",
+            "t",
+            "kp_msb",
+            "kp_lsb",
+            "mod_eq",
+        ]
         var_params = [
             "模数 N",
             "倍数 k",
             "因数 p 长度",
             "kp MSB 长度",
             "kp LSB 长度",
+            "m（可选）",
+            "t（可选）",
             "kp MSB",
             "kp LSB",
             "模方程",
@@ -633,6 +645,8 @@ class 主窗UI:
             param_hlo.addWidget(param_le)
             self.var_parma_vlo.addWidget(param_frm)
 
+        self.var_m_le.setPlaceholderText("（自动选取）")
+        self.var_t_le.setPlaceholderText("（自动选取）")
         self.var_parma_vlo.addStretch(1)
         self.var_parma_vlo.addItem(
             QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
@@ -646,7 +660,7 @@ class 主窗UI:
         self.var_te = QTextEdit()
         self.var_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.var_te.setObjectName("var_te")
-        # self.var_text_display.setReadOnly(True)
+        self.var_te.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.var_te.setSizePolicy(size_policy)
@@ -746,7 +760,7 @@ class 主窗UI:
         self.auto_te = QTextEdit()
         self.auto_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
         self.auto_te.setObjectName("auto_te")
-        # self.auto_text_display.setReadOnly(True)
+        self.auto_te.setReadOnly(True)
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.auto_te.setSizePolicy(size_policy)

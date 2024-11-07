@@ -4,7 +4,6 @@ from PySide6.QtCore import (
     QPropertyAnimation,
     QEasingCurve,
     QParallelAnimationGroup,
-    QProcess,
     QTimer,
 )
 from sage.all import Integer
@@ -15,7 +14,9 @@ from qt_material import apply_stylesheet
 from src.cfg import 配置
 from src.ernst05 import mixed_1, mixed_2
 from src.mns21 import dp_dq_with_lsb
-from src.tk14 import msb_1
+from src.tk14 import msb_1, lsb, mixed
+from src.mns22 import mixed_kp
+from src.mn23 import mn23
 
 
 class 主窗(QMainWindow):
@@ -56,11 +57,15 @@ class 主窗(QMainWindow):
 
     def 连信(self):
         self.ui.pnl_btn.toggled["bool"].connect(self.tgl_pnl)
+        self.换页()
         self.连rsa_btn()
         self.连crt_btn()
-        self.换页()
+        self.连var_btn()
+        self.连auto_btn()
         self.连rsa_atk_btn()
         self.连crt_atk_btn()
+        self.连var_atk_btn()
+        self.连auto_atk_btn()
         self.ui.主题_cb.currentTextChanged.connect(self.chg_th)
 
     def 连rsa_btn(self):
@@ -93,10 +98,32 @@ class 主窗(QMainWindow):
                 )
 
             def tk14lsb():
-                pass
+                print(f"""攻击成功！私钥 d = {lsb(Integer(self.ui.N_le.text()),
+                        Integer(self.ui.e_le.text()),
+                        (Integer(self.ui.d_lsb_le.text()),),
+                        (
+                            Integer(self.ui.d_len_le.text()),
+                            Integer(self.ui.lsb_len_le.text()),
+                        ),
+                        (None,),
+                    )}""")
 
             def tk14mixed():
-                pass
+                print(
+                    f"""攻击成功！私钥 d = {mixed(Integer(self.ui.N_le.text()),
+                        Integer(self.ui.e_le.text()),
+                        (
+                            Integer(self.ui.d_msb_le.text()),
+                            Integer(self.ui.d_lsb_le.text()),
+                        ),
+                        (
+                            Integer(self.ui.d_len_le.text()),
+                            Integer(self.ui.msb_len_le.text()),
+                            Integer(self.ui.lsb_len_le.text()),
+                        ),
+                        (None, None),
+                    )}"""
+                )
 
             def ernstmixed1():
                 rst = mixed_1(
@@ -165,28 +192,22 @@ class 主窗(QMainWindow):
                 print(f"攻击成功！私钥 d = {rst}")
 
             def mns22msb():
-                pass
-
-            def mns22lsb():
-                pass
-
-            def tlp17sesdp():
-                pass
-
-            def tlp17lesdp():
-                pass
-
-            def tlp17sdpdq():
-                pass
+                rst = msb_1(
+                    Integer(self.ui.crt_N_le.text()),
+                    Integer(self.ui.crt_e_le.text()),
+                    (Integer(self.ui.crt_kp_msb_le.text()),),
+                    (
+                        Integer(self.ui.crt_kp_len_le.text()),
+                        Integer(self.ui.msb_len_le.text()),
+                    ),
+                    (None,),
+                )
+                print(f"攻击成功！私钥 d = {rst}")
 
             方法 = self.ui.crt_atk_cb.currentIndex()
             攻击函数 = [
                 mns21lsb,
                 mns22msb,
-                mns22lsb,
-                tlp17sesdp,
-                tlp17lesdp,
-                tlp17sdpdq,
             ]
 
             攻击函数[方法]()
@@ -196,16 +217,24 @@ class 主窗(QMainWindow):
     def 连var_atk_btn(self):
         def var攻击():
             def mns22():
-                pass
-
-            def cop():
-                pass
-
-            def hg():
-                pass
+                rst = mixed_kp(
+                    Integer(self.ui.var_N_le.text()),
+                    Integer(self.ui.var_e_le.text()),
+                    (
+                        Integer(self.ui.var_kp_msb_le.text()),
+                        Integer(self.ui.var_kp_lsb_le.text()),
+                    ),
+                    (
+                        Integer(self.ui.var_kp_len_le.text()),
+                        Integer(self.ui.msb_len_le.text()),
+                        Integer(self.ui.lsb_len_le.text()),
+                    ),
+                    (None, None),
+                )
+                print(f"攻击成功！私钥 d = {rst}")
 
             方法 = self.ui.var_atk_cb.currentIndex()
-            攻击函数 = [mns22, cop, hg]
+            攻击函数 = [mns22]
 
             攻击函数[方法]()
 
@@ -213,9 +242,9 @@ class 主窗(QMainWindow):
 
     def 连auto_atk_btn(self):
         def auto攻击():
-            pass
+            mn23(512, 300, 6)
 
-        self.ui.auto_btn.clicked.connect(auto攻击)
+        self.ui.auto_atk_btn.clicked.connect(auto攻击)
 
     def 换页(self):
         btn_list = [
@@ -269,14 +298,15 @@ class te_stdout重定向(io.StringIO):
         self.te = te
 
     def write(self, string):
+        QApplication.processEvents()  # 激活事件循环
         cursor = self.te.textCursor()
         cursor.movePosition(QTextCursor.End)
         cursor.insertText(string)
-
+        self.te.setTextCursor(cursor)
+        self.te.ensureCursorVisible()
 
     def redirect_stdout(self):
-        self.stdout_redirector = te_stdout重定向(self.te)
-        sys.stdout = self.stdout_redirector
+        sys.stdout = self
 
     def restore_stdout(self):
         sys.stdout = sys.__stdout__

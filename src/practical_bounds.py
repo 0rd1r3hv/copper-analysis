@@ -232,7 +232,7 @@ def tk17_large_e(alpha, beta, delta):
                 return m, t
 
 
-def tk17_small_e(alpha, beta, delta):
+def tlp17_small_e(alpha, beta, delta):
     ll = (1 - beta - delta) / beta
     t = (1 - beta - delta) / (1 - beta)
     for m in range(1, MAX_M + 1):
@@ -267,7 +267,7 @@ def tk17_small_e(alpha, beta, delta):
             return m
 
 
-def tk17_small_dp_dq(alpha, delta):
+def tlp17_small_dp_dq(alpha, delta):
     t = 1 - 2 * delta
     for m in range(1, MAX_M + 1):
         n = s_X = s_Y = s_e = 0

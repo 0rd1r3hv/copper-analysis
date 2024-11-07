@@ -25,7 +25,7 @@ def transform(PR, Q, pol, mono, mod, i):
 
 # leaks = [dp_l, dq_l], lens = [len_dp, len_dq, len_l], params = [m, s], test = [p]
 def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
-    print("开始 May, Nowakowski, Sarkar 的 dp,dq 纯低位泄露攻击…")
+    print("开始执行 May, Nowakowski, Sarkar 的 dp,dq 纯低位泄露攻击…")
     dp_l, dq_l = leaks
     len_dp, len_dq, len_l = lens
     len_N = N.nbits()
