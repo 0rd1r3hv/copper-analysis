@@ -1,7 +1,9 @@
-from sage.all import Ideal, Integer, QQ, ZZ, GF, crt, jacobian, vector
+from sage.all import Ideal, Integer, QQ, ZZ, Zmod, GF, crt, jacobian, vector, random_prime
 from time import time
+from random import sample
 
 
+'''
 def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
     start = time()
     bound, var = bound_var
@@ -68,6 +70,47 @@ def groebner(pols, bound_var, max_fails=10, N=None, neg=False):
         else:
             return res
     print(f"groebner failed: {time() - start}s")
+'''
+
+
+def groebner(pols, bound_var, max_fails=10, ex_pols=[]):
+    start = time()
+    bound, var = bound_var
+    R = pols[0].parent()
+    varlst = R.gens()
+    num = R.ngens()
+    p = random_prime((1 << 28) - 1, True, 1 << (27 - 1))
+    R = R.change_ring(GF(p))
+    ZM = Zmod(p)
+    fails = 0
+    len_selected = len(pols) // 2
+    while fails < max_fails:
+        selected = ex_pols + sample(pols, len_selected)
+        Id = Ideal((R * selected).groebner_basis())
+        if Id.dimension() == 0:
+            sols = Id.variety()
+            if len(sols) == 1:
+                sol = sols[0]
+                v = vector([ZM(sol[v_]) for v_ in varlst])
+                break
+        else:
+            fails += 1
+    else:
+        print('failed')
+        return
+    f = vector(selected[:num])
+    J = jacobian(f, varlst)
+    while p < bound:
+        p **= 2
+        ZM = Zmod(p)
+        R = R.change_ring(ZM)
+        v = v.change_ring(ZM)
+        v -= J.change_ring(R)(list(v)).solve_right(f.change_ring(R)(list(v)))
+    if fails < max_fails:
+        print(f"groebner success: {time() - start}s")
+        for i, v_ in enumerate(varlst):
+            if v_ == var:
+                return Integer(v[i])
 
 
 def newton(sys, boundslst, it=20):

@@ -1,8 +1,8 @@
 import subprocess
 from sage.all import floor, gcd, Integer, Matrix, QQ, ZZ, prod, sqrt, Sequence, vector
-from src.mp import groebner
+# from src.mp import groebner
 
-# from src.root_methods import groebner
+from src.root_methods import groebner
 from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
 
@@ -118,7 +118,8 @@ def solve_copper(
         )
     )
     if len(bounds) > 1:
-        return groebner(ex_pols + selected, bound_var, N=N)
+        # return groebner(ex_pols + selected, bound_var, N=N)
+        return groebner(selected, bound_var, ex_pols=ex_pols)
     else:
         print(f"开始求解单变元方程…")
         start = time()
