@@ -13,11 +13,11 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
     R = R.change_ring(GF(p), order='degrevlex')
     ZM = Zmod(p)
     fails = 0
+    if restrict:
+        len_selected = num + 1 - len(ex_pols)
+    else:
+        len_selected = min(pols[0].degree() - len(ex_pols), len(pols))
     while fails < max_fails:
-        if restrict:
-            len_selected = num + 1 - len(ex_pols)
-        else:
-            len_selected = min(pols[0].degree() - len(ex_pols), len(pols))
         selected = ex_pols + sample(pols, len_selected)
         try:
             st = time()

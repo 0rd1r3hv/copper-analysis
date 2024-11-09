@@ -122,7 +122,7 @@ def small_e(N, e, lens, params, test=None):
         dq = inverse_mod(e, q - 1)
         ell = (e * dq - 1) // (q - 1)
         test = [ell - 1, ell, p, q]
-    res = solve_copper(shifts, [Yp, yp], [X, X, Yp, Yq], test, ex_pols=[N - yp * yq, xp - xq + 1], monomials=monomials, N=N)
+    res = solve_copper(shifts, [Yp, yp], [X, X, Yp, Yq], test, ex_pols=[N - yp * yq, xp - xq + 1], monomials=monomials, N=N, restrict=True)
     return res
 
 

@@ -63,7 +63,7 @@ def get_kp_partial_test(len_N, len_p, len_k, len_m, len_l):
     k = 2 * get_rand(len_k - 1) + 1
     kp = k * p
     len_kp = kp.nbits()
-    return p, k, N, get_leak(kp, "high", len_m), get_leak(kp, "low", len_l), len_kp
+    return p, k, N, get_leak(kp, "high", len_m), get_leak(kp, "low", len_l)
 
 
 def get_crt_partial_test(len_fac, len_dp, len_dq, len_l):
@@ -135,6 +135,27 @@ def get_crt_partial_control_e_test(len_fac, len_e, len_dp_m, len_dq_m, len_l):
     return p, N, e, dp, dq, dp_m, dq_m, dp_l, dq_l
 
 
+def hg_cop_test(beta, delta, len_N, deg, mode):
+    len_p = ceil(len_N * beta)
+    len_q = ceil(len_N * (1 - beta))
+    len_X = ceil(len_N * delta)
+    p = get_prime(len_p)
+    q = get_prime(len_q)
+    N = p * q
+    x0 = get_rand(len_X)
+    PR = ZZ['x']
+    x = PR.gen()
+    a = get_rand(len_N)
+    g = PR.random_element(degree=deg)
+    f = (x + a) ** deg + 2 * g
+    strf = f'(x + {a}) ** {deg} + {2 * g}'
+    if mode == 'cop':
+        res = cop(strf + f' - {f(x0) % N}', N, [len_X], [None])
+    elif mode == 'hg':
+        res = hg(strf + f' - {f(x0) % p}', N, [len_X, len_p], [None])
+    return res == x0
+
+
 def ernst05_mixed_1_test(beta, delta, kappa, len_fac):
     print(
         f"ernst05_mixed_1_test beta: {beta}, delta: {delta}, kappa: {kappa}, len_fac: {len_fac}"
@@ -147,7 +168,6 @@ def ernst05_mixed_1_test(beta, delta, kappa, len_fac):
         return mixed_1(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
     else:
         return mixed_1(N, e, [d_m, d_l], [len_d, len_m, len_l], [None]) == d
-
 
 
 def ernst05_mixed_2_test(beta, delta, kappa, len_fac):
@@ -181,10 +201,6 @@ def tk14_msb_1_test(beta, delta, len_fac, test=True):
     else:
         res = msb_1(N, e, [d_m], [len_d, len_m], [None])
     return res == d
-    '''
-    if res == d:
-        print(f"攻击成功！\nd = {d}\np = {p}\nq = {N // p}")
-    '''
 
 
 def tk14_lsb_test(beta, delta, len_fac):
@@ -274,20 +290,22 @@ def tlp17_small_dp_dq_test(delta1, delta2, len_fac):
 
 
 def mns21_dp_dq_with_lsb_test(delta1, delta2, leak, len_fac):
-    # print(f"mns21_dp_dq_with_lsb_test delta1: {delta1}, delta2: {delta2}, leak: {leak}, len_fac: {len_fac}")
+    print(f"mns21_dp_dq_with_lsb_test delta1: {delta1}, delta2: {delta2}, leak: {leak}, len_fac: {len_fac}")
     len_dp = ceil(2 * len_fac * delta1)
     len_dq = ceil(2 * len_fac * delta2)
     len_l = ceil(2 * len_fac * leak)
     p, N, e, dp, dq, dp_l, dq_l = get_crt_partial_test(len_fac, len_dp, len_dq, len_l)
+    '''
     with open("mns21_dp_dq_with_lsb_test.txt", "w", encoding="utf-8") as file:
         file.write(
             f"p: {p}, N: {N}, e: {e}, dp: {dp}, dq: {dq}, dp_l: {dp_l}, dq_l: {dq_l}, len_dp: {len_dp}, len_dq: {len_dq}, len_l: {len_l}"
         )
-    res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
-    if res == p or res == N // p:
-        print(f"攻击成功！\ndp = {dp}\ndq = {dq}\np = {p}\nq = {N // p}")
+    '''
+    if test:
+        res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
     else:
-        print(f"攻击失败！\nres = {res}")
+        res = dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None])
+    return res == p or res == N // p
 
 
 def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
@@ -295,16 +313,17 @@ def mns22_mixed_kp_test(beta, mu, delta, kappa, len_N):
     len_k = ceil(len_N * mu)
     len_l = ceil(len_N * kappa)
     len_m = ceil(len_N * (beta + mu - delta - kappa))
-    p, k, N, kp_m, kp_l, len_kp = get_kp_partial_test(len_N, len_p, len_k, len_m, len_l)
+    p, k, N, kp_m, kp_l = get_kp_partial_test(len_N, len_p, len_k, len_m, len_l)
+    len_kp = (k * p).nbits()
     with open("mns22_mixed_kp_test.txt", "w", encoding="utf-8") as file:
         file.write(
             f"p: {p}, k: {k}, N: {N}, kp_m: {kp_m}, kp_l: {kp_l}, len_kp: {len_kp}, len_p: {len_p}, len_k: {len_k}, len_l: {len_l}, len_m: {len_m}"
         )
-    res = mixed_kp(N, k, [kp_m, kp_l], [len_kp, len_m, len_l], [None], test=[p])
+    res = mixed_kp(N, k, [kp_m, kp_l], [len_kp, len_m, len_l], [None])
     if res:
-        print(f"攻击成功！\np = {p}\nq = {N // p}")
+        return (kp_m << (len_kp - len_m)) + (res << len_l) + kp_l == k * p
     else:
-        print(f"攻击失败！\nres = {res}")
+        return False
 
 
 def mns22_small_e_dp_dq_with_msb_test(alpha, delta, len_fac):
@@ -315,7 +334,7 @@ def mns22_small_e_dp_dq_with_msb_test(alpha, delta, len_fac):
     len_dp = dp.nbits()
     len_dq = dq.nbits()
     res = small_e_dp_dq_with_msb(N, e, [dp_m, dq_m], [len_dp, len_dq, len_dp_m, len_dq_m])
-    return res == p or res == q
+    return res == p or res == N // p
 
 
 def mns22_small_e_dp_dq_with_lsb_test(alpha, delta, len_fac):
@@ -332,28 +351,7 @@ def mns22_small_e_dp_dq_with_lsb_test(alpha, delta, len_fac):
     return res == p
 
 
-def hg_cop_test(beta, delta, len_N, deg, mode):
-    len_p = ceil(len_N * beta)
-    len_q = ceil(len_N * (1 - beta))
-    len_X = ceil(len_N * delta)
-    p = get_prime(len_p)
-    q = get_prime(len_q)
-    N = p * q
-    x0 = get_rand(len_X)
-    PR = ZZ['x']
-    x = PR.gen()
-    a = get_rand(len_N)
-    g = PR.random_element(degree=deg)
-    f = (x + a) ** deg + 2 * g
-    strf = f'(x + {a}) ** {deg} + {2 * g}'
-    if mode == 'cop':
-        res = cop(strf + f' - {f(x0) % N}', N, [len_X], [None])
-    elif mode == 'hg':
-        res = hg(strf + f' - {f(x0) % p}', N, [len_X, len_p], [None])
-    return res == x0
-
-
-def mn23(n, k, m):
+def mn23_automated_test(n, k, m):
 
 
     def split(x, bits):
@@ -445,7 +443,6 @@ def mn23(n, k, m):
 #         (None, None),
 #     ),
 # )
-
 # tk14_mixed_test(0.292, 0.248, 0, 512, brute=False, triangluarize=True)
 # tk14_msb_1_test(0.292, 0.26, 512)
 # mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512)
@@ -454,19 +451,17 @@ def mn23(n, k, m):
 # mns22_mixed_kp_test(0.5, 0.1, 0.347, 0.1, 1024)
 # mn23(512, 300, 6)
 
-# print(tlp17_large_e_test(1, 0.29, 0.11, 1024))
-# print(tlp17_small_e_test(0.6, 0.5, 0.05, 1024))
-# print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.32, 512))
-# print(mns22_small_e_dp_dq_with_msb_test(1 / 12, 0.32, 512))
 # print(hg_cop_test(1 / 2, 0.18, 1024, 5, 'cop'))
-# print(hg_cop_test(1 / 2, 0.115, 1024, 2, 'hg'))
-
-# print(tk14_lsb_test(0.3, 0.26, 512))
-# print(tlp17_small_dp_dq_test(0.03, 0.03, 512))
-# print(tk14_msb_1_test(0.292, 0.26, 512))
-# print(tlp17_large_e_test(1, 0.29, 0.20, 1024))
-# print(tlp17_small_e_test(0.6, 0.5, 0.05, 1024))
-# print(tk14_mixed_test(0.4, 0.19, 0.1, 512, brute=False, triangluarize=True))
-# print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.3, 512))
+# print(hg_cop_test(1 / 2, 0.07, 1024, 3, 'hg'))
 # print(ernst05_mixed_1_test(0.4, 0.16, 0.1, 512))
-# print(ernst05_mixed_2_test(0.7, 0.1, 0.05, 512))
+# print(ernst05_mixed_2_test(0.7, 0.06, 0.05, 512))
+# print(tk14_msb_1_test(0.292, 0.26, 512))
+# print(tk14_lsb_test(0.292, 0.26, 512))
+# print(tk14_mixed_test(0.4, 0.18, 0.1, 512, brute=False, triangluarize=True))
+# print(tlp17_large_e_test(1, 0.29, 0.19, 1024))
+# print(tlp17_small_e_test(0.6, 0.5, 0.06, 1024))
+# print(tlp17_small_dp_dq_test(0.03, 0.03, 512))
+print(mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512))
+# print(mns22_mixed_kp_test(0.55, 0.05, 0.346, 0.1, 512))
+# print(mns22_small_e_dp_dq_with_msb_test(1 / 12, 0.32, 512))
+# print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.31, 512))

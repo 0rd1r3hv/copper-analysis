@@ -106,7 +106,7 @@ def small_e_dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
         k = (e * dp - 1) // (p - 1)
         ll = (e * dq - 1) // (q - 1)
         test = [k, ll]
-    k = solve_copper(shifts, [X, x], [X, Y], test, monomials=monomials)
+    k = solve_copper(shifts, [X, x], [X, Y], test, monomials=monomials, restrict=True)
     if k:
         dp_m = mixed_kp(N, k, [0, ((e * dp_l + k - 1) * inverse_mod(e, k * N)) % (k * N)], [len_k + len_N // 2, 0, len_low], [None], len_e=len_e)
         if dp_m:
