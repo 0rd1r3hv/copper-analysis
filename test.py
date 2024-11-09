@@ -333,6 +333,7 @@ def mns22_small_e_dp_dq_with_msb_test(alpha, delta, len_fac):
     p, N, e, dp, dq, dp_m, dq_m, dp_l, dq_l = get_crt_partial_control_e_test(len_fac, len_e, len_dp_m, len_dq_m, len_l)
     len_dp = dp.nbits()
     len_dq = dq.nbits()
+    print(f"N: {N}, e: {e}, dp_m: {dp_m}, dq_m: {dq_m}, len_dp: {len_dp}, len_dq: {len_dq}, len_dp_m: {len_dp_m}, len_dq_m: {len_dq_m}")
     res = small_e_dp_dq_with_msb(N, e, [dp_m, dq_m], [len_dp, len_dq, len_dp_m, len_dq_m])
     return res == p or res == N // p
 
@@ -441,7 +442,7 @@ def mn23_automated_test(n, k):
     return res == solutions_verify
 
 
-ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
+# ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # ernst05_mixed_2_test()
 # tk14_high_leak_test()
 # tk14_low_leak_1_test()

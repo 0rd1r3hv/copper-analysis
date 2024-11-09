@@ -9,6 +9,7 @@ from PySide6.QtCore import (
 from sage.all import Integer
 from PySide6.QtGui import QIcon, QTextCursor
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel
+import src.tlp17
 from ui import 主窗UI
 from qt_material import apply_stylesheet
 from src.cfg import 配置
@@ -218,26 +219,87 @@ class 主窗(QMainWindow):
                     ),
                     (None, None),
                 )
-                print(f"攻击成功！私钥 d = {rst}")
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
 
             def mns22msb():
                 rst = src.mns22.small_e_dp_dq_with_msb(
                     Integer(self.ui.crt_N_le.text()),
                     Integer(self.ui.crt_e_le.text()),
-                    (Integer(self.ui.crt_kp_msb_le.text()),),
+                    (Integer(self.ui.crt_dp_msb_le.text()), Integer(self.ui.crt_dq_msb_le.text())),
                     (
-                        Integer(self.ui.crt_kp_len_le.text()),
-                        Integer(self.ui.msb_len_le.text()),
+                        Integer(self.ui.crt_dp_len_le.text()),
+                        Integer(self.ui.crt_dq_len_le.text()),
+                        Integer(self.ui.crt_msb_len_le.text()),
+                        Integer(self.ui.crt_msb_len_le.text())
+                    ),
+                )
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
+
+            def mns22lsb():
+                rst = src.mns22.small_e_dp_dq_with_lsb(
+                    Integer(self.ui.crt_N_le.text()),
+                    Integer(self.ui.crt_e_le.text()),
+                    (Integer(self.ui.crt_dp_lsb_le.text()), Integer(self.ui.crt_dq_lsb_le.text())),
+                    (
+                        Integer(self.ui.crt_dp_len_le.text()),
+                        Integer(self.ui.crt_dq_len_le.text()),
+                        Integer(self.ui.crt_lsb_len_le.text()),
                     ),
                     (None,),
                 )
-                print(f"攻击成功！私钥 d = {rst}")
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
 
-            def mns22lsb():
-                pass
+            def tlp17small_e():
+                rst = src.tlp17.small_e(
+                    Integer(self.ui.crt_N_le.text()),
+                    Integer(self.ui.crt_e_le.text()),
+                    (
+                        Integer(self.ui.crt_p_len_le.text()),
+                        Integer(self.ui.crt_dq_len_le.text()),
+                    ),
+                    (None,),
+                )
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
+
+            def tlp17large_e():
+                rst = src.tlp17.large_e(
+                    Integer(self.ui.crt_N_le.text()),
+                    Integer(self.ui.crt_e_le.text()),
+                    (
+                        Integer(self.ui.crt_p_len_le.text()),
+                        Integer(self.ui.crt_dq_len_le.text()),
+                    ),
+                    (None,),
+                )
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
 
             方法 = self.ui.crt_atk_cb.currentIndex()
-            攻击函数 = [mns21lsb, mns22msb, mns22lsb]
+            攻击函数 = [mns21lsb, mns22msb, mns22lsb, tlp17small_e, tlp17large_e]
 
             攻击函数[方法]()
 
