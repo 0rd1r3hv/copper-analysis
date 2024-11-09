@@ -105,7 +105,6 @@ def solve_copper(
         except subprocess.CalledProcessError as e:
             print(e)
             return
-
         print(f"Flatter 约化完成！用时 {round(time() - start, 3)}s.")
 
     L = L.change_ring(QQ)

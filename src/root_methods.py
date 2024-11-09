@@ -10,7 +10,7 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
     varlst = vector(R.gens())
     num = R.ngens()
     p = random_prime((1 << 29) - 1, True, 1 << (29 - 1))
-    R = R.change_ring(GF(p))
+    R = R.change_ring(GF(p), order='degrevlex')
     ZM = Zmod(p)
     fails = 0
     while fails < max_fails:

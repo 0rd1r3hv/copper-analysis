@@ -17,7 +17,7 @@ from src.ernst05 import mixed_1, mixed_2
 from src.practical_bounds import *
 from src.mn23 import *
 
-test = True
+test = False
 
 
 def get_prime(length, proof=False):
@@ -469,4 +469,4 @@ def mn23(n, k, m):
 # print(tk14_mixed_test(0.4, 0.19, 0.1, 512, brute=False, triangluarize=True))
 # print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.3, 512))
 # print(ernst05_mixed_1_test(0.4, 0.16, 0.1, 512))
-print(ernst05_mixed_2_test(0.7, 0.05, 0, 512))
+# print(ernst05_mixed_2_test(0.7, 0.1, 0.05, 512))

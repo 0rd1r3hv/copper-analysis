@@ -8,7 +8,7 @@ from src.practical_bounds import ernst05_eq1, ernst05_eq2
 # test = [x, y, z]
 # a * x + b * y + c * y * z + d = 0
 def eq1(coefs, bounds, params, test):
-    x, y, z = PolynomialRing(ZZ, "x, y, z", order="degrevlex").gens()
+    x, y, z = PolynomialRing(ZZ, "x, y, z", order="lex").gens()
     a, b, c, d = coefs
     f0 = a * x + b * y + c * y * z + d
     X, Y, Z, W = assure_coprime(bounds + [poly_norm(f0, bounds, "inf")], d)
@@ -19,8 +19,8 @@ def eq1(coefs, bounds, params, test):
         m, t = params
     n = (X * Y * Z) ** m * Z**t * W
     f = (inverse_mod(d, n) * f0) % n
-    shifts = []
     monomials = []
+    shifts = []
     for i in range(m + 2):
         j = m + 1 - i
         for k in range(j + t + 1):
@@ -30,7 +30,7 @@ def eq1(coefs, bounds, params, test):
     shifts2 = []
     for i in range(m + 1):
         for j in range(m - i + 1):
-            for k in range(j + 1):
+            for k in range(j + t + 1):
                 monomials2.append(x**i * y**j * z**k)
                 shifts2.append(
                     x**i
@@ -41,23 +41,8 @@ def eq1(coefs, bounds, params, test):
                     * Y ** (m - j)
                     * Z ** (m + t - k)
                 )
-    monomials3 = []
-    shifts3 = []
-    for i in range(m + 1):
-        for j in range(m - i + 1):
-            for k in range(j + 1, j + t + 1):
-                monomials3.append(x**i * y**j * z**k)
-                shifts3.append(
-                    x**i
-                    * y**j
-                    * z**k
-                    * f
-                    * X ** (m - i)
-                    * Y ** (m - j)
-                    * Z ** (m + t - k)
-                )
-    monomials += sorted(monomials2, reverse=True) + sorted(monomials3, reverse=True)
-    shifts += sorted(shifts2, reverse=True) + sorted(shifts3, reverse=True)
+    monomials += sorted(monomials2, reverse=True)
+    shifts += sorted(shifts2, reverse=True)
     return solve_copper(
         shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0], monomials=monomials
     )
@@ -66,11 +51,10 @@ def eq1(coefs, bounds, params, test):
 # test = [x, z, y]
 # a * x + b * y + c * y * z + d * z + e = 0
 def eq2(coefs, bounds, params, test):
-    x, z, y = PolynomialRing(ZZ, "x, z, y", order="degrevlex").gens()
+    x, y, z = PolynomialRing(ZZ, "x, y, z", order="lex").gens()
     a, b, c, d, e = coefs
     f0 = a * x + b * y + c * y * z + d * z + e
-    X, Y, Z = assure_coprime(bounds, e)
-    W, = assure_coprime([poly_norm(f0, [X, Z, Y], "inf")], e)
+    X, Y, Z, W = assure_coprime(bounds + [poly_norm(f0, bounds, "inf")], e)
     if None in params:
         m, t = ernst05_eq2(bounds + [W])
     else:
@@ -89,10 +73,10 @@ def eq2(coefs, bounds, params, test):
         for k in range(m - i + 1):
             monomials.append(x**i * y**j * z**k)
             shifts.append(n * x**i * y**j * z**k)
-    shifts2 = []
     monomials2 = []
+    shifts2 = []
     for i in range(m + 1):
-        for j in range(m - i + 1):
+        for j in range(m + t - i + 1):
             for k in range(m - i + 1):
                 monomials2.append(x**i * y**j * z**k)
                 shifts2.append(
@@ -104,24 +88,9 @@ def eq2(coefs, bounds, params, test):
                     * Y ** (m + t - j)
                     * Z ** (m - k)
                 )
-    shifts3 = []
-    monomials3 = []
-    for i in range(m + 1):
-        for j in range(m - i + 1, m + t - i + 1):
-            for k in range(m - i + 1):
-                monomials3.append(x**i * y**j * z**k)
-                shifts3.append(
-                    x**i
-                    * y**j
-                    * z**k
-                    * f
-                    * X ** (m - i)
-                    * Y ** (m + t - j)
-                    * Z ** (m - k)
-                )
-    monomials += sorted(monomials2, reverse=True) + sorted(monomials3, reverse=True)
-    shifts += sorted(shifts2, reverse=True) + sorted(shifts3, reverse=True)
-    return solve_copper(shifts, min(zip(bounds, [x, y, z])), [X, Z, Y], test, ex_pols=[f0], monomials=monomials)
+    monomials += sorted(monomials2, reverse=True)
+    shifts += sorted(shifts2, reverse=True)
+    return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0], monomials=monomials)
 
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t], test = [p]
@@ -173,8 +142,8 @@ def mixed_2(N, e, leaks, lens, params=None, test=None):
         d = inverse_mod(e, N + 1 - p_q)
         test = [
             (d - d_m - d_l) >> len_l,
-            (p_q - s - ((N + 1 - s) % 4)) >> 2,
             (e * d - 1) // (N + 1 - p_q) - k0,
+            (p_q - s - ((N + 1 - s) % 4)) >> 2,
         ]
     res = eq2(coefs, bounds, params, test)
     if res:
