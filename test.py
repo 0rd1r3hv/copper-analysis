@@ -441,7 +441,7 @@ def mn23_automated_test(n, k):
     return res == solutions_verify
 
 
-# ernst05_mixed_1_test()
+ernst05_mixed_1_test(0.4, 0.14, 0.1, 512)
 # ernst05_mixed_2_test()
 # tk14_high_leak_test()
 # tk14_low_leak_1_test()

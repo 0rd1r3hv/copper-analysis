@@ -133,6 +133,9 @@ class 主窗(QMainWindow):
                         Integer(self.ui.lsb_len_le.text()),
                     ),
                     (None, None),
+                    test=False,
+                    brute=False,
+                    triangluarize=True,
                 )
                 print(
                     f"""攻击成功！私钥 d = 
