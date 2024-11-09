@@ -56,11 +56,11 @@ def small_e_dp_dq_with_msb(N, e, leaks, lens):
         delt = sqrt(s ** 2 - 4 * kl)
     k = (s + delt) >> 1
     len_k = k.nbits()
-    dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], len_e=len_e, raw=True)
+    dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], [None], len_e=len_e, raw=True)
     if dp_l is None:
         k = (s - delt) >> 1
         len_k = k.nbits()
-        dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], len_e=len_e, raw=True)
+        dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], [None], len_e=len_e, raw=True)
     if dp_l:
         dp = dp_m + dp_l
         p = (e * dp - 1) // k + 1
@@ -108,7 +108,7 @@ def small_e_dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
         test = [k, ll]
     k = solve_copper(shifts, [X, x], [X, Y], test, monomials=monomials)
     if k:
-        dp_m = mixed_kp(N, k, [0, ((e * dp_l + k - 1) * inverse_mod(e, k * N)) % (k * N)], [len_k + len_N // 2, 0, len_low], len_e=len_e)
+        dp_m = mixed_kp(N, k, [0, ((e * dp_l + k - 1) * inverse_mod(e, k * N)) % (k * N)], [len_k + len_N // 2, 0, len_low], [None], len_e=len_e)
         if dp_m:
             dp = (dp_m << len_low) + dp_l
             p = (e * dp - 1) // k + 1

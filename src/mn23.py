@@ -45,5 +45,5 @@ def automated(pols, bound_var, bounds, monomials, modulus, m, test=None):
         shifts.append(shift * modulus ** (m - sum(opt_exps)))
     print("格行列式中各项幂次：")
     print(f"s_X = {g.degree(x)}, s_Y = {g.degree(y)}, s_Z = {g.degree(z)}, s_M = {s_M}")
-    res = solve_copper(shifts, bound_var, bounds, test)
+    res = solve_copper(shifts, bound_var, bounds, test, variety=True)
     return res

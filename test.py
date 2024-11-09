@@ -17,8 +17,10 @@ from src.ernst05 import mixed_1, mixed_2
 from src.practical_bounds import *
 from src.mn23 import *
 
+test = True
 
-def get_prime(length, proof=True):
+
+def get_prime(length, proof=False):
     return random_prime((1 << length) - 1, proof, 1 << (length - 1))
 
 
@@ -141,7 +143,11 @@ def ernst05_mixed_1_test(beta, delta, kappa, len_fac):
     len_m = ceil(2 * len_fac * (beta - delta - kappa))
     len_l = ceil(2 * len_fac * kappa)
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
-    return mixed_1(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+    if test:
+        return mixed_1(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+    else:
+        return mixed_1(N, e, [d_m, d_l], [len_d, len_m, len_l], [None]) == d
+
 
 
 def ernst05_mixed_2_test(beta, delta, kappa, len_fac):
@@ -152,22 +158,33 @@ def ernst05_mixed_2_test(beta, delta, kappa, len_fac):
     len_m = ceil(2 * len_fac * (beta - delta - kappa))
     len_l = ceil(2 * len_fac * kappa)
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
-    return mixed_2(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+    if test:
+        return mixed_2(N, e, [d_m, d_l], [len_d, len_m, len_l], [None], [p]) == d
+    else:
+        return mixed_2(N, e, [d_m, d_l], [len_d, len_m, len_l], [None]) == d
 
 
-def tk14_msb_1_test(beta, delta, len_fac):
-    # print(f"tk14_msb_1_test beta: {beta}, delta: {delta}, len_fac: {len_fac}")
+def tk14_msb_1_test(beta, delta, len_fac, test=True):
+    print(f"tk14_msb_1_test beta: {beta}, delta: {delta}, len_fac: {len_fac}")
     len_d = ceil(2 * len_fac * beta)
     len_m = ceil(2 * len_fac * (beta - delta))
     len_l = 0
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
+    '''
     with open("tk14_msb_1_test.txt", "w", encoding="utf-8") as file:
         file.write(
             f"len_d: {len_d}\nlen_m: {len_m}\nlen_l: {len_l}\np: {p}\nN: {N}\ne: {e}\nd: {d}\nd_m: {d_m}\nd_l: {d_l}"
         )
-    res = msb_1(N, e, [d_m], [len_d, len_m], [None], [p])
+    '''
+    if test:
+        res = msb_1(N, e, [d_m], [len_d, len_m], [None], [p])
+    else:
+        res = msb_1(N, e, [d_m], [len_d, len_m], [None])
+    return res == d
+    '''
     if res == d:
         print(f"攻击成功！\nd = {d}\np = {p}\nq = {N // p}")
+    '''
 
 
 def tk14_lsb_test(beta, delta, len_fac):
@@ -177,7 +194,10 @@ def tk14_lsb_test(beta, delta, len_fac):
     len_m = 0
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
     print(f"N: {N}, e: {e}, d_len: {len_d}, lsb_len: {len_l}, lsb: {d_l}")
-    return lsb(N, e, [d_l], [len_d, len_l], [None], [p]) == d
+    if test:
+        return lsb(N, e, [d_l], [len_d, len_l], [None], [p]) == d
+    else:
+        return lsb(N, e, [d_l], [len_d, len_l], [None]) == d
 
 
 def tk14_mixed_test(beta, delta, kappa, len_fac, brute, triangluarize):
@@ -188,50 +208,68 @@ def tk14_mixed_test(beta, delta, kappa, len_fac, brute, triangluarize):
     len_m = ceil(2 * len_fac * (beta - delta - kappa))
     len_l = ceil(2 * len_fac * kappa)
     p, N, e, d, d_m, d_l = get_partial_test(len_fac, len_d, len_m, len_l)
-    return (
-        mixed(
-            N,
-            e,
-            [d_m, d_l],
-            [len_d, len_m, len_l],
-            [None],
-            [p],
-            brute=brute,
-            triangluarize=triangluarize,
-        )
-        == d
-    )
+    if test:
+        res = mixed(
+                N,
+                e,
+                [d_m, d_l],
+                [len_d, len_m, len_l],
+                [None],
+                [p],
+                brute=brute,
+                triangluarize=triangluarize,
+            )
+    else:
+        res = mixed(
+                N,
+                e,
+                [d_m, d_l],
+                [len_d, len_m, len_l],
+                [None],
+                brute=brute,
+                triangluarize=triangluarize,
+            )
+    return res == d
 
 
-def tk17_large_e_test(alpha, beta, delta, len_N):
-    print(f"tk17_large_e_test alpha: {alpha}, beta: {beta}, delta: {delta}")
+def tlp17_large_e_test(alpha, beta, delta, len_N):
+    print(f"tlp17_large_e_test alpha: {alpha}, beta: {beta}, delta: {delta}")
     len_dq = ceil(len_N * delta)
     len_p = ceil(len_N * beta)
     len_e = ceil(len_N * alpha)
     p, N, e, dq = get_crt_1_test(len_N, len_e, len_dq, len_p)
-    res = large_e(N, e, [len_p, len_dq], [None], test=[p])
+    if test:
+        res = large_e(N, e, [len_p, len_dq], [None], test=[p])
+    else:
+        res = large_e(N, e, [len_p, len_dq], [None])
     return res == p
 
 
-def tk17_small_e_test(alpha, beta, delta, len_N):
-    print(f"tk17_small_e_test alpha: {alpha}, beta: {beta}, delta: {delta}")
+def tlp17_small_e_test(alpha, beta, delta, len_N):
+    print(f"tlp17_small_e_test alpha: {alpha}, beta: {beta}, delta: {delta}")
     len_dq = ceil(len_N * delta)
     len_p = ceil(len_N * beta)
     len_e = ceil(len_N * alpha)
     p, N, e, dq = get_crt_1_test(len_N, len_e, len_dq, len_p)
-    res = small_e(N, e, [len_p, len_dq], [None], test=[p])
+    if test:
+        res = small_e(N, e, [len_p, len_dq], [None], test=[p])
+    else:
+        res = small_e(N, e, [len_p, len_dq], [None])
     return res == p
 
 
-def tk17_small_dp_dq_test(delta1, delta2, len_fac):
+def tlp17_small_dp_dq_test(delta1, delta2, len_fac):
     print(
-        f"tk17_small_dp_dq_test delta1: {delta1}, delta2: {delta2}, len_fac: {len_fac}"
+        f"tlp17_small_dp_dq_test delta1: {delta1}, delta2: {delta2}, len_fac: {len_fac}"
     )
     len_dp = ceil(2 * len_fac * delta1)
     len_dq = ceil(2 * len_fac * delta2)
     len_l = 0
     p, N, e, dp, dq, dp_l, dq_l = get_crt_partial_test(len_fac, len_dp, len_dq, len_l)
-    res = small_dp_dq(N, e, [len_dp, len_dq], [None], test=[p])
+    if test:
+        res = small_dp_dq(N, e, [len_dp, len_dq], [None], test=[p])
+    else:
+        res = small_dp_dq(N, e, [len_dp, len_dq], [None])
     return res == p or res == N // p
 
 
@@ -277,7 +315,7 @@ def mns22_small_e_dp_dq_with_msb_test(alpha, delta, len_fac):
     len_dp = dp.nbits()
     len_dq = dq.nbits()
     res = small_e_dp_dq_with_msb(N, e, [dp_m, dq_m], [len_dp, len_dq, len_dp_m, len_dq_m])
-    return res == p
+    return res == p or res == q
 
 
 def mns22_small_e_dp_dq_with_lsb_test(alpha, delta, len_fac):
@@ -287,7 +325,10 @@ def mns22_small_e_dp_dq_with_lsb_test(alpha, delta, len_fac):
     p, N, e, dp, dq, dp_m, dq_m, dp_l, dq_l = get_crt_partial_control_e_test(len_fac, len_e, len_dp_m, len_dq_m, len_l)
     len_dp = dp.nbits()
     len_dq = dq.nbits()
-    res = small_e_dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
+    if test:
+        res = small_e_dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None], test=[p])
+    else:
+        res = small_e_dp_dq_with_lsb(N, e, [dp_l, dq_l], [len_dp, len_dq, len_l], [None])
     return res == p
 
 
@@ -360,9 +401,9 @@ def mn23(n, k, m):
 # tk14_high_leak_test()
 # tk14_low_leak_1_test()
 # tk14_low_leak_2_test()
-# tk17_large_e_test()
-# tk17_small_e_test()
-# tk17_small_dp_dq_test()
+# tlp17_large_e_test()
+# tlp17_small_e_test()
+# tlp17_small_dp_dq_test()
 # mns21_test()
 # tk14_msb_1(0.3, 0.25)
 # tk14_msb_1_test(0.37, 0.216, 512)
@@ -413,10 +454,19 @@ def mn23(n, k, m):
 # mns22_mixed_kp_test(0.5, 0.1, 0.347, 0.1, 1024)
 # mn23(512, 300, 6)
 
-# print(tk17_large_e_test(1, 0.29, 0.11, 1024))
-# print(tk17_small_e_test(0.6, 0.5, 0.05, 1024))
+# print(tlp17_large_e_test(1, 0.29, 0.11, 1024))
+# print(tlp17_small_e_test(0.6, 0.5, 0.05, 1024))
 # print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.32, 512))
 # print(mns22_small_e_dp_dq_with_msb_test(1 / 12, 0.32, 512))
 # print(hg_cop_test(1 / 2, 0.18, 1024, 5, 'cop'))
 # print(hg_cop_test(1 / 2, 0.115, 1024, 2, 'hg'))
-print(tk14_lsb_test(0.3, 0.25, 512))
+
+# print(tk14_lsb_test(0.3, 0.26, 512))
+# print(tlp17_small_dp_dq_test(0.03, 0.03, 512))
+# print(tk14_msb_1_test(0.292, 0.26, 512))
+# print(tlp17_large_e_test(1, 0.29, 0.20, 1024))
+# print(tlp17_small_e_test(0.6, 0.5, 0.05, 1024))
+# print(tk14_mixed_test(0.4, 0.19, 0.1, 512, brute=False, triangluarize=True))
+# print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.3, 512))
+# print(ernst05_mixed_1_test(0.4, 0.16, 0.1, 512))
+print(ernst05_mixed_2_test(0.7, 0.05, 0, 512))

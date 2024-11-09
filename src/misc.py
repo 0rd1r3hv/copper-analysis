@@ -42,7 +42,7 @@ def reduce_varsize(N):
 
 
 def solve_copper(
-    shifts, bound_var, bounds, test=None, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False
+    shifts, bound_var, bounds, test=None, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False, variety=False, restrict=False
 ):
     if select_num is None:
         select_num = len(shifts)
@@ -111,15 +111,17 @@ def solve_copper(
     L = L.change_ring(QQ)
     for col, scale in enumerate(scales):
         L.rescale_col(col, 1 / scale)
+    pols = L.change_ring(ZZ)[: select_num + 1] * monomials
+    deg = max(pols, key=lambda e: e.degree()).degree()
     selected = list(
         filter(
-            lambda e: test is None or e(test) == 0,
-            L.change_ring(ZZ)[: select_num + 1] * monomials,
+            lambda e: (e.degree() >= deg - 1 and e.degree() >= 1) and (test is None or e(test) == 0),
+            pols,
         )
     )
     if len(bounds) > 1:
         # return groebner(ex_pols + selected, bound_var, N=N)
-        return groebner(selected, bound_var, ex_pols=ex_pols)
+        return groebner(selected, bound_var, ex_pols=ex_pols, variety=variety, restrict=restrict)
     else:
         print(f"开始求解单变元方程…")
         start = time()

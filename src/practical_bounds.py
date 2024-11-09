@@ -44,6 +44,7 @@ def ernst05_eq1(bounds=None, props=None):
 def ernst05_eq2(bounds=None, props=None):
     if bounds:
         x, y, z, w = calc_bits(bounds)
+        print(x, y, z, w)
     else:
         x, y, z, w = props
     for m in range(1, MAX_M + 1):

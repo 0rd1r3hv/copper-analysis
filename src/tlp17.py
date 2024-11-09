@@ -269,5 +269,7 @@ def small_dp_dq(N, e, lens, params, test=None):
         ex_pols=[N - yp * yq, xp1 - xq1 + 1, xp2 - xq2 - 1],
         monomials=monomials,
         N=N,
+        variety=True,
+        restrict=True
     )
     return res
