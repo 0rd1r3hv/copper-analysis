@@ -119,7 +119,6 @@ def solve_copper(
         )
     )
     if len(bounds) > 1:
-        # return groebner(ex_pols + selected, bound_var, N=N)
         return groebner(selected, bound_var, ex_pols=ex_pols, variety=variety, restrict=restrict, all_sols=all_sols)
     else:
         print(f"开始求解单变元方程…")
