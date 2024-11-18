@@ -196,5 +196,5 @@ def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
         test,
         ex_pols=[N - yp * yq, xp - xq - 1, zp - zq + 1],
         monomials=monomials,
-        N=N,
+        restrict=True,
     )

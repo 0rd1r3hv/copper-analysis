@@ -3,7 +3,7 @@ from time import time
 from random import sample, choice
 
 
-def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=False):
+def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=False, all_sols=False):
     start = time()
     bound, var = bound_var
     R = pols[0].parent()
@@ -17,6 +17,7 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
         len_selected = num + 1 - len(ex_pols)
     else:
         len_selected = min(pols[0].degree() - len(ex_pols), len(pols))
+        print(len_selected)
     while fails < max_fails:
         selected = ex_pols + sample(pols, len_selected)
         try:
@@ -50,7 +51,10 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
         v -= J.change_ring(R)(list(v)).solve_right(f.change_ring(R)(list(v)))
     if fails < max_fails:
         print(f"求解成功！用时 {round(time() - start, 3)}s")
-        for i, v_ in enumerate(varlst):
-            if v_ == var:
-                return Integer(v[i])
+        if all_sols:
+            return [Integer(val) for val in v]
+        else:
+            for i, v_ in enumerate(varlst):
+                if v_ == var:
+                    return Integer(v[i])
 

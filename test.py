@@ -351,6 +351,7 @@ def mns22_small_e_dp_dq_with_lsb_test(alpha, delta, len_fac):
     return res == p
 
 
+'''
 def mn23_automated_test(n, k, m):
 
 
@@ -392,6 +393,52 @@ def mn23_automated_test(n, k, m):
     res = automated(polys, [X, x], bounds, (prod(polys) ** i).monomials(), p, 3 * i, solutions_verify)
     if res:
         print(f"攻击成功！\nx = {A_LSB}\ny = {B_LSB}\nz = {C_LSB}")
+'''
+
+
+def mn23_automated_test(n, k):
+
+
+    def split(x, bits):
+        lsb = (x % (1 << bits))
+        msb = x - lsb
+        return msb, lsb
+
+
+    p = next_prime(ZZ.random_element(1 << (n - 1), 1 << n))
+    while p % 4 != 3:
+        p = next_prime(p + 1)
+
+    A = ZZ(GF(p).random_element())
+    B = (2 * (A + 6) * inverse_mod(-A + 2, p)) % p
+    C = (2 * (A - 6) * inverse_mod(A + 2, p)) % p
+
+    unknown_bits = n - k
+
+    A_MSB, A_LSB = split(A, unknown_bits)
+    B_MSB, B_LSB = split(B, unknown_bits)
+    C_MSB, C_LSB = split(C, unknown_bits)
+
+    x, y, z = ZZ['x, y, z'].gens()
+
+    f = (A_MSB + x)*(B_MSB + y) + 2 * (A_MSB + x) - 2 * (B_MSB + y) + 12
+    g = (C_MSB + z)*(B_MSB + y) + 2 * (B_MSB + y) - 2 * (C_MSB + z) + 12
+    h = (A_MSB + x)*(C_MSB + z) - 2 * (A_MSB + x) + 2 * (C_MSB + z) + 12
+
+    polys = [f, g, h]
+    len_bounds = [unknown_bits] * 3
+    solutions_verify = [A_LSB, B_LSB, C_LSB]
+    '''
+    with open('mn23.txt', "w", encoding="utf-8") as file:
+        file.write(f"p: {p}\nm: {m}\nf: {str(f)}\ng: {str(g)}\nh: {str(h)}\nx: {A_LSB}\ny: {B_LSB}\nz: {C_LSB}")
+    '''
+    str_vars = 'x, y, z'
+    str_pols = [str(pol) for pol in polys]
+    if test:
+        res = automated(str_vars, str_pols, len_bounds, p, test=solutions_verify)
+    else:
+        res = automated(str_vars, str_pols, len_bounds, p)
+    return res == solutions_verify
 
 
 # ernst05_mixed_1_test()
@@ -461,7 +508,8 @@ def mn23_automated_test(n, k, m):
 # print(tlp17_large_e_test(1, 0.29, 0.19, 1024))
 # print(tlp17_small_e_test(0.6, 0.5, 0.06, 1024))
 # print(tlp17_small_dp_dq_test(0.03, 0.03, 512))
-print(mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512))
+# print(mns21_dp_dq_with_lsb_test(0.07, 0.07, 0.03, 512))
 # print(mns22_mixed_kp_test(0.55, 0.05, 0.346, 0.1, 512))
 # print(mns22_small_e_dp_dq_with_msb_test(1 / 12, 0.32, 512))
 # print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.31, 512))
+print(mn23_automated_test(512, 318))
