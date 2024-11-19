@@ -499,7 +499,7 @@ def mn23_automated_test(n, k):
 # mn23(512, 300, 6)
 
 # print(hg_cop_test(1 / 2, 0.18, 1024, 5, 'cop'))
-# print(hg_cop_test(1 / 2, 0.07, 1024, 3, 'hg'))
+print(hg_cop_test(1 / 2, 0.07, 1024, 3, 'hg'))
 # print(ernst05_mixed_1_test(0.4, 0.16, 0.1, 512))
 # print(ernst05_mixed_2_test(0.7, 0.06, 0.05, 512))
 # print(tk14_msb_1_test(0.292, 0.26, 512))
@@ -512,4 +512,4 @@ def mn23_automated_test(n, k):
 # print(mns22_mixed_kp_test(0.55, 0.05, 0.346, 0.1, 512))
 # print(mns22_small_e_dp_dq_with_msb_test(1 / 12, 0.32, 512))
 # print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.31, 512))
-print(mn23_automated_test(512, 318))
+# print(mn23_automated_test(512, 318))

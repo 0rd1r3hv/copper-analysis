@@ -30,6 +30,7 @@ def univariate(f, len_X, len_p, N, params):
 
 # lens = [len X], params = [m]
 def cop(f, N, lens, params, test=None):
+    print("开始执行 Coppersmith 模 N 单变元方程攻击…")
     len_X, = lens
     PR = ZZ['x']
     f = PR(f)
@@ -38,6 +39,7 @@ def cop(f, N, lens, params, test=None):
 
 # lens = [len X, len p], params = [m, t]
 def hg(f, N, lens, params):
+    print("开始执行 Howgrave-Graham 模 N 未知因子的单变元方程攻击…")
     len_X, len_p = lens
     PR = ZZ['x']
     f = PR(f)

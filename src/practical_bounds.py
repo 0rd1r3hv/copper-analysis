@@ -37,14 +37,16 @@ def ernst05_eq1(bounds=None, props=None):
                     sw += 1
                     dim += 1
             if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * z + w):
-                print(f"sx: {sx} sy: {sy} sz: {sz} sw: {sw} dim: {dim} m: {m} t: {t}")
+                print(f"自动使用攻击参数：\nm = {m}, t = {t}")
+                print(f"格的维度：\ndim = {dim}")
+                print("格行列式中各项幂次：")
+                print(f"s_W = {sw}, s_X = {sx}, s_Y = {sy}, s_Z = {sz}")
                 return m, t
 
 
 def ernst05_eq2(bounds=None, props=None):
     if bounds:
         x, y, z, w = calc_bits(bounds)
-        print(x, y, z, w)
     else:
         x, y, z, w = props
     for m in range(1, MAX_M + 1):
@@ -73,7 +75,10 @@ def ernst05_eq2(bounds=None, props=None):
                     sw += 1
                     dim += 1
             if sx * x + sy * y + sz * z + sw * w < dim * (m * (x + y + z) + t * y + w):
-                print(f"sx: {sx} sy: {sy} sz: {sz} sw: {sw} dim: {dim} m: {m} t: {t}")
+                print(f"自动使用攻击参数：\nm = {m}, t = {t}")
+                print(f"格的维度：\ndim = {dim}")
+                print("格行列式中各项幂次：")
+                print(f"s_W = {sw}, s_X = {sx}, s_Y = {sy}, s_Z = {sz}")
                 return m, t
 
 
@@ -99,10 +104,8 @@ def tk14_msb_1(beta, gamma):
                 s_e += m - u
                 n += 1
         if s_X * gamma + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e < n * m:
-            print("自动使用攻击参数：")
-            print(f"m = {m}")
-            print("格的维度：")
-            print(f"dim = {n}")
+            print(f"自动使用攻击参数：\nm = {m}")
+            print(f"格的维度：\ndim = {n}")
             print("格行列式中各项幂次：")
             print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}")
             return m
@@ -132,17 +135,14 @@ def tk14_lsb(beta, gamma):
         if s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (
             beta - gamma
         ) < n * m * (1 + beta - gamma):
-            print(
-                f"s_X: {s_X} s_Y: {s_Y} s_Z: {s_Z} s_e: {s_e} s_M: {s_M} n: {n} m: {m}"
-            )
-            print(
-                f"s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) - n * m * (1 + beta - gamma): {(s_X * beta + s_Y * 1 / 2 + s_Z * (beta + 1 / 2) + s_e + s_M * (beta - gamma) - n * m * (1 + beta - gamma)) / n}"
-            )
+            print(f"自动使用攻击参数：\nm = {m}")
+            print(f"格的维度：\ndim = {n}")
+            print("格行列式中各项幂次：")
+            print(f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_e}, s_M = {s_M}")
             return m
 
 
 def tk14_mixed(beta, delta, eta=Rational("1/2")):
-    print(f"beta: {beta} delta: {delta} eta: {eta}")
     for m in range(1, MAX_M + 1):
         for t in range(m + 1):
             s_w = s_x = s_y = s_em = dim = 0
@@ -162,34 +162,10 @@ def tk14_mixed(beta, delta, eta=Rational("1/2")):
                     s_em += m - u
                     dim += 1
             if s_w * beta + s_x * delta + s_y * eta + s_em < dim * m:
-                print(
-                    f"s_w: {s_w} s_x: {s_x} s_y: {s_y} s_em: {s_em} dim: {dim} m: {m} t: {t}"
-                )
-                return m, t
-
-
-def tk14_low_2(kbeta, gamma):
-    for m in range(1, MAX_M + 1):
-        for t in range(m + 1):
-            s_X = s_Y = s_eM = n = 0
-            for u in range(m + 1):
-                for i in range(u + 1):
-                    s_X += u
-                    s_Y += i
-                    s_eM += m - i
-                    n += 1
-                for j in range(1, t):
-                    s_X += u
-                    s_Y += u + j
-                    s_eM += m - u
-                    n += 1
-            if s_X * kbeta + s_Y * 1 / 2 + s_eM * (1 + kbeta - gamma) < n * m * (
-                1 + kbeta - gamma
-            ):
-                print(f"s_X: {s_X} s_Y: {s_Y} s_eM: {s_eM} n: {n} m: {m}")
-                print(
-                    f"s_X * kbeta + s_Y * 1 / 2 + s_eM * (1 + kbeta - gamma) - n * m * (1 + kbeta - gamma): {s_X * kbeta + s_Y * 1 / 2 + s_eM * (1 + kbeta - gamma) - n * m * (1 + kbeta - gamma)}"
-                )
+                print(f"自动使用攻击参数：\nm = {m}, t = {t}")
+                print(f"格的维度：\ndim = {dim}")
+                print("格行列式中各项幂次：")
+                print(f"s_W = {s_w}, s_X = {s_x}, s_Y = {s_y}, s_eM = {s_em}")
                 return m, t
 
 
@@ -223,13 +199,10 @@ def tlp17_large_e(alpha, beta, delta):
                 + s_e * alpha
                 < n * m * alpha
             ):
-                print(f"s_X: {s_X} s_Yp: {s_Yp} s_Yq: {s_Yq} s_e: {s_e} n: {n} m: {m}")
-                print(
-                    f"s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha: {(s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha) / n}"
-                )
-                print(
-                    f"alpha + beta + delta - 1: {alpha + beta + delta - 1} beta: {beta} 1 - beta: {1 - beta} alpha: {alpha}"
-                )
+                print(f"自动使用攻击参数：\nm = {m}, t = {t}")
+                print(f"格的维度：\ndim = {n}")
+                print("格行列式中各项幂次：")
+                print(f"s_X = {s_X}, s_Yp = {s_Yp}, s_Yq = {s_Yq}, s_e = {s_e}")
                 return m, t
 
 
@@ -258,13 +231,10 @@ def tlp17_small_e(alpha, beta, delta):
             + s_e * alpha
             < n * m * alpha
         ):
-            print(f"s_X: {s_X} s_Yp: {s_Yp} s_Yq: {s_Yq} s_e: {s_e} n: {n} m: {m}")
-            print(
-                f"s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha: {(s_X * (alpha + beta + delta - 1) + s_Yp * beta + s_Yq * (1 - beta) + s_e * alpha - n * m * alpha) / n}"
-            )
-            print(
-                f"alpha + beta + delta - 1: {alpha + beta + delta - 1} beta: {beta} 1 - beta: {1 - beta} alpha: {alpha}"
-            )
+            print(f"自动使用攻击参数：\nm = {m}")
+            print(f"格的维度：\ndim = {n}")
+            print("格行列式中各项幂次：")
+            print(f"s_X = {s_X}, s_Yp = {s_Yp}, s_Yq = {s_Yq}, s_e = {s_e}")
             return m
 
 
@@ -309,10 +279,10 @@ def tlp17_small_dp_dq(alpha, delta):
                     s_Y += (i1 + i2) // 2 + j2
                     s_e += m - (i1 + i2)
         if s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha < n * m * alpha:
-            print(f"s_X: {s_X} s_Y: {s_Y} s_e: {s_e} n: {n} m: {m}")
-            print(
-                f"s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha - n * m * alpha: {(s_X * (alpha + delta - 1 / 2) + s_Y / 2 + s_e * alpha - n * m * alpha) / n}"
-            )
+            print(f"自动使用攻击参数：\nm = {m}")
+            print(f"格的维度：\ndim = {n}")
+            print("格行列式中各项幂次：")
+            print(f"s_X = {s_X}, s_Y = {s_Y}, s_e = {s_e}")
             return m
 
 
@@ -405,8 +375,8 @@ def mns21_dp_dq_with_lsb(alpha, delta1, delta2, leak):
             if s_X * (alpha + delta1 - 1 / 2) + s_Y / 2 + s_Z * (
                 alpha + delta2 - 1 / 2
             ) + s_M * leak + s_eM * (alpha + leak) < dim * 2 * m * (alpha + leak):
-                print(f"自动使用攻击参数：m = {m}, s = {thres}")
-                print(f"格的维度：dim = {dim}")
+                print(f"自动使用攻击参数：\nm = {m}, s = {thres}")
+                print(f"格的维度：\ndim = {dim}")
                 print("格行列式中各项幂次：")
                 print(
                     f"s_X = {s_X}, s_Y = {s_Y}, s_Z = {s_Z}, s_e = {s_eM}, s_M = {s_eM + s_M}"
@@ -429,8 +399,8 @@ def mns22_mixed_kp(beta, mu, delta):
                 s_k += t - i
                 dim += 1
             if s_X * delta + s_k * mu + s_N < dim * ((m + t) * mu + m * beta):
-                print(f"自动使用攻击参数：m = {m}, t = {t}")
-                print(f"格的维度：dim = {dim}")
+                print(f"自动使用攻击参数：\nm = {m}, t = {t}")
+                print(f"格的维度：\ndim = {dim}")
                 print("格行列式中各项幂次：")
                 print(f"s_X = {s_X}, s_k = {s_k}, s_N = {s_N}")
                 return m, t
@@ -453,8 +423,8 @@ def cop96_univariate(beta, delta, deg):
             s_X += m * deg + i
             dim += 1
             if s_X * delta + s_N < dim * m * beta:
-                print(f"自动使用攻击参数：m = {m}, t = {i}")
-                print(f"格的维度：dim = {dim}")
+                print(f"自动使用攻击参数：\nm = {m}, t = {i}")
+                print(f"格的维度：\ndim = {dim}")
                 print("格行列式中各项幂次：")
                 print(f"s_X = {s_X}, s_N = {s_N}")
                 return m, i

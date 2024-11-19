@@ -1,4 +1,4 @@
-from sage.all import floor, sqrt, ZZ, inverse_mod, PolynomialRing, Matrix
+from sage.all import floor, sqrt, ZZ, inverse_mod, PolynomialRing, Matrix, Rational
 from src.misc import solve_copper, assure_coprime, poly_norm
 from src.practical_bounds import ernst05_eq1, ernst05_eq2
 # from src.mp import groebner
@@ -14,6 +14,7 @@ def eq1(coefs, bounds, params, test):
     X, Y, Z, W = assure_coprime(bounds + [poly_norm(f0, bounds, "inf")], d)
     bounds = [X, Y, Z]
     if None in params:
+        print("未指定攻击参数，自动选择攻击参数'm', 't'…")
         m, t = ernst05_eq1(bounds + [W])
     else:
         m, t = params
@@ -56,6 +57,7 @@ def eq2(coefs, bounds, params, test):
     f0 = a * x + b * y + c * y * z + d * z + e
     X, Y, Z, W = assure_coprime(bounds + [poly_norm(f0, bounds, "inf")], e)
     if None in params:
+        print("未指定攻击参数，自动选择攻击参数'm', 't'…")
         m, t = ernst05_eq2(bounds + [W])
     else:
         m, t = params
@@ -95,12 +97,23 @@ def eq2(coefs, bounds, params, test):
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t], test = [p]
 def mixed_1(N, e, leaks, lens, params=None, test=None):
+    print("开始执行 Ernst, Jochemsz, May, Weger 的 d 高低位混合泄露攻击1…")
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))
     s_r = (1 << len_p) + N // (1 << len_p)
     s = (s_l + s_r) >> 1
     A = N + 1 - s - ((N + 1 - s) % 4)
     len_d, len_m, len_l = lens
+    len_N = N.nbits()
+    len_e = e.nbits()
+    alpha = len_e / len_N
+    beta = len_d / len_N
+    delta = (len_d - len_m - len_l) / len_N
+    kappa = len_l / len_N
+    print("密钥参数：")
+    print(
+        f"α = {Rational(alpha).n(digits=3)}, β = {Rational(beta).n(digits=3)}, δ = {Rational(delta).n(digits=3)}, κ = {Rational(kappa).n(digits=3)}"
+    )
     d_m, d_l = leaks
     d_m <<= len_d - len_m
     coefs = [e << len_l, -A, 4, e * (d_m + d_l) - 1]
@@ -121,12 +134,23 @@ def mixed_1(N, e, leaks, lens, params=None, test=None):
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t], test = [p]
 def mixed_2(N, e, leaks, lens, params=None, test=None):
+    print("开始执行 Ernst, Jochemsz, May, Weger 的 d 高低位混合泄露攻击2…")
     len_p = (N.nbits() + 1) // 2
     s_l = floor(2 * sqrt(N))
     s_r = (1 << len_p) + N // (1 << len_p)
     s = (s_l + s_r) >> 1
     A = N + 1 - s - ((N + 1 - s) % 4)
     len_d, len_m, len_l = lens
+    len_N = N.nbits()
+    len_e = e.nbits()
+    alpha = len_e / len_N
+    beta = len_d / len_N
+    delta = (len_d - len_m - len_l) / len_N
+    kappa = len_l / len_N
+    print("密钥参数：")
+    print(
+        f"α = {Rational(alpha).n(digits=3)}, β = {Rational(beta).n(digits=3)}, δ = {Rational(delta).n(digits=3)}, κ = {Rational(kappa).n(digits=3)}"
+    )
     d_m, d_l = leaks
     d_m <<= len_d - len_m
     k0 = e * d_m // N

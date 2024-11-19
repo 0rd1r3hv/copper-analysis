@@ -10,6 +10,7 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
     varlst = vector(R.gens())
     num = R.ngens()
     p = random_prime((1 << 29) - 1, True, 1 << (29 - 1))
+    print(f"选取素域：\nGF({p})")
     R = R.change_ring(GF(p), order='degrevlex')
     ZM = Zmod(p)
     fails = 0
@@ -17,18 +18,17 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
         len_selected = num + 1 - len(ex_pols)
     else:
         len_selected = min(pols[0].degree() - len(ex_pols), len(pols))
-        print(len_selected)
     while fails < max_fails:
         selected = ex_pols + sample(pols, len_selected)
         try:
             st = time()
             gb = (R * selected).groebner_basis()
-            print(f"groebner basis time: {time() - st}")
+            print(f"第 {fails + 1} 次选取计算 Gröbner 基，用时：{round(time() - st, 3)}s")
             if len(gb) == num:
                 if variety:
                     st = time()
                     sols = Ideal(gb).variety()
-                    print(f"variety time: {time() - st}")
+                    print(f"求解代数簇用时：{round(time() - st, 3)}s")
                     sol = sols[0]
                     v = vector([ZM(sol[v_]) for v_ in varlst])
                 else:
@@ -39,22 +39,23 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
         except:
             fails += 1
     else:
-        print(f"求解失败！用时 {round(time() - start, 3)}s")
+        print(f"求解失败！求根用时：{round(time() - start, 3)}s")
         return
     f = vector(selected[:num])
     J = jacobian(f, varlst)
+    st = time()
     while p < bound:
         p **= 2
         ZM = Zmod(p)
         R = R.change_ring(ZM)
         v = v.change_ring(ZM)
         v -= J.change_ring(R)(list(v)).solve_right(f.change_ring(R)(list(v)))
-    if fails < max_fails:
-        print(f"求解成功！用时 {round(time() - start, 3)}s")
-        if all_sols:
-            return [Integer(val) for val in v]
-        else:
-            for i, v_ in enumerate(varlst):
-                if v_ == var:
-                    return Integer(v[i])
+    print(f"Hensel 提升用时：{round(time() - st, 3)}s")
+    print(f"求解成功！求根用时：{round(time() - start, 3)}s")
+    if all_sols:
+        return [Integer(val) for val in v]
+    else:
+        for i, v_ in enumerate(varlst):
+            if v_ == var:
+                return Integer(v[i])
 

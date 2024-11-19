@@ -6,7 +6,7 @@ MAX_i = 100
 
 
 # str_vars should be a string, str_pols should be strings
-def automated(str_vars, str_pols, len_bounds, modulus, params, test=None):
+def automated(str_vars, str_pols, len_bounds, modulus, test=None):
 
 
     def optimize_shift(mono, depth):

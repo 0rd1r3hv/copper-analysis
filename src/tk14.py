@@ -1,4 +1,4 @@
-from sage.all import ceil, floor, inverse_mod, ZZ
+from sage.all import ceil, floor, inverse_mod, ZZ, Rational
 from src.misc import reduce_varsize, solve_copper
 from src.practical_bounds import tk14_msb_1, tk14_lsb, tk14_mixed
 # from src.root_method import groebner
@@ -31,12 +31,14 @@ def msb_1(N, e, leaks, lens, params, test=None):
     bounds = [X, Y, Z]
     beta = len_d / N.nbits()
     gamma = (len_d - len_m) / N.nbits()
-    print(f"密钥参数：β = {beta.n(digits=3)}, γ = {gamma.n(digits=3)}")
+    print("密钥参数：")
+    print(f"β = {beta.n(digits=3)}, γ = {gamma.n(digits=3)}")
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
-    print(f"有益格基参数：κ = {k.n(digits=3)}, τ = {t.n(digits=3)}")
+    print("有益格基参数：")
+    print(f"κ = {k.n(digits=3)}, τ = {t.n(digits=3)}")
     if None in params:
-        print("未指定参数，自动选择参数'm'…")
+        print("未指定攻击参数，自动选择攻击参数'm'…")
         m = tk14_msb_1(beta, gamma)
     else:
         (m,) = params
@@ -137,6 +139,7 @@ def msb_1(N, e, leaks, lens, params, test=None):
 
 # leaks = [d lsb], lens = [len d, len lsb], params = [m], test = [p]
 def lsb(N, e, leaks, lens, params, test=None):
+    print("开始执行 Takayasu, Kunihiro 的 d 纯低位泄露攻击…")
     (d_l,) = leaks
     len_d, len_l = lens
     X = 1 << len_d
@@ -145,8 +148,12 @@ def lsb(N, e, leaks, lens, params, test=None):
     bounds = [X, Y, Z]
     beta = len_d / N.nbits()
     gamma = (len_d - len_l) / N.nbits()
+    print("密钥参数：")
+    print(f"β = {Rational(beta).n(digits=3)}, γ = {Rational(gamma).n(digits=3)}")
     k = 2 * (beta - gamma)
     t = 1 + 2 * gamma - 4 * beta
+    print("有益格基参数：")
+    print(f"κ = {Rational(k).n(digits=3)}, τ = {Rational(t).n(digits=3)}")
     if None in params:
         print("未指定参数，自动选择参数'm'…")
         m = tk14_lsb(beta, gamma)
@@ -213,6 +220,7 @@ def lsb(N, e, leaks, lens, params, test=None):
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t]
 def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True):
+    print("开始执行 Takayasu, Kunihiro 的 d 高低位混合泄露攻击…")
     d_m, d_l = leaks
     len_d, len_m, len_l = lens
     d_m <<= len_d - len_m
@@ -225,8 +233,13 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
     bounds = [W, X, Y]
     beta = len_d / N.nbits()
     delta = (len_d - len_m - len_l) / N.nbits()
-    # kappa = len_l / N.nbits()
+    kappa = len_l / N.nbits()
+    print("密钥参数：")
+    print(
+        f"β = {Rational(beta).n(digits=3)}, δ = {Rational(delta).n(digits=3)}, κ = {Rational(kappa).n(digits=3)}"
+    )
     if None in params:
+        print("未指定攻击参数，自动选择攻击参数'm', 't'…")
         m, t = tk14_mixed(beta, delta)
     else:
         m, t = params

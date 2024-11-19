@@ -1,4 +1,4 @@
-from sage.all import Matrix, ZZ, inverse_mod, gcd, ceil, floor
+from sage.all import Matrix, ZZ, inverse_mod, gcd, ceil, floor, Rational
 from src.mp import groebner
 from src.practical_bounds import tlp17_large_e, tlp17_small_e, tlp17_small_dp_dq
 from src.misc import solve_copper
@@ -11,15 +11,21 @@ import subprocess
 
 # lens = [len_p, len_dq], params = [m, t], test = [p]
 def large_e(N, e, lens, params, test=None):
+    print("开始执行 Takayasu, Lu, Peng 的小 dq 大 e 攻击…")
     len_p, len_dq = lens
     len_N = N.nbits()
     len_e = e.nbits()
     alpha = len_e / len_N
     beta = len_p / len_N
     delta = len_dq / len_N
+    print("密钥参数：")
+    print(
+        f"α = {Rational(alpha).n(digits=3)}, β = {Rational(beta).n(digits=3)}, δ = {Rational(delta).n(digits=3)}"
+    )
     if None in params:
         m, t = tlp17_large_e(alpha, beta, delta)
     else:
+        print("未指定攻击参数，自动选择攻击参数'm', 't'…")
         m, t = params
     PR = ZZ["xp, xq, yp, yq"]
     xp, xq, yp, yq = PR.gens()
@@ -61,13 +67,19 @@ def large_e(N, e, lens, params, test=None):
 
 # lens = [len_p, len_dq], params = [m], test = [p]
 def small_e(N, e, lens, params, test=None):
+    print("开始执行 Takayasu, Lu, Peng 的小 dq 小 e 攻击…")
     len_p, len_dq = lens
     len_N = N.nbits()
     len_e = e.nbits()
     alpha = len_e / len_N
     beta = len_p / len_N
     delta = len_dq / len_N
+    print("密钥参数：")
+    print(
+        f"α = {Rational(alpha).n(digits=3)}, β = {Rational(beta).n(digits=3)}, δ = {Rational(delta).n(digits=3)}"
+    )
     if None in params:
+        print("未指定攻击参数，自动选择攻击参数'm'…")
         m = tlp17_small_e(alpha, beta, delta)
     else:
         m = params
@@ -128,6 +140,7 @@ def small_e(N, e, lens, params, test=None):
 
 # lens = [len_dp, len_dq], params = [m], test = [p]
 def small_dp_dq(N, e, lens, params, test=None):
+    print("开始执行 Takayasu, Lu, Peng 的小 dp,dq 攻击…")
     len_dp, len_dq = lens
     len_N = N.nbits()
     len_e = e.nbits()
@@ -135,7 +148,12 @@ def small_dp_dq(N, e, lens, params, test=None):
     delta1 = len_dp / len_N
     delta2 = len_dq / len_N
     delta = max(delta1, delta2)
+    print("密钥参数：")
+    print(
+        f"α = {Rational(alpha).n(digits=3)}, δ1 = {Rational(delta1).n(digits=3)}, δ2 = {Rational(delta2).n(digits=3)}"
+    )
     if None in params:
+        print("未指定攻击参数，自动选择攻击参数'm'…")
         m = tlp17_small_dp_dq(alpha, delta)
     else:
         (m,) = params
