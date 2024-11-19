@@ -1,4 +1,17 @@
-from sage.all import Ideal, Integer, QQ, ZZ, Zmod, GF, crt, jacobian, vector, random_prime, Matrix, gcd
+from sage.all import (
+    Ideal,
+    Integer,
+    QQ,
+    ZZ,
+    Zmod,
+    GF,
+    crt,
+    jacobian,
+    vector,
+    random_prime,
+    Matrix,
+    gcd,
+)
 from time import time
 from random import sample, choice
 
@@ -58,4 +71,3 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
         for i, v_ in enumerate(varlst):
             if v_ == var:
                 return Integer(v[i])
-
