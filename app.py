@@ -17,6 +17,7 @@ from src import ernst05
 from src import mns21
 from src import tk14
 import src.mns22
+import src.cop96
 from src.mn23 import automated
 
 
@@ -133,8 +134,7 @@ class 主窗(QMainWindow):
                         Integer(self.ui.msb_len_le.text()),
                         Integer(self.ui.lsb_len_le.text()),
                     ),
-                    (None, None),
-                    test=False,
+                    (None,),
                     brute=False,
                     triangluarize=True,
                 )
@@ -158,7 +158,7 @@ class 主窗(QMainWindow):
                         Integer(self.ui.msb_len_le.text()),
                         Integer(self.ui.lsb_len_le.text()),
                     ),
-                    (None, None),
+                    (None,),
                 )
                 print(
                     f"""攻击成功！私钥 d = 
@@ -180,7 +180,7 @@ class 主窗(QMainWindow):
                         Integer(self.ui.msb_len_le.text()),
                         Integer(self.ui.lsb_len_le.text()),
                     ),
-                    (None, None),
+                    (None,),
                 )
                 print(
                     f"""攻击成功！私钥 d = 
@@ -230,12 +230,15 @@ class 主窗(QMainWindow):
                 rst = src.mns22.small_e_dp_dq_with_msb(
                     Integer(self.ui.crt_N_le.text()),
                     Integer(self.ui.crt_e_le.text()),
-                    (Integer(self.ui.crt_dp_msb_le.text()), Integer(self.ui.crt_dq_msb_le.text())),
+                    (
+                        Integer(self.ui.crt_dp_msb_le.text()),
+                        Integer(self.ui.crt_dq_msb_le.text()),
+                    ),
                     (
                         Integer(self.ui.crt_dp_len_le.text()),
                         Integer(self.ui.crt_dq_len_le.text()),
                         Integer(self.ui.crt_msb_len_le.text()),
-                        Integer(self.ui.crt_msb_len_le.text())
+                        Integer(self.ui.crt_msb_len_le.text()),
                     ),
                 )
                 print(
@@ -249,13 +252,16 @@ class 主窗(QMainWindow):
                 rst = src.mns22.small_e_dp_dq_with_lsb(
                     Integer(self.ui.crt_N_le.text()),
                     Integer(self.ui.crt_e_le.text()),
-                    (Integer(self.ui.crt_dp_lsb_le.text()), Integer(self.ui.crt_dq_lsb_le.text())),
+                    (
+                        Integer(self.ui.crt_dp_lsb_le.text()),
+                        Integer(self.ui.crt_dq_lsb_le.text()),
+                    ),
                     (
                         Integer(self.ui.crt_dp_len_le.text()),
                         Integer(self.ui.crt_dq_len_le.text()),
                         Integer(self.ui.crt_lsb_len_le.text()),
                     ),
-                    (None,),
+                    (None, None),
                 )
                 print(
                     f"""攻击成功！私钥 d = 
@@ -272,7 +278,7 @@ class 主窗(QMainWindow):
                         Integer(self.ui.crt_p_len_le.text()),
                         Integer(self.ui.crt_dq_len_le.text()),
                     ),
-                    (None,),
+                    (None, None),
                 )
                 print(
                     f"""攻击成功！私钥 d = 
@@ -289,7 +295,24 @@ class 主窗(QMainWindow):
                         Integer(self.ui.crt_p_len_le.text()),
                         Integer(self.ui.crt_dq_len_le.text()),
                     ),
-                    (None,),
+                    (None, None),
+                )
+                print(
+                    f"""攻击成功！私钥 d = 
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
+
+            def tlp17small_dp_dq():
+                rst = src.tlp17.small_dp_dq(
+                    Integer(self.ui.crt_N_le.text()),
+                    Integer(self.ui.crt_e_le.text()),
+                    (
+                        Integer(self.ui.crt_dp_len_le.text()),
+                        Integer(self.ui.crt_dq_len_le.text()),
+                    ),
+                    (None, None),
                 )
                 print(
                     f"""攻击成功！私钥 d = 
@@ -299,7 +322,14 @@ class 主窗(QMainWindow):
                 )
 
             方法 = self.ui.crt_atk_cb.currentIndex()
-            攻击函数 = [mns21lsb, mns22msb, mns22lsb, tlp17small_e, tlp17large_e]
+            攻击函数 = [
+                mns21lsb,
+                mns22msb,
+                mns22lsb,
+                tlp17small_e,
+                tlp17large_e,
+                tlp17small_dp_dq,
+            ]
 
             攻击函数[方法]()
 
@@ -310,22 +340,58 @@ class 主窗(QMainWindow):
             def mns22():
                 rst = src.mns22.mixed_kp(
                     Integer(self.ui.var_N_le.text()),
-                    Integer(self.ui.var_e_le.text()),
+                    Integer(self.ui.var_k_le.text()),
                     (
                         Integer(self.ui.var_kp_msb_le.text()),
                         Integer(self.ui.var_kp_lsb_le.text()),
                     ),
                     (
                         Integer(self.ui.var_kp_len_le.text()),
-                        Integer(self.ui.msb_len_le.text()),
-                        Integer(self.ui.lsb_len_le.text()),
+                        Integer(self.ui.var_msb_len_le.text()),
+                        Integer(self.ui.var_lsb_len_le.text()),
                     ),
                     (None, None),
                 )
-                print(f"攻击成功！私钥 d = {rst}")
+                print(
+                    f"""攻击成功！私钥 d =
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
+
+            def Cop():
+                rst = src.cop96.cop(
+                    self.ui.var_mod_eq_le.text(),
+                    Integer(self.ui.var_N_le.text()),
+                    (Integer(self.ui.var_X_len_le.text()),),
+                    [None],
+                )
+                print(
+                    f"""攻击成功！私钥 d =
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
+
+            def Hg():
+                rst = src.cop96.hg(
+                    self.ui.var_mod_eq_le.text(),
+                    Integer(self.ui.var_N_le.text()),
+                    (
+                        Integer(self.ui.var_X_len_le.text()),
+                        Integer(self.ui.var_p_len_le.text()),
+                    ),
+                    [None],
+                )
+                print(
+                    f"""攻击成功！私钥 d =
+{rst}"""
+                    if rst is not None
+                    else "攻击失败！"
+                )
 
             方法 = self.ui.var_atk_cb.currentIndex()
-            攻击函数 = [mns22]
+            攻击函数 = [mns22, Cop, Hg]
 
             攻击函数[方法]()
 

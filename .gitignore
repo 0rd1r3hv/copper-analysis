@@ -1,5 +1,4 @@
 *.pri
-*.txt
 __pycache__
 .direnv
 .ruff_cache

@@ -42,7 +42,19 @@ def reduce_varsize(N):
 
 
 def solve_copper(
-    shifts, bound_var, bounds, test=None, delta=0.75, ex_pols=[], select_num=None, N=None, monomials=None, brute=False, variety=False, restrict=False, all_sols=False
+    shifts,
+    bound_var,
+    bounds,
+    test=None,
+    delta=0.75,
+    ex_pols=[],
+    select_num=None,
+    N=None,
+    monomials=None,
+    brute=False,
+    variety=False,
+    restrict=False,
+    all_sols=False,
 ):
     if select_num is None:
         select_num = len(shifts)
@@ -114,15 +126,23 @@ def solve_copper(
     deg = max(pols, key=lambda e: e.degree()).degree()
     selected = list(
         filter(
-            lambda e: (e.degree() >= deg - 1 and e.degree() >= 1) and (test is None or e(test) == 0),
+            lambda e: (e.degree() >= deg - 1 and e.degree() >= 1)
+            and (test is None or e(test) == 0),
             pols,
         )
     )
     if len(bounds) > 1:
-        print(f"开始利用 Gröbner 基求解多元方程…")
-        return groebner(selected, bound_var, ex_pols=ex_pols, variety=variety, restrict=restrict, all_sols=all_sols)
+        print("开始利用 Gröbner 基求解多元方程…")
+        return groebner(
+            selected,
+            bound_var,
+            ex_pols=ex_pols,
+            variety=variety,
+            restrict=restrict,
+            all_sols=all_sols,
+        )
     else:
-        print(f"开始求解单变元方程…")
+        print("开始求解单变元方程…")
         start = time()
         for pol in selected:
             roots = pol.roots(multiplicities=False)

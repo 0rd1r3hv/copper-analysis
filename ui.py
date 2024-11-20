@@ -602,26 +602,30 @@ class 主窗UI:
         var = [
             "N",
             "k",
+            "mod_eq",
             "p_len",
+            "kp_len",
+            "X_len",
             "msb_len",
             "lsb_len",
             "m",
             "t",
             "kp_msb",
             "kp_lsb",
-            "mod_eq",
         ]
         var_params = [
             "模数 N",
             "倍数 k",
+            "模方程",
             "因数 p 长度",
+            "kp 长度",
+            "变元 X 长度",
             "kp MSB 长度",
             "kp LSB 长度",
             "m（可选）",
             "t（可选）",
             "kp MSB",
             "kp LSB",
-            "模方程",
         ]
         for param, name in zip(var, var_params):
             param_frm = QFrame()
@@ -635,9 +639,9 @@ class 主窗UI:
             param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
             param_le = QLineEdit()
             param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
-            param_le.setObjectName(f"var_{param.lower().replace(' ', '_')}_le")
+            param_le.setObjectName(f"var_{param}_le")
             param_le.setMinimumHeight(40)
-            setattr(self, f"var_{param.lower().replace(' ', '_')}_le", param_le)
+            setattr(self, f"var_{param}_le", param_le)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
             self.var_parma_vlo.addWidget(param_frm)
