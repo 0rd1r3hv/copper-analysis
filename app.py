@@ -400,11 +400,10 @@ class 主窗(QMainWindow):
     def 连auto_atk_btn(self):
         def auto攻击():
             automated(
+                self.ui.auto_vars_le.text(),
+                [le.text() for le in self.ui.auto_pols if le.text() != ""],
+                [Integer(ll) for ll in self.ui.auto_var_bounds_le.text().split(",")],
                 Integer(self.ui.auto_M_le.text()),
-                Integer(self.ui.auto_m_le.text()),
-                Integer(self.ui.auto_var_le.text()),
-                Integer(self.ui.auto_mono_set_le.text()),
-                Integer(self.ui.auto_eq_le.text()),
             )
 
         self.ui.auto_atk_btn.clicked.connect(auto攻击)

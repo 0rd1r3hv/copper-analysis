@@ -486,8 +486,16 @@ def mn23_automated_test(n, k):
     str_vars = "x, y, z"
     str_pols = [str(pol) for pol in polys]
     if test:
+        with open("mn23_automated.txt", "w", encoding="utf-8") as file:
+            file.write(
+                f"str_vars: {str_vars}\nstr_pols: {str_pols}\nlen_bounds: {len_bounds}\np: {p}\ntest: {solutions_verify}"
+            )
         res = automated(str_vars, str_pols, len_bounds, p, test=solutions_verify)
     else:
+        with open("mn23_automated.txt", "w", encoding="utf-8") as file:
+            file.write(
+                f"str_vars: {str_vars}\nstr_pols: {str_pols}\nlen_bounds: {len_bounds}\np: {p}"
+            )
         res = automated(str_vars, str_pols, len_bounds, p)
     return res == solutions_verify
 
@@ -525,8 +533,8 @@ def mn23_automated_test(n, k):
 # mns22_mixed_kp_test(0.5, 0.1, 0.347, 0.1, 512)
 # mn23(512, 300, 6)
 
-print(hg_cop_test(1 / 2, 0.18, 1024, 5, "cop"))
-print(hg_cop_test(1 / 2, 0.07, 1024, 3, "hg"))
+# print(hg_cop_test(1 / 2, 0.18, 1024, 5, "cop"))
+# print(hg_cop_test(1 / 2, 0.07, 1024, 3, "hg"))
 # print(ernst05_mixed_1_test(0.4, 0.16, 0.1, 512))
 # print(ernst05_mixed_2_test(0.7, 0.06, 0.05, 512))
 # print(tk14_msb_1_test(0.292, 0.26, 512))
@@ -539,4 +547,4 @@ print(hg_cop_test(1 / 2, 0.07, 1024, 3, "hg"))
 # print(mns22_mixed_kp_test(0.55, 0.05, 0.346, 0.1, 512))
 # print(mns22_small_e_dp_dq_with_msb_test(1 / 12, 0.32, 512))
 # print(mns22_small_e_dp_dq_with_lsb_test(1 / 12, 0.31, 512))
-# print(mn23_automated_test(512, 318))
+print(mn23_automated_test(512, 318))

@@ -37,6 +37,9 @@ class 主窗UI:
             self.cent_glo.setObjectName("cent_glo")
             self.cent_glo.setContentsMargins(0, 0, 0, 0)
             self.cent_glo.setSpacing(4)
+            
+            self.auto_pol_cnt = 1
+            self.auto_pols = []
 
         def 设置侧栏():
             self.sidebar_frm = QFrame()
@@ -690,17 +693,15 @@ class 主窗UI:
 
         auto = [
             "M",
-            "m",
-            "var",
-            "mono_set",
-            "eq",
+            "vars",
+            "var_bounds",
+            "pol1",
         ]
         auto_params = [
             "模数 M",
-            "参数 m",
             "变元",
-            "单项式集合",
-            "方程",
+            "变元长度",
+            "多项式1",
         ]
         for param, name in zip(auto, auto_params):
             param_frm = QFrame()
@@ -716,41 +717,41 @@ class 主窗UI:
             param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
             param_le.setObjectName(f"auto_{param}_le")
             param_le.setMinimumHeight(40)
-            if param == "mono_set":
-                param_le.setPlaceholderText("（自动选取）")
-            setattr(self, f"auto_{param.lower().replace(' ', '_')}_le", param_le)
+            setattr(self, f"auto_{param}_le", param_le)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
             self.auto_parma_vlo.addWidget(param_frm)
-
+        self.auto_pols.append(self.auto_pol1_le)
         self.auto_parma_vlo.addStretch(1)
         self.auto_parma_vlo.addItem(
             QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         )
 
-        self.auto_eq_add_btn = QPushButton("添加方程")
-        self.auto_eq_add_btn.setObjectName("auto_eq_add_btn")
-        self.auto_parma_vlo.addWidget(self.auto_eq_add_btn)
+        self.auto_pol_add_btn = QPushButton("添加多项式")
+        self.auto_pol_add_btn.setObjectName("auto_pol_add_btn")
+        self.auto_parma_vlo.addWidget(self.auto_pol_add_btn)
 
-        def add_eq_component():
+        def 添加多项式():
+            self.auto_pol_cnt += 1
             param_frm = QFrame()
             param_frm.setMinimumHeight(64)
             param_hlo = QHBoxLayout(param_frm)
             param_hlo.setContentsMargins(12, 0, 12, 0)
             param_hlo.setSpacing(16)
-            param_lbl = QLabel("方程")
+            param_lbl = QLabel(f"多项式{self.auto_pol_cnt}")
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             param_lbl.setMinimumWidth(120)
             param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
             param_le = QLineEdit()
             param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
-            param_le.setObjectName(f"auto_eq_le_{self.auto_parma_vlo.count()}")
+            param_le.setObjectName(f"auto_pol{self.auto_pol_cnt}_le")
             param_le.setMinimumHeight(40)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
             self.auto_parma_vlo.insertWidget(self.auto_parma_vlo.count() - 4, param_frm)
+            self.auto_pols.append(param_le)
 
-        self.auto_eq_add_btn.clicked.connect(add_eq_component)
+        self.auto_pol_add_btn.clicked.connect(添加多项式)
 
         self.auto_atk_btn = QPushButton("开始攻击")
         self.auto_atk_btn.setObjectName("auto_atk_btn")

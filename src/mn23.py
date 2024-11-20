@@ -7,8 +7,6 @@ MAX_i = 100
 
 # str_vars should be a string, str_pols should be strings
 def automated(str_vars, str_pols, len_bounds, modulus, test=None):
-
-
     def optimize_shift(mono, depth):
         nonlocal max_sum
         nonlocal leadings
@@ -27,7 +25,6 @@ def automated(str_vars, str_pols, len_bounds, modulus, test=None):
             exps[depth] += 1
             mono //= leadings[depth]
             optimize_shift(mono, depth + 1)
-
 
     print("开始执行 Meers, Nowakowski 的自动化 Coppersmith 攻击…")
     PR = PolynomialRing(ZZ, str_vars)
@@ -65,6 +62,13 @@ def automated(str_vars, str_pols, len_bounds, modulus, test=None):
                 display += f"s_{str(gen).upper()} = {g.degree(gen)}, "
             display += f"s_M = {s_M}"
             print(display)
-            res = solve_copper(shifts, [1 << max(len_bounds), None], [1 << l for l in len_bounds], test, restrict=True, all_sols=True)
+            res = solve_copper(
+                shifts,
+                [1 << max(len_bounds), None],
+                [1 << l for l in len_bounds],
+                test,
+                restrict=True,
+                all_sols=True,
+            )
             return res
     print("攻击失败！")
