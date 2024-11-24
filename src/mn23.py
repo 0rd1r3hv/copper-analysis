@@ -62,13 +62,9 @@ def automated(str_vars, str_pols, len_bounds, modulus, test=None):
                 display += f"s_{str(gen).upper()} = {g.degree(gen)}, "
             display += f"s_M = {s_M}"
             print(display)
-            res = solve_copper(
-                shifts,
-                [1 << max(len_bounds), None],
-                [1 << l for l in len_bounds],
-                test,
-                restrict=True,
-                all_sols=True,
-            )
+            res = solve_copper(shifts, [1 << max(len_bounds), None], [1 << l for l in len_bounds], test, restrict=True, all_sols=True)
+            if res:
+                for ind, gen in enumerate(gens):
+                    print(f"{gen} = {res[ind]}")
             return res
     print("攻击失败！")

@@ -35,6 +35,10 @@ def mixed_kp(N, k, leaks, lens, params, len_e=0, raw=False):
         monomials.append(x**(m + i))
         shifts.append(f ** (m + i) * k ** (t - i))
     res = solve_copper(shifts, [X, x], [X], None, monomials=monomials)
+    if res:
+        if not raw:
+            print(f"x = {res}")
+            print(f"p = {gcd(f(res), N)}")
     return res
 
 
@@ -72,15 +76,18 @@ def small_e_dp_dq_with_msb(N, e, leaks, lens):
     len_k = k.nbits()
     dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], [None], len_e=len_e, raw=True)
     if dp_l is None:
-        print("小根为 k…")
         k = (s - delt) >> 1
         len_k = k.nbits()
         dp_l = mixed_kp(N, k, [((e * dp_m + k - 1) * inverse_mod(e, k * N)) % (k * N), 0], [len_k + len_N // 2, len_dp_m, 0], [None], len_e=len_e, raw=True)
+        print("小根为 k…")
     else:
         print("大根为 k…")
     if dp_l:
         dp = dp_m + dp_l
         p = (e * dp - 1) // k + 1
+        q = N // p
+        dq = inverse_mod(e, q - 1)
+        print(f"dp = {dp}\ndq = {dq}\np = {p}\nq = {q}")
         return p
 
 # leaks = [dp lsb, dq lsb], lens = [len dp, len dq, len low], params = [m], test = [p]
@@ -145,4 +152,7 @@ def small_e_dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
         if dp_m:
             dp = (dp_m << len_low) + dp_l
             p = (e * dp - 1) // k + 1
+            q = N // p
+            dq = inverse_mod(e, q - 1)
+            print(f"dp = {dp}\ndq = {dq}\np = {p}\nq = {q}")
             return p

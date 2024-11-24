@@ -1,5 +1,5 @@
 from sage.all import floor, sqrt, ZZ, inverse_mod, PolynomialRing, Matrix, Rational
-from src.misc import solve_copper, assure_coprime, poly_norm
+from src.misc import solve_copper, assure_coprime, poly_norm, known_d
 from src.practical_bounds import ernst05_eq1, ernst05_eq2
 # from src.mp import groebner
 # from src.root_methods import groebner
@@ -129,7 +129,10 @@ def mixed_1(N, e, leaks, lens, params=None, test=None):
         ]
     res = eq1(coefs, bounds, params, test)
     if res:
-        return d_m + (res << len_l) + d_l
+        d = d_m + (res << len_l) + d_l
+        p, q = known_d(N, e, d)
+        print(f"d = {d}\np = {p}\nq = {q}")
+        return d
 
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t], test = [p]
@@ -171,5 +174,7 @@ def mixed_2(N, e, leaks, lens, params=None, test=None):
         ]
     res = eq2(coefs, bounds, params, test)
     if res:
-        return d_m + (res << len_l) + d_l
-
+        d = d_m + (res << len_l) + d_l
+        p, q = known_d(N, e, d)
+        print(f"d = {d}\np = {p}\nq = {q}")
+        return d

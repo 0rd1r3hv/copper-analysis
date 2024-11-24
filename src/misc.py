@@ -1,9 +1,9 @@
 import subprocess
-from sage.all import floor, gcd, Integer, Matrix, QQ, ZZ, prod, sqrt, Sequence, vector
+from sage.all import floor, gcd, Integer, Matrix, QQ, ZZ, prod, sqrt, Sequence, vector, power_mod
+from random import randint
 # from src.mp import groebner
 
 from src.root_methods import groebner
-from time import time
 from src.fplll_fmt import fplll_fmt, fplll_read
 
 
@@ -39,6 +39,22 @@ def reduce_varsize(N):
     s = (s_l + s_r) >> 1
     s += (N + 1 - s) % 4
     return N + 1 - s, (s_r - s_l) >> 1
+
+
+def known_d(N, e, d):
+    S = Integer(e * d - 1)
+    r = S.valuation(2)
+    s = S // (1 << r)
+    while True:
+        b_nxt = power_mod(randint(2, N - 2), s, N)
+        for _ in range(r):
+            b_pre = b_nxt
+            if b_pre == 1 or b_pre == N - 1:
+                break
+            b_nxt = power_mod(b_pre, 2, N)
+            if b_nxt == 1:
+                p = gcd(b_pre - 1, N)
+                return p, N // p
 
 
 def solve_copper(

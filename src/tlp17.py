@@ -62,6 +62,12 @@ def large_e(N, e, lens, params, test=None):
         ell = (e * dq - 1) // (q - 1)
         test = [ell - 1, ell, p, q]
     res = solve_copper(shifts, [Yp, yp], [X, X, Yp, Yq], test, ex_pols=[N - yp * yq, xp - xq + 1], monomials=monomials, N=N)
+    if res:
+        p = res
+        dp = inverse_mod(e, p - 1)
+        q = N // res
+        dq = inverse_mod(e, q - 1)
+        print(f"dp = {dp}\ndq = {dq}\np = {p}\nq = {q}")
     return res
 
 
@@ -135,6 +141,12 @@ def small_e(N, e, lens, params, test=None):
         ell = (e * dq - 1) // (q - 1)
         test = [ell - 1, ell, p, q]
     res = solve_copper(shifts, [Yp, yp], [X, X, Yp, Yq], test, ex_pols=[N - yp * yq, xp - xq + 1], monomials=monomials, N=N, restrict=True)
+    if res:
+        p = res
+        dp = inverse_mod(e, p - 1)
+        q = N // res
+        dq = inverse_mod(e, q - 1)
+        print(f"dp = {dp}\ndq = {dq}\np = {p}\nq = {q}")
     return res
 
 
@@ -289,4 +301,10 @@ def small_dp_dq(N, e, lens, params, test=None):
         variety=True,
         restrict=True
     )
+    if res:
+        p = res
+        dp = inverse_mod(e, p - 1)
+        q = N // res
+        dq = inverse_mod(e, q - 1)
+        print(f"dp = {dp}\ndq = {dq}\np = {p}\nq = {q}")
     return res

@@ -4,3 +4,5 @@ __pycache__
 .direnv
 .ruff_cache
 .venv
+.idea
+*.code-workspace

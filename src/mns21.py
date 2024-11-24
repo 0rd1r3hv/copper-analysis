@@ -189,7 +189,7 @@ def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
         k = (e * dp - 1) // (p - 1)
         ell = (e * dq - 1) // (q - 1)
         test = [k, k - 1, p, q, ell - 1, ell]
-    return solve_copper(
+    res = solve_copper(
         shifts,
         [Y, yp],
         bounds,
@@ -198,3 +198,9 @@ def dp_dq_with_lsb(N, e, leaks, lens, params, test=None):
         monomials=monomials,
         restrict=True,
     )
+    if res:
+        p, q = res, N // res
+        dp = inverse_mod(e, p - 1)
+        dq = inverse_mod(e, q - 1)
+        print(f"dp = {dp}\ndq = {dq}\np = {p}\nq = {q}")
+        return res

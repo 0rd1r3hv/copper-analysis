@@ -34,7 +34,10 @@ def cop(f, N, lens, params, test=None):
     len_X, = lens
     PR = ZZ['x']
     f = PR(f)
-    return univariate(f, len_X, N.nbits(), N, params + [0])
+    res = univariate(f, len_X, N.nbits(), N, params + [0])
+    if res:
+        print(f"x = {res}")
+    return res
 
 
 # lens = [len X, len p], params = [m, t]
@@ -43,4 +46,8 @@ def hg(f, N, lens, params):
     len_X, len_p = lens
     PR = ZZ['x']
     f = PR(f)
-    return univariate(f, len_X, len_p, N, params)
+    res = univariate(f, len_X, len_p, N, params)
+    if res:
+        print(f"x = {res}")
+        print(f"p = {gcd(f(res), N)}")
+    return res

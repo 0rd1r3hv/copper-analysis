@@ -1,4 +1,4 @@
-from sage.all import ceil, floor, inverse_mod, ZZ, Rational
+from sage.all import ceil, floor, inverse_mod, ZZ, Rational, sqrt
 from src.misc import reduce_varsize, solve_copper
 from src.practical_bounds import tk14_msb_1, tk14_lsb, tk14_mixed
 # from src.root_method import groebner
@@ -134,7 +134,14 @@ def msb_1(N, e, leaks, lens, params, test=None):
         monomials=monomials,
     )
     if res:
-        return ((k0 + res) * N) // e
+        k = k0 + res
+        s = ((k * (N + 1) + 1) * inverse_mod(k, e)) % e
+        delta = sqrt(s ** 2 - 4 * N)
+        p = (s + delta) >> 1
+        q = (s - delta) >> 1
+        d = inverse_mod(e, (p - 1) * (q - 1))
+        print(f"d = {d}\np = {p}\nq = {q}")
+        return d
 
 
 # leaks = [d lsb], lens = [len d, len lsb], params = [m], test = [p]
@@ -215,7 +222,14 @@ def lsb(N, e, leaks, lens, params, test=None):
         shifts, [X, x], bounds, test, ex_pols=[z - x * y - 1], monomials=monomials
     )
     if res:
-        return (res * N) // e
+        k = res
+        s = ((k * (N + 1) + 1) * inverse_mod(k, e)) % e
+        delta = sqrt(s ** 2 - 4 * N)
+        p = (s + delta) >> 1
+        q = (s - delta) >> 1
+        d = inverse_mod(e, (p - 1) * (q - 1))
+        print(f"d = {d}\np = {p}\nq = {q}")
+        return d
 
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t]
@@ -307,4 +321,11 @@ def mixed(N, e, leaks, lens, params, test=None, brute=False, triangluarize=True)
             shifts, [X, x], bounds, test, ex_pols=[w - k0 - x], monomials=monomials
         )
     if res:
-        return ((k0 + res) * N) // e
+        k = k0 + res
+        s = ((k * (N + 1) + 1) * inverse_mod(k, e)) % e
+        delta = sqrt(s ** 2 - 4 * N)
+        p = (s + delta) >> 1
+        q = (s - delta) >> 1
+        d = inverse_mod(e, (p - 1) * (q - 1))
+        print(f"d = {d}\np = {p}\nq = {q}")
+        return d
