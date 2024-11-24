@@ -52,7 +52,8 @@
             ];
             shellHook = ''
               if [ -z ${"\${DIRENVED+x}"} ]; then
-                echo "enter sage subshell"
+                export SHELL=nu
+                echo "Entering sage subshell"
                 export DIRENVED=1
                 if which sage >/dev/null 2>&1; then
                   sage -sh
