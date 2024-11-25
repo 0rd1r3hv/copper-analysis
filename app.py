@@ -197,8 +197,9 @@ class 主窗(QMainWindow):
                 ernstmixed1,
                 ernstmixed2,
             ]
-
+            print(">>> RSA 攻击")
             攻击函数[方法]()
+            print("")
 
         self.ui.rsa_atk_btn.clicked.connect(rsa攻击)
 
@@ -330,8 +331,9 @@ class 主窗(QMainWindow):
                 tlp17large_e,
                 tlp17small_dp_dq,
             ]
-
+            print(">>> CRT-RSA 攻击")
             攻击函数[方法]()
+            print("")
 
         self.ui.crt_atk_btn.clicked.connect(crt攻击)
 
@@ -392,20 +394,28 @@ class 主窗(QMainWindow):
 
             方法 = self.ui.var_atk_cb.currentIndex()
             攻击函数 = [mns22, Cop, Hg]
-
+            print(">>> 单变元攻击")
             攻击函数[方法]()
+            print("")
 
         self.ui.var_atk_btn.clicked.connect(var攻击)
 
     def 连auto_atk_btn(self):
         def auto攻击():
-            automated(
+            rst = automated(
                 self.ui.auto_vars_le.text(),
                 [le.text() for le in self.ui.auto_pols if le.text() != ""],
                 [Integer(ll) for ll in self.ui.auto_var_bounds_le.text().split(",")],
                 Integer(self.ui.auto_M_le.text()),
             )
-
+            print(
+                f"""攻击成功！私钥 d =
+{rst}"""
+                if rst is not None
+                else "攻击失败！"
+            )
+            print("")
+    
         self.ui.auto_atk_btn.clicked.connect(auto攻击)
 
     def 换页(self):
