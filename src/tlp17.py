@@ -1,12 +1,8 @@
-from sage.all import Matrix, ZZ, inverse_mod, gcd, ceil, floor, Rational
-from src.mp import groebner
+from sage.all import ZZ, inverse_mod, gcd, ceil, floor, Rational
 from src.practical_bounds import tlp17_large_e, tlp17_small_e, tlp17_small_dp_dq
 from src.misc import solve_copper
 
 # from src.root_methods import groebner
-from time import time
-from src.fplll_fmt import fplll_fmt, fplll_read
-import subprocess
 # Small CRT-Exponent RSA Revisited
 
 # lens = [len_p, len_dq], params = [m, t], test = [p]

@@ -1,4 +1,4 @@
-from sage.all import *
+from sage.all import ZZ, Rational, inverse_mod, gcd, sqrt, ceil
 from src.practical_bounds import mns22_mixed_kp
 from src.misc import solve_copper
 
@@ -10,7 +10,7 @@ def mixed_kp(N, k, leaks, lens, params, len_e=0, raw=False):
     len_kp, len_m, len_l = lens
     len_N = N.nbits()
     len_k = k.nbits()
-    if raw == False:
+    if raw is False:
         kp_m <<= len_kp - len_m
     beta = (len_kp - len_k) / len_N
     mu = len_k / len_N
@@ -66,7 +66,7 @@ def small_e_dp_dq_with_msb(N, e, leaks, lens):
     kl = ((e ** 2 * dp_m * dq_m) // N) + 1
     s = (1 - kl * (N - 1)) % e
     delt = sqrt(s ** 2 - 4 * kl)
-    if delt.is_integer() == False:
+    if delt.is_integer() is False:
         print("e ≤ k + l < 2 * e")
         s += e
         delt = sqrt(s ** 2 - 4 * kl)

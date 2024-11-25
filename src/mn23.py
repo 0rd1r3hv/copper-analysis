@@ -1,6 +1,5 @@
-from sage.all import *
+from sage.all import ZZ, PolynomialRing, prod
 from src.misc import solve_copper
-from time import time
 
 MAX_i = 100
 

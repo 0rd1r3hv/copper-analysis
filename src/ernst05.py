@@ -1,4 +1,4 @@
-from sage.all import floor, sqrt, ZZ, inverse_mod, PolynomialRing, Matrix, Rational
+from sage.all import floor, sqrt, ZZ, inverse_mod, PolynomialRing, Rational
 from src.misc import solve_copper, assure_coprime, poly_norm, known_d
 from src.practical_bounds import ernst05_eq1, ernst05_eq2
 # from src.mp import groebner
@@ -45,7 +45,12 @@ def eq1(coefs, bounds, params, test):
     monomials += sorted(monomials2, reverse=True)
     shifts += sorted(shifts2, reverse=True)
     return solve_copper(
-        shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0], monomials=monomials
+        shifts,
+        min(zip(bounds, [x, y, z])),
+        bounds,
+        test,
+        ex_pols=[f0],
+        monomials=monomials,
     )
 
 
@@ -92,7 +97,14 @@ def eq2(coefs, bounds, params, test):
                 )
     monomials += sorted(monomials2, reverse=True)
     shifts += sorted(shifts2, reverse=True)
-    return solve_copper(shifts, min(zip(bounds, [x, y, z])), bounds, test, ex_pols=[f0], monomials=monomials)
+    return solve_copper(
+        shifts,
+        min(zip(bounds, [x, y, z])),
+        bounds,
+        test,
+        ex_pols=[f0],
+        monomials=monomials,
+    )
 
 
 # leaks = [d msb, d lsb], lens = [len d, len msb, len lsb], params = [m, t], test = [p]

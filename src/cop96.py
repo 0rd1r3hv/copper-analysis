@@ -1,4 +1,4 @@
-from sage.all import *
+from sage.all import ZZ, inverse_mod, gcd
 from src.practical_bounds import cop96_univariate
 from src.misc import solve_copper
 

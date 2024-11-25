@@ -6,7 +6,9 @@ from sage.all import (
     gcd,
     randint,
     random_prime,
-    Rational,
+    ZZ,
+    GF,
+    next_prime,
 )
 from src.cop96 import cop, hg
 from src.tk14 import mixed, msb_1, lsb
@@ -14,8 +16,7 @@ from src.tlp17 import large_e, small_e, small_dp_dq
 from src.mns21 import dp_dq_with_lsb
 from src.mns22 import mixed_kp, small_e_dp_dq_with_msb, small_e_dp_dq_with_lsb
 from src.ernst05 import mixed_1, mixed_2
-from src.practical_bounds import *
-from src.mn23 import *
+from src.mn23 import automated
 
 test = False
 
@@ -62,7 +63,7 @@ def get_kp_partial_test(len_N, len_p, len_k, len_m, len_l):
     N = p * q
     k = 2 * get_rand(len_k - 1) + 1
     kp = k * p
-    len_kp = kp.nbits()
+    # len_kp = kp.nbits()
     return p, k, N, get_leak(kp, "high", len_m), get_leak(kp, "low", len_l)
 
 

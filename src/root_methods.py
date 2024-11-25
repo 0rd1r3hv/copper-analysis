@@ -1,19 +1,14 @@
 from sage.all import (
     Ideal,
     Integer,
-    QQ,
-    ZZ,
     Zmod,
     GF,
-    crt,
     jacobian,
     vector,
     random_prime,
-    Matrix,
-    gcd,
 )
 from time import time
-from random import sample, choice
+from random import sample
 
 
 def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=False, all_sols=False):
@@ -49,7 +44,7 @@ def groebner(pols, bound_var, max_fails=40, ex_pols=[], variety=False, restrict=
                 break
             else:
                 fails += 1
-        except:
+        except Exception as _:
             fails += 1
     else:
         print(f"求解失败！求根用时：{round(time() - start, 3)}s")
