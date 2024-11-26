@@ -27,6 +27,7 @@ class 主窗UI:
             if not w.objectName():
                 w.setObjectName("主窗")
             w.setWindowIcon(QIcon("./assets/徽标.png"))
+            w.showMaximized()
 
             self.cent = QWidget(w)
             self.cent.setObjectName("cent")
@@ -37,7 +38,7 @@ class 主窗UI:
             self.cent_glo.setObjectName("cent_glo")
             self.cent_glo.setContentsMargins(0, 0, 0, 0)
             self.cent_glo.setSpacing(4)
-            
+
             self.auto_pol_cnt = 1
             self.auto_pols = []
 
@@ -125,7 +126,12 @@ class 主窗UI:
                     sizePolicy.setHeightForWidth(lbl.sizePolicy().hasHeightForWidth())
                     lbl.setSizePolicy(sizePolicy)
                     lbl.setFixedSize(cfg.lbl_size)
-                    lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+                    if n == "tit_lbl":
+                        lbl.setStyleSheet(
+                            "QLabel {font-size: 16pt; font-weight: bold;}"
+                        )
+                    else:
+                        lbl.setStyleSheet("QLabel {font-size: 16pt;}")
 
                     self.sidebar_glo.addWidget(lbl, r, c, 1, 1)
                     setattr(self, n, lbl)
@@ -186,6 +192,7 @@ class 主窗UI:
             self.srch_le = QLineEdit(self.cent)
             self.srch_le.setObjectName("srch_le")
             self.srch_le.setMinimumSize(cfg.srch_le_min_size)
+            self.srch_le.setStyleSheet("QLineEdit { font-size: 16pt; }")
             self.srch_hlo.addWidget(self.srch_le)
 
             self.srch_btn = QPushButton(self.cent)
@@ -221,25 +228,26 @@ class 主窗UI:
 
             def 设置主页():
                 home_vlo = QVBoxLayout(self.home_page)
-                home_vlo.setSpacing(20)
+                home_vlo.setSpacing(12)
                 home_vlo.setContentsMargins(20, 20, 20, 20)
 
                 # 上半部分：图标和标题
                 upper_widget = QWidget()
-                upper_widget.setMaximumHeight(self.home_page.height() // 2)
+                upper_widget.setMaximumHeight(2 * self.home_page.height() // 3)
                 upper_vlo = QVBoxLayout(upper_widget)
                 upper_vlo.setAlignment(Qt.AlignCenter)
+                upper_vlo.setSpacing(4)
 
                 icon_label = QLabel()
                 icon_pixmap = QPixmap("./assets/徽标.png").scaled(
-                    192, 192, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                    288, 288, Qt.KeepAspectRatio, Qt.SmoothTransformation
                 )
                 icon_label.setPixmap(icon_pixmap)
                 icon_label.setAlignment(Qt.AlignCenter)
 
                 title_label = QLabel("自动化公钥密码系统 Coppersmith 格攻击工具")
                 title_label.setAlignment(Qt.AlignCenter)
-                title_label.setStyleSheet("font-size: 24pt; font-weight: bold;")
+                title_label.setStyleSheet("font-size: 40pt; font-weight: bold;")
 
                 upper_vlo.addWidget(icon_label)
                 upper_vlo.addWidget(title_label)
@@ -247,7 +255,7 @@ class 主窗UI:
                 # 下半部分：三个框架
                 lower_widget = QWidget()
                 lower_hlo = QHBoxLayout(lower_widget)
-                lower_hlo.setSpacing(20)
+                lower_hlo.setSpacing(36)
 
                 框名 = [
                     "针对 RSA 的攻击",
@@ -258,7 +266,7 @@ class 主窗UI:
                 for tit in 框名:
                     框 = QGroupBox(tit)
                     框.setStyleSheet(
-                        "QGroupBox { border-color: #00CA9A; font-size: 14pt; }"
+                        "QGroupBox { border-color: #00CA9A; font-size: 18pt; border-radius: 8px; }"
                     )
                     frame_vlo = QVBoxLayout(框)
                     if tit == "针对 RSA 的攻击":
@@ -284,7 +292,7 @@ class 主窗UI:
                     内容.setMinimumWidth(192)
                     内容.setWordWrap(True)
                     内容.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-                    内容.setStyleSheet("QLabel { font-size: 14pt; }")
+                    内容.setStyleSheet("QLabel { font-size: 20pt; }")
                     frame_vlo.addWidget(内容)
                     lower_hlo.addWidget(框)
 
@@ -375,17 +383,19 @@ class 主窗UI:
         atk_frm.setMinimumHeight(64)
         atk_hlo = QHBoxLayout(atk_frm)
         atk_hlo.setContentsMargins(12, 0, 12, 0)
-        atk_hlo.setSpacing(16)
+        atk_hlo.setSpacing(12)
         atk_hlo.setAlignment(Qt.AlignLeft)
         atk_lbl = QLabel("攻击方法")
         atk_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         atk_lbl.setMinimumWidth(120)
-        atk_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+        atk_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
         atk_cb = QComboBox()
-        atk_cb.setFixedWidth(120)
-        atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
+        atk_cb.setFixedWidth(240)
         atk_cb.setObjectName("atk_cb")
-        atk_cb.setMinimumHeight(40)
+        atk_cb.setStyleSheet(
+            "QComboBox { background-color: #8A8A8A; font-size: 16pt; font-weight: bold; }"
+        )
+        atk_cb.setMinimumHeight(48)
         atk_cb.addItems(
             ["TK14 MSB", "TK14 LSB", "TK14 Mixed", "Ernst Mixed1", "Ernst Mixed2"]
         )  # 添加攻击方法选项
@@ -394,32 +404,34 @@ class 主窗UI:
         atk_hlo.addWidget(atk_cb)
         self.parma_vlo.addWidget(atk_frm)
 
-        params = ["N", "e", "d_len", "msb_len", "lsb_len", "m", "t", "d_msb", "d_lsb"]
+        params = ["N", "e", "d_len", "msb_len", "lsb_len", "d_msb", "d_lsb", "m", "t"]
         params_name = [
             "模数 N",
             "公钥 e",
             "私钥 d 长度",
             "MSB 长度",
             "LSB 长度",
-            "m（可选）",
-            "t（可选）",
             "私钥 MSB",
             "私钥 LSB",
+            "m（可选）",
+            "t（可选）",
         ]
         for param, name in zip(params, params_name):
             param_frm = QFrame()
-            param_frm.setMinimumHeight(64)
+            param_frm.setMinimumHeight(56)
             param_hlo = QHBoxLayout(param_frm)
             param_hlo.setContentsMargins(12, 0, 12, 0)
-            param_hlo.setSpacing(16)
+            param_hlo.setSpacing(12)
             param_lbl = QLabel(name)
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             param_lbl.setMinimumWidth(120)
-            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
             param_le = QLineEdit()
-            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setStyleSheet(
+                "QLineEdit { background-color: #8A8A8A; font-size: 16pt; }"
+            )
             param_le.setObjectName(f"rsa_{param}_le")
-            param_le.setMinimumHeight(40)
+            param_le.setMinimumHeight(44)
             setattr(self, f"{param}_le", param_le)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
@@ -434,10 +446,13 @@ class 主窗UI:
         self.rsa_atk_btn = QPushButton("开始攻击")
         self.rsa_atk_btn.setObjectName("atk_btn")
         self.rsa_atk_btn.setMinimumSize(cfg.btn_size)
+        self.rsa_atk_btn.setStyleSheet(
+            "QPushButton { font-size: 18pt; font-weight: bold; }"
+        )
         self.parma_vlo.addWidget(self.rsa_atk_btn)
         self.rsa_hlo.addWidget(self.parma_cont)
         self.rsa_te = QTextEdit()
-        self.rsa_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.rsa_te.setStyleSheet("QTextEdit { font-size: 14pt; }")
         self.rsa_te.setObjectName("rsa_te")
         self.rsa_te.setReadOnly(True)
 
@@ -467,17 +482,19 @@ class 主窗UI:
         crt_atk_frm.setMinimumHeight(64)
         crt_atk_hlo = QHBoxLayout(crt_atk_frm)
         crt_atk_hlo.setContentsMargins(12, 0, 12, 0)
-        crt_atk_hlo.setSpacing(16)
+        crt_atk_hlo.setSpacing(12)
         crt_atk_hlo.setAlignment(Qt.AlignLeft)
         crt_atk_lbl = QLabel("攻击方法")
         crt_atk_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         crt_atk_lbl.setMinimumWidth(120)
-        crt_atk_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+        crt_atk_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
         crt_atk_cb = QComboBox()
-        crt_atk_cb.setFixedWidth(120)
-        crt_atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
+        crt_atk_cb.setFixedWidth(240)
+        crt_atk_cb.setStyleSheet(
+            "QComboBox { background-color: #8A8A8A; font-size: 16pt; font-weight: bold; }"
+        )
         crt_atk_cb.setObjectName("crt_atk_cb")
-        crt_atk_cb.setMinimumHeight(40)
+        crt_atk_cb.setMinimumHeight(48)
         crt_atk_cb.addItems(
             [
                 "MNS21 LSB",
@@ -525,18 +542,20 @@ class 主窗UI:
         ]
         for param, name in zip(crt_params, crt_params_name):
             param_frm = QFrame()
-            param_frm.setMinimumHeight(64)
+            param_frm.setMinimumHeight(56)
             param_hlo = QHBoxLayout(param_frm)
             param_hlo.setContentsMargins(12, 0, 12, 0)
-            param_hlo.setSpacing(16)
+            param_hlo.setSpacing(12)
             param_lbl = QLabel(name)
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             param_lbl.setMinimumWidth(120)
-            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
             param_le = QLineEdit()
-            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setStyleSheet(
+                "QLineEdit { background-color: #8A8A8A; font-size: 16pt; }"
+            )
             param_le.setObjectName(f"crt_{param}_le")
-            param_le.setMinimumHeight(40)
+            param_le.setMinimumHeight(44)
             setattr(self, f"crt_{param}_le", param_le)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
@@ -552,11 +571,14 @@ class 主窗UI:
         self.crt_atk_btn = QPushButton("开始攻击")
         self.crt_atk_btn.setObjectName("crt_atk_btn")
         self.crt_atk_btn.setMinimumSize(cfg.btn_size)
+        self.crt_atk_btn.setStyleSheet(
+            "QPushButton { font-size: 18pt; font-weight: bold; }"
+        )
         self.crt_parma_vlo.addWidget(self.crt_atk_btn)
 
         self.crt_hlo.addWidget(self.crt_parma_cont)
         self.crt_te = QTextEdit()
-        self.crt_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.crt_te.setStyleSheet("QTextEdit { font-size: 14pt; }")
         self.crt_te.setObjectName("crt_te")
         self.crt_te.setReadOnly(True)
 
@@ -585,17 +607,19 @@ class 主窗UI:
         var_atk_frm.setMinimumHeight(64)
         var_atk_hlo = QHBoxLayout(var_atk_frm)
         var_atk_hlo.setContentsMargins(12, 0, 12, 0)
-        var_atk_hlo.setSpacing(16)
+        var_atk_hlo.setSpacing(12)
         var_atk_hlo.setAlignment(Qt.AlignLeft)
         var_atk_lbl = QLabel("攻击方法")
         var_atk_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         var_atk_lbl.setMinimumWidth(120)
-        var_atk_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+        var_atk_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
         var_atk_cb = QComboBox()
-        var_atk_cb.setFixedWidth(120)
-        var_atk_cb.setStyleSheet("QComboBox { background-color: #8A8A8A; }")
+        var_atk_cb.setFixedWidth(240)
+        var_atk_cb.setStyleSheet(
+            "QComboBox { background-color: #8A8A8A; font-size: 16pt; font-weight: bold; }"
+        )
         var_atk_cb.setObjectName("var_atk_cb")
-        var_atk_cb.setMinimumHeight(40)
+        var_atk_cb.setMinimumHeight(48)
         var_atk_cb.addItems(["MNS22", "Cop", "HG"])
         setattr(self, "var_atk_cb", var_atk_cb)
         var_atk_hlo.addWidget(var_atk_lbl)
@@ -611,10 +635,10 @@ class 主窗UI:
             "X_len",
             "msb_len",
             "lsb_len",
-            "m",
-            "t",
             "kp_msb",
             "kp_lsb",
+            "m",
+            "t",
         ]
         var_params = [
             "模数 N",
@@ -625,25 +649,27 @@ class 主窗UI:
             "变元 X 长度",
             "kp MSB 长度",
             "kp LSB 长度",
-            "m（可选）",
-            "t（可选）",
             "kp MSB",
             "kp LSB",
+            "m（可选）",
+            "t（可选）",
         ]
         for param, name in zip(var, var_params):
             param_frm = QFrame()
-            param_frm.setMinimumHeight(64)
+            param_frm.setMinimumHeight(56)
             param_hlo = QHBoxLayout(param_frm)
             param_hlo.setContentsMargins(12, 0, 12, 0)
-            param_hlo.setSpacing(16)
+            param_hlo.setSpacing(12)
             param_lbl = QLabel(name)
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             param_lbl.setMinimumWidth(120)
-            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
             param_le = QLineEdit()
-            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setStyleSheet(
+                "QLineEdit { background-color: #8A8A8A; font-size: 16pt; }"
+            )
             param_le.setObjectName(f"var_{param}_le")
-            param_le.setMinimumHeight(40)
+            param_le.setMinimumHeight(44)
             setattr(self, f"var_{param}_le", param_le)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
@@ -658,11 +684,12 @@ class 主窗UI:
         self.var_atk_btn = QPushButton("开始攻击")
         self.var_atk_btn.setObjectName("var_atk_btn")
         self.var_atk_btn.setMinimumSize(cfg.btn_size)
+        self.var_atk_btn.setStyleSheet("QPushButton { font-size: 18pt; font-weight: bold; }")
         self.var_parma_vlo.addWidget(self.var_atk_btn)
 
         self.var_hlo.addWidget(self.var_parma_cont)
         self.var_te = QTextEdit()
-        self.var_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.var_te.setStyleSheet("QTextEdit { font-size: 14pt; }")
         self.var_te.setObjectName("var_te")
         self.var_te.setReadOnly(True)
 
@@ -705,18 +732,18 @@ class 主窗UI:
         ]
         for param, name in zip(auto, auto_params):
             param_frm = QFrame()
-            param_frm.setMinimumHeight(64)
+            param_frm.setMinimumHeight(56)
             param_hlo = QHBoxLayout(param_frm)
             param_hlo.setContentsMargins(12, 0, 12, 0)
-            param_hlo.setSpacing(16)
+            param_hlo.setSpacing(12)
             param_lbl = QLabel(name)
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             param_lbl.setMinimumWidth(120)
-            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
             param_le = QLineEdit()
-            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; font-size: 16pt; }")
             param_le.setObjectName(f"auto_{param}_le")
-            param_le.setMinimumHeight(40)
+            param_le.setMinimumHeight(44)
             setattr(self, f"auto_{param}_le", param_le)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
@@ -729,23 +756,28 @@ class 主窗UI:
 
         self.auto_pol_add_btn = QPushButton("添加多项式")
         self.auto_pol_add_btn.setObjectName("auto_pol_add_btn")
+        self.auto_pol_add_btn.setMinimumSize(cfg.btn_size)
+        self.auto_pol_add_btn.setStyleSheet("QPushButton { font-size: 18pt; font-weight: bold; }")
         self.auto_parma_vlo.addWidget(self.auto_pol_add_btn)
 
         def 添加多项式():
+            if self.auto_pol_cnt >= 8:
+                print("多项式数量已达上限！")
+                return
             self.auto_pol_cnt += 1
             param_frm = QFrame()
-            param_frm.setMinimumHeight(64)
+            param_frm.setMinimumHeight(56)
             param_hlo = QHBoxLayout(param_frm)
             param_hlo.setContentsMargins(12, 0, 12, 0)
-            param_hlo.setSpacing(16)
+            param_hlo.setSpacing(12)
             param_lbl = QLabel(f"多项式{self.auto_pol_cnt}")
             param_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             param_lbl.setMinimumWidth(120)
-            param_lbl.setStyleSheet("QLabel {font-size: 14pt;}")
+            param_lbl.setStyleSheet("QLabel {font-size: 16pt;}")
             param_le = QLineEdit()
-            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; }")
+            param_le.setStyleSheet("QLineEdit { background-color: #8A8A8A; font-size: 16pt; }")
             param_le.setObjectName(f"auto_pol{self.auto_pol_cnt}_le")
-            param_le.setMinimumHeight(40)
+            param_le.setMinimumHeight(44)
             param_hlo.addWidget(param_lbl)
             param_hlo.addWidget(param_le)
             self.auto_parma_vlo.insertWidget(self.auto_parma_vlo.count() - 4, param_frm)
@@ -756,11 +788,12 @@ class 主窗UI:
         self.auto_atk_btn = QPushButton("开始攻击")
         self.auto_atk_btn.setObjectName("auto_atk_btn")
         self.auto_atk_btn.setMinimumSize(cfg.btn_size)
+        self.auto_atk_btn.setStyleSheet("QPushButton { font-size: 18pt; font-weight: bold; }")
         self.auto_parma_vlo.addWidget(self.auto_atk_btn)
 
         self.auto_hlo.addWidget(self.auto_parma_cont)
         self.auto_te = QTextEdit()
-        self.auto_te.setStyleSheet("QTextEdit { font-size: 12pt; }")
+        self.auto_te.setStyleSheet("QTextEdit { font-size: 14pt; }")
         self.auto_te.setObjectName("auto_te")
         self.auto_te.setReadOnly(True)
 
@@ -849,11 +882,11 @@ class 主窗UI:
 
     def 设置关于页(self, cfg: 配置):
         about_vlo = QVBoxLayout(self.about_page)
-        about_vlo.setContentsMargins(20, 20, 20, 20)
+        about_vlo.setContentsMargins(12, 12, 12, 12)
         about_upper_hlo = QHBoxLayout()
         about_upper_hlo.setAlignment(Qt.AlignTop)
-        about_upper_hlo.setSpacing(20)
-        about_upper_hlo.setContentsMargins(20, 20, 20, 20)
+        about_upper_hlo.setSpacing(12)
+        about_upper_hlo.setContentsMargins(12, 12, 12, 12)
         about_vlo.addLayout(about_upper_hlo)
         about_lower_hlo = QHBoxLayout()
         about_lower_hlo.setAlignment(Qt.AlignBottom)
@@ -898,7 +931,7 @@ class 主窗UI:
         about_lower_hlo.addLayout(right_vlo)
 
         left_vlo.setSpacing(4)
-        left_vlo.setContentsMargins(20, 20, 20, 20)
+        left_vlo.setContentsMargins(12, 12, 12, 12)
         left_vlo.setStretch(0, 1)
 
         # 在右下角添加图标和标签

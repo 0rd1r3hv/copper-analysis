@@ -28,7 +28,7 @@ fmt:
   git status
 
 [group('main')]
-run:
+@run:
   python app.py
 
 [group('cfg')]
